@@ -11,7 +11,8 @@
 
         .section--{{ section.id }} .homepage-collection-grid-inner .grid-image,
         .section--{{ section.id }} .homepage-collection-grid-inner .grid-item-details--hover,
-        .section--{{ section.id }} .homepage-collection-grid-inner .grid-item-details--overlay {
+        .section--{{ section.id }} .homepage-collection-grid-inner .grid-item-details--overlay,
+        .section--{{ section.id }} .homepage-collection-grid-inner .grid-item-details--custom {
             grid-column: 1 / 2;
             grid-row: 1 / 2;
         }
@@ -19,6 +20,91 @@
         .section--{{ section.id }} .homepage-collection-grid-inner .responsive-image-wrapper,
         .section--{{ section.id }} .homepage-collection-grid-inner .responsive-image-wrapper img {
             height: 100%;
+        }
+
+        /* Custom content position styles */
+        .section--{{ section.id }} .grid-item-details--custom {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start !important;
+            align-items: flex-start !important;
+            padding: 30px;
+            z-index: 2;
+            height: 100%;
+        }
+
+        .section--{{ section.id }} .grid-item-details--custom .grid-item__content {
+            align-self: flex-start !important;
+            margin-top: 0 !important;
+            width: 100% !important;
+            text-align: left !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            padding: 30px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            align-items: flex-start !important;
+        }
+
+        /* Force all content inside grid-item__content to align left */
+        .section--{{ section.id }} .grid-item-details--custom .grid-item__content * {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+        }
+
+        .section--{{ section.id }} .grid-item-details--custom .grid-item__subheading {
+            margin-bottom: 8px;
+            text-align: left !important;
+            display: block !important;
+        }
+
+        .section--{{ section.id }} .grid-item-details--custom .grid-item__title {
+            font-size: 1.125rem !important;
+            margin: 0 !important;
+            z-index: 3;
+            text-align: left !important;
+            display: block !important;
+            position: relative !important;
+        }
+
+        /* Specifically target the h3 element that contains collection_title */
+        .section--{{ section.id }} .grid-item-details--custom h3.grid-item__title {
+            font-size: 1.125rem !important;
+            margin: 0 !important;
+            text-align: left !important;
+            display: block !important;
+            position: relative !important;
+            z-index: 3 !important;
+        }
+
+        /* Override any centering that might be applied */
+        .section--{{ section.id }} .grid-item-details--custom * {
+            text-align: left !important;
+        }
+
+        .section--{{ section.id }} .grid-item-details--custom .custom-arrow {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 24px;
+            height: 24px;
+            z-index: 3;
+            cursor: pointer;
+        }
+
+        .section--{{ section.id }} .grid-item-details--custom .custom-arrow svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+
+        /* Hide button for custom position, arrow replaces it */
+        .section--{{ section.id }} .grid-item-details--custom .homepage-featured-box-btn {
+            display: none;
         }
     </style>
 {% else %}
@@ -83,6 +169,12 @@
                 color: rgba({{ block.settings.overlay_font_color.rgba }}) !important;
               }
             {% endunless %}
+
+            {% if section.settings.content-position == 'custom' %}
+              .section--{{ section.id }} .block-section--{{ block.id }} .homepage-collection-grid-inner {
+                background-color: rgba({{ block.settings.custom_background_color.rgba }});
+              }
+            {% endif %}
           </style>
 
           {%- assign collection = collections[block.settings.collection] -%}
@@ -106,12 +198,13 @@
             {{ block.shopify_attributes }}
           >
 
-              <div class="homepage-collection-grid-inner{% unless section.settings.content-position == 'below-image' or section.settings.remove-spacing %} block-radius-clip{% endunless %}"{% if section.settings.content-position != 'below-image' and block.settings.overlay-btn-text == blank %} data-animate-hover-zoom{% endif %}>
+            {% if section.settings.content-position == 'custom' and block.settings.collection != blank %}
+              <a href="{{ collection.url }}" class="grid-item-link" style="display: block; width: 100%; height: 100%; text-decoration: none; color: inherit;">
+            {% endif %}
 
-                <div class="grid-image{% if section.settings.content-position == 'below-image' and section.settings.remove-spacing == false %} block-radius-clip{% endif %}"{% if block.settings.collection == blank and section.settings.content-position == 'below-image' %} data-animate-hover-zoom{% endif %}>
-                  {% if block.settings.collection != blank and section.settings.content-position == 'below-image' %}
-                  <a href="{{ collection.url }}" class="grid-image--centered" tabindex="-1" title="" data-animate-hover-zoom>
-                  {% endif %}
+              <div class="homepage-collection-grid-inner{% unless section.settings.content-position == 'below-image' or section.settings.remove-spacing %} block-radius-clip{% endunless %}"{% if section.settings.content-position != 'below-image' and block.settings.overlay-btn-text == blank %} data-animate-hover-zoom{% endif %}{% if section.settings.content-position == 'custom' %} data-animate-hover-zoom{% endif %}>
+
+                <div class="grid-image{% if section.settings.content-position == 'below-image' and section.settings.remove-spacing == false %} block-radius-clip{% endif %}"{% if block.settings.collection == blank and section.settings.content-position == 'below-image' %} data-animate-hover-zoom{% endif %}{% if section.settings.content-position == 'custom' %} data-animate-hover-zoom{% endif %}>
 
                     {% if collection == empty %}
                       {% if block.settings.collection_img %}
@@ -184,7 +277,7 @@
                       {% endif %}
                       {% assign animation_order = animation_order | plus: 1 %}
 
-                      {% if block.settings.overlay-btn-text != blank %}
+                      {% if block.settings.overlay-btn-text != blank and section.settings.content-position != 'custom' %}
                         {% assign aria_label = block.settings.overlay-btn-text | append: ' - ' | append: collection_title %}
 
                         {% if section.settings.content-position == 'hover' %}
@@ -209,9 +302,28 @@
                   {% if section.settings.content-position != 'below-image' and block.settings.overlay-btn-text == blank and block.settings.collection != blank %}
                     </a>
                   {% endif %}
+
+                  {% comment %} Custom arrow for custom content position - replaces button {% endcomment %}
+                  {% if section.settings.content-position == 'custom' and block.settings.collection != blank %}
+                    <div class="custom-arrow" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                      </svg>
+                    </div>
+                  {% elsif section.settings.content-position == 'custom' %}
+                    <div class="custom-arrow">
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                      </svg>
+                    </div>
+                  {% endif %}
                 </div>
 
               </div>
+
+            {% if section.settings.content-position == 'custom' and block.settings.collection != blank %}
+              </a>
+            {% endif %}
 
           </div>
         {% endfor %}
@@ -280,6 +392,10 @@
         {
           "value": "below-image",
           "label": "t:all.Below_image"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
         }
       ]
     },
@@ -455,6 +571,13 @@
           "id": "overlay_color",
           "label": "t:all.Overlay",
           "default": "#242424"
+        },
+        {
+          "type": "color",
+          "id": "custom_background_color",
+          "label": "Custom background color",
+          "default": "rgba(0,0,0,0.5)",
+          "info": "Background color for custom content position"
         }
       ]
     }
