@@ -1,0 +1,83 @@
+<div class="logo-section">
+  <div class="logo-container">
+    {% if section.settings.logo != blank %}
+      {% render 'responsive-image' with section.settings.logo, alt: alt | escape, props: 'itemprop="logo"', allow_stretch: true, blur: false, class: 'logo-image', loading: 'eager' %}
+    {% else %}
+      <h1 class="logo-text">{{ shop.name }}</h1>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .logo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px; /* Standard navigation height */
+    padding: 0 20px;
+    background: var(--color-background, #ffffff);
+  }
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 200px;
+  }
+
+  .logo-image {
+    max-height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: var(--color-foreground, #000000);
+  }
+
+  @media screen and (max-width: 768px) {
+    .logo-section {
+      height: 50px;
+    }
+    
+    .logo-image {
+      max-height: 30px;
+    }
+    
+    .logo-text {
+      font-size: 1.25rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Logo Section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Top & Bottom Padding",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Logo Section",
+      "category": "Header"
+    }
+  ]
+}
+{% endschema %}
