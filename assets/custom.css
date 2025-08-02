@@ -1,0 +1,21 @@
+ul.site-nav li.first-level-dropdown {
+  font-weight: bold;
+}
+.top-links ul.site-nav {
+  column-gap: 10px;
+}
+ul.site-nav li.first-level-dropdown:hover {
+  background-color: #e3e3e3; /* Light gray */
+  border-radius: 6px; /* Slight rounding */
+}
+.first-level-dropdown .site-nav__link {
+  padding: 7.5px 15px;
+}
+ul.site-nav li.first-level-dropdown:hover > a {
+  text-decoration: none; /* Remove underline */
+}
+#top_links_wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
