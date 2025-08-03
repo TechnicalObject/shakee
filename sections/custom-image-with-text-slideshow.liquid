@@ -39,10 +39,10 @@
   
   .slideshow-tab {
     background: transparent;
-    border: 2px solid #ddd;
+    border: 0;
+    border-bottom: 2px solid #ddd;
     padding: 0.75rem 1.5rem;
     cursor: pointer;
-    border-radius: 4px;
     transition: all 0.3s ease;
     font-weight: 500;
     flex: 1;
@@ -60,8 +60,10 @@
   
   .slideshow-tab.active {
     border-color: {{ section.settings.tab_active_border_color }};
-    background-color: {{ section.settings.tab_active_background_color }};
+    background-color: transparent;
     color: {{ section.settings.tab_active_text_color }};
+    border-bottom: 2px solid #999;
+    font-weight: bold;
   }
   
   /* Text-only slide centering */
