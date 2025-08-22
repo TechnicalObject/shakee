@@ -24,3 +24,7 @@ ul.site-nav li.first-level-dropdown:hover > a {
     width: 40px;
     height: 40px;
 }
+
+li.nav-link-animated--custom {
+    visibility: hidden;
+}
