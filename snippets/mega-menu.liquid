@@ -12,6 +12,8 @@
   elsif link.links.size == 0 and block.settings.mega_image_1 != blank or block.settings.mega_image_2 != blank
     assign block_grid_cols = 'repeat(5, 1fr)'
   endif
+
+  assign display_type = block.settings.menu_display_type | default: 'list'
 %}
 
 {% style %}
@@ -21,6 +23,33 @@
 
   [data-mega-menu-block-id="{{ block.id }}"] .mega-menu--links {
     grid-template-columns: {{ links_grid_cols }};
+  }
+
+  [data-mega-menu-block-id="{{ block.id }}"] .mega-menu--links.image-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  [data-mega-menu-block-id="{{ block.id }}"] .collection-image-item {
+    text-align: center;
+  }
+
+  [data-mega-menu-block-id="{{ block.id }}"] .collection-image-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+  }
+
+  [data-mega-menu-block-id="{{ block.id }}"] .collection-image-item:hover img {
+    transform: scale(1.05);
+  }
+
+  [data-mega-menu-block-id="{{ block.id }}"] .collection-image-item .collection-name {
+    margin-top: 10px;
+    font-weight: 500;
+    color: var(--color-foreground);
   }
 
   .mega-menu-block .block-id-{{ block.id }} .overlay-text-on-image-promo-1,
@@ -44,21 +73,56 @@
   {% endif %}
 
   {% if link.links.size > 0 %}
-    <div class="mega-menu--links">
-      {% for sub_link in link.links %}
-        <li class="dropdown-submenu nav-link-animated--custom" aria-haspopup="true">
-          <div class="inner">
-            <p class="h4 mega-menu-link--title"><a class="animated-link--item" href="{{ sub_link.url }}">{{ sub_link.title | escape }}</a></p>
-            <ul class="menu-link">
-              {% for sub_sub_link in sub_link.links %}
-                <li>
-                  <a class="animated-link--item" href="{{ sub_sub_link.url }}">{{ sub_sub_link.title | escape }}</a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </li>
-      {% endfor %}
+    <div class="mega-menu--links{% if display_type == 'images' %} image-grid{% endif %}">
+      {% if display_type == 'list' %}
+        {% for sub_link in link.links %}
+          <li class="dropdown-submenu nav-link-animated--custom" aria-haspopup="true">
+            <div class="inner">
+              <p class="h4 mega-menu-link--title"><a class="animated-link--item" href="{{ sub_link.url }}">{{ sub_link.title | escape }}</a></p>
+              <ul class="menu-link">
+                {% for sub_sub_link in sub_link.links %}
+                  <li>
+                    <a class="animated-link--item" href="{{ sub_sub_link.url }}">{{ sub_sub_link.title | escape }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </li>
+        {% endfor %}
+      {% elsif display_type == 'images' %}
+        {% for sub_link in link.links %}
+          {% assign collection = collections[sub_link.handle] %}
+          {% if collection %}
+            <div class="collection-image-item">
+              <a href="{{ sub_link.url }}">
+                {% if collection.featured_image %}
+                  <img src="{{ collection.featured_image | image_url: width: 300 }}" 
+                       alt="{{ collection.title | escape }}" 
+                       loading="lazy">
+                {% elsif collection.products.first.featured_image %}
+                  <img src="{{ collection.products.first.featured_image | image_url: width: 300 }}" 
+                       alt="{{ collection.title | escape }}" 
+                       loading="lazy">
+                {% else %}
+                  <div class="placeholder-image" style="width: 100%; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                    <span>{{ 'general.placeholder.image' | t }}</span>
+                  </div>
+                {% endif %}
+                <p class="collection-name">{{ sub_link.title | escape }}</p>
+              </a>
+            </div>
+          {% else %}
+            <div class="collection-image-item">
+              <a href="{{ sub_link.url }}">
+                <div class="placeholder-image" style="width: 100%; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                  <span>{{ 'general.placeholder.image' | t }}</span>
+                </div>
+                <p class="collection-name">{{ sub_link.title | escape }}</p>
+              </a>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
     </div>
   {% endif %}
 
