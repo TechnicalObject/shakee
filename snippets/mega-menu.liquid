@@ -95,17 +95,26 @@
           {% if collection %}
             <div class="collection-image-item">
               <a href="{{ sub_link.url }}">
-                {% if collection.featured_image %}
-                  <img src="{{ collection.featured_image | image_url: width: 300 }}" 
-                       alt="{{ collection.title | escape }}" 
-                       loading="lazy">
-                {% elsif collection.products.first.featured_image %}
-                  <img src="{{ collection.products.first.featured_image | image_url: width: 300 }}" 
-                       alt="{{ collection.title | escape }}" 
-                       loading="lazy">
+                {% liquid
+                  assign image_to_show = null
+                  assign image_alt = collection.title | escape
+                  
+                  if collection.image
+                    assign image_to_show = collection.image
+                  elsif collection.products.size > 0 and collection.products.first.featured_image
+                    assign image_to_show = collection.products.first.featured_image
+                  endif
+                %}
+                
+                {% if image_to_show %}
+                  <img src="{{ image_to_show | image_url: width: 300 }}" 
+                       alt="{{ image_alt }}" 
+                       loading="lazy"
+                       width="300"
+                       height="150">
                 {% else %}
                   <div class="placeholder-image" style="width: 100%; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-                    <span>{{ 'general.placeholder.image' | t }}</span>
+                    <span>No Image</span>
                   </div>
                 {% endif %}
                 <p class="collection-name">{{ sub_link.title | escape }}</p>
@@ -115,7 +124,7 @@
             <div class="collection-image-item">
               <a href="{{ sub_link.url }}">
                 <div class="placeholder-image" style="width: 100%; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-                  <span>{{ 'general.placeholder.image' | t }}</span>
+                  <span>No Collection</span>
                 </div>
                 <p class="collection-name">{{ sub_link.title | escape }}</p>
               </a>
