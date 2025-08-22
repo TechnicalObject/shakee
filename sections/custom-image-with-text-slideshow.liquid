@@ -80,6 +80,14 @@
     margin: 0 auto;
   }
   
+  /* Square corners override */
+  .square-corners,
+  .square-corners img,
+  .square-corners video,
+  .square-corners .image-with-text-slideshow__video-wrapper {
+    border-radius: 0 !important;
+  }
+  
   @media (max-width: 767px) {
     .slideshow-tabs {
       gap: 0.5rem;
@@ -162,18 +170,32 @@
 
                 {% capture media_content %}
                   {% if block.settings.image != blank or video %}
-                    <div class="image-with-text-slideshow__media-content image-with-text-slideshow__aspect-ratio--{{ section.settings.image_shape }}">
+                    <div class="image-with-text-slideshow__media-content image-with-text-slideshow__aspect-ratio--{{ section.settings.image_shape }}{% if block.settings.image_corners == 'square' %} square-corners{% endif %}">
                       {% case block.type %}  
                         {% when 'image_and_text' %}
                           {% if block.settings.image != blank %}
-                            {% render 'responsive-image' with block.settings.image, class: image_classes, allow_stretch: true %}
+                            {% assign media_classes = image_classes %}
+                            {% if block.settings.image_corners == 'square' %}
+                              {% assign media_classes = null %}
+                            {% endif %}
+                            {% render 'responsive-image' with block.settings.image, class: media_classes, allow_stretch: true %}
                           {% else %}
                             {% capture svg_index %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
-                            {{ 'collection-' | append: svg_index | placeholder_svg_tag: placeholder_classes }}
+                            {% assign placeholder_classes_modified = placeholder_classes %}
+                            {% if block.settings.image_corners == 'square' %}
+                              {% assign placeholder_classes_modified = 'icon icon--placeholder' %}
+                            {% endif %}
+                            {{ 'collection-' | append: svg_index | placeholder_svg_tag: placeholder_classes_modified }}
                           {% endif %}
 
                         {% when 'video_and_text' %}
-                          <div class="image-with-text-slideshow__video-wrapper{% unless full_width %} block-radius{% endunless %}" data-video-wrapper>
+                          {% assign video_wrapper_classes = 'image-with-text-slideshow__video-wrapper' %}
+                          {% unless full_width %}
+                            {% if block.settings.image_corners != 'square' %}
+                              {% assign video_wrapper_classes = video_wrapper_classes | append: ' block-radius' %}
+                            {% endif %}
+                          {% endunless %}
+                          <div class="{{ video_wrapper_classes }}" data-video-wrapper>
                             {% liquid 
                               if block.settings.video != blank
                                 assign video = block.settings.video
@@ -705,6 +727,22 @@
           "info": "t:sections.image-with-text-slideshow.settings.image_info"
         },
         {
+          "type": "select",
+          "id": "image_corners",
+          "label": "Image corners",
+          "default": "soft",
+          "options": [
+            {
+              "value": "soft",
+              "label": "Soft (rounded)"
+            },
+            {
+              "value": "square",
+              "label": "Square"
+            }
+          ]
+        },
+        {
           "type": "header",
           "content": "t:all.Content"
         },
@@ -940,6 +978,22 @@
           "id": "video_alt_text",
           "label": "t:all.Video_alt_text",
           "info": "t:all.Video_alt_text_info"
+        },
+        {
+          "type": "select",
+          "id": "image_corners",
+          "label": "Video corners",
+          "default": "soft",
+          "options": [
+            {
+              "value": "soft",
+              "label": "Soft (rounded)"
+            },
+            {
+              "value": "square",
+              "label": "Square"
+            }
+          ]
         },
         {
           "type": "header",
