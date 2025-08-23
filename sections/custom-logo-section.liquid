@@ -7,15 +7,39 @@
     {% endif %}
   </div>
 
-<div class="center-text">
+  <div class="center-text">
+    {% assign text_items = 0 %}
+    
     {% if section.settings.text_line_1 != blank %}
-      <span class="text-line">{{ section.settings.text_line_1 | escape }}</span>
+      {% assign text_items = text_items | plus: 1 %}
+      {% if section.settings.text_link_1 != blank %}
+        <a href="{{ section.settings.text_link_1 }}" class="text-line text-link">{{ section.settings.text_line_1 | escape }}</a>
+      {% else %}
+        <span class="text-line">{{ section.settings.text_line_1 | escape }}</span>
+      {% endif %}
     {% endif %}
-    {% if section.settings.text_line_1 != blank and section.settings.text_line_2 != blank %}
-      <span class="separator">|</span>
-    {% endif %}
+    
     {% if section.settings.text_line_2 != blank %}
-      <span class="text-line">{{ section.settings.text_line_2 | escape }}</span>
+      {% if text_items > 0 %}
+        <span class="separator">|</span>
+      {% endif %}
+      {% assign text_items = text_items | plus: 1 %}
+      {% if section.settings.text_link_2 != blank %}
+        <a href="{{ section.settings.text_link_2 }}" class="text-line text-link">{{ section.settings.text_line_2 | escape }}</a>
+      {% else %}
+        <span class="text-line">{{ section.settings.text_line_2 | escape }}</span>
+      {% endif %}
+    {% endif %}
+    
+    {% if section.settings.text_line_3 != blank %}
+      {% if text_items > 0 %}
+        <span class="separator">|</span>
+      {% endif %}
+      {% if section.settings.text_link_3 != blank %}
+        <a href="{{ section.settings.text_link_3 }}" class="text-line text-link">{{ section.settings.text_line_3 | escape }}</a>
+      {% else %}
+        <span class="text-line">{{ section.settings.text_line_3 | escape }}</span>
+      {% endif %}
     {% endif %}
   </div>
   
@@ -131,23 +155,38 @@
     color: var(--color-foreground, #000000);
   }
 
-    .center-text {
+  .center-text {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     flex: 1;
-    gap: 10px;
+    gap: 20px;
     font-size: {{ section.settings.text_size }}px;
     color: var(--color-foreground, #000000);
+    padding: 0 40px;
+    min-width: 0;
   }
 
   .text-line {
     white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .text-link {
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+  }
+
+  .text-link:hover {
+    opacity: 0.7;
+    text-decoration: underline;
   }
 
   .separator {
     color: var(--color-foreground, #000000);
     opacity: 0.6;
+    flex: 0 0 auto;
   }
 
   .social-icons {
@@ -192,7 +231,9 @@
 
     .center-text {
       font-size: {{ section.settings.text_size | minus: 2 }}px;
-      gap: 8px;
+      gap: 12px;
+      padding: 0 20px;
+      justify-content: center;
     }
 
     .social-icons {
@@ -202,6 +243,13 @@
     .social-icon {
       width: {{ section.settings.icon_size | times: 0.9 }}px;
       height: {{ section.settings.icon_size | times: 0.9 }}px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .center-text {
+      padding: 0 10px;
+      gap: 8px;
     }
   }
 </style>
@@ -236,10 +284,34 @@
       "default": "Free Shipping"
     },
     {
+      "type": "url",
+      "id": "text_link_1",
+      "label": "First Text Link (optional)",
+      "info": "Leave empty if you don't want this text to be clickable"
+    },
+    {
       "type": "text",
       "id": "text_line_2",
       "label": "Second Text Line",
       "default": "Fast Delivery"
+    },
+    {
+      "type": "url",
+      "id": "text_link_2",
+      "label": "Second Text Link (optional)",
+      "info": "Leave empty if you don't want this text to be clickable"
+    },
+    {
+      "type": "text",
+      "id": "text_line_3",
+      "label": "Third Text Line",
+      "default": "Refer a friend"
+    },
+    {
+      "type": "url",
+      "id": "text_link_3",
+      "label": "Third Text Link (optional)",
+      "info": "Leave empty if you don't want this text to be clickable"
     },
     {
       "type": "range",
