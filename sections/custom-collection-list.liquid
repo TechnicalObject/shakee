@@ -116,6 +116,43 @@
     </style>
 {% else %}
     {% assign stretch_img = false %}
+    <style>
+        /* Below-image layout styles */
+        .section--{{ section.id }} .content-below-image .homepage-collection-grid-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section--{{ section.id }} .content-below-image .grid-image {
+            width: 100%;
+            height: 350px; /* Increased from 250px to 350px for taller images */
+            overflow: hidden;
+            position: relative;
+        }
+
+        .section--{{ section.id }} .content-below-image .grid-image .responsive-image-wrapper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .section--{{ section.id }} .content-below-image .grid-image .responsive-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Crop to fit */
+            object-position: center;
+            transition: transform 0.3s ease;
+        }
+
+        /* Hover zoom effect for below-image */
+        .section--{{ section.id }} .content-below-image .grid-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .section--{{ section.id }} .content-below-image .grid-item-details--below-image {
+            flex: 1;
+            padding: 20px 0;
+        }
+    </style>
 {% endunless %}
 
 {% if section.settings.remove-spacing and section.settings.section-width == 'full' %}
