@@ -1,3 +1,17 @@
+{%- liquid
+  assign social_icons = false
+  if settings.sm_facebook_link != blank or settings.sm_instagram_link != blank or settings.sm_x_link != blank or settings.sm_tiktok_link != blank or settings.sm_youtube_link != blank or settings.sm_pinterest_link != blank or settings.sm_linkedin_link != blank or settings.sm_snapchat_link != blank
+    assign social_icons = true
+  endif
+
+  assign text_items = 0
+  for block in section.blocks
+    if block.settings.text != blank
+      assign text_items = text_items | plus: 1
+    endif
+  endfor
+-%}
+
 <div class="logo-section">
   <div class="logo-container">
     {% if section.settings.logo != blank %}
@@ -8,41 +22,23 @@
   </div>
 
   <div class="center-text">
-    {% assign text_items = 0 %}
-    
-    {% if section.settings.text_line_1 != blank %}
-      {% assign text_items = text_items | plus: 1 %}
-      {% if section.settings.text_link_1 != blank %}
-        <a href="{{ section.settings.text_link_1 }}" class="text-line text-link">{{ section.settings.text_line_1 | escape }}</a>
-      {% else %}
-        <span class="text-line">{{ section.settings.text_line_1 | escape }}</span>
-      {% endif %}
-    {% endif %}
-    
-    {% if section.settings.text_line_2 != blank %}
-      {% if text_items > 0 %}
-        <span class="separator">|</span>
-      {% endif %}
-      {% assign text_items = text_items | plus: 1 %}
-      {% if section.settings.text_link_2 != blank %}
-        <a href="{{ section.settings.text_link_2 }}" class="text-line text-link">{{ section.settings.text_line_2 | escape }}</a>
-      {% else %}
-        <span class="text-line">{{ section.settings.text_line_2 | escape }}</span>
-      {% endif %}
-    {% endif %}
-    
-    {% if section.settings.text_line_3 != blank %}
-      {% if text_items > 0 %}
-        <span class="separator">|</span>
-      {% endif %}
-      {% if section.settings.text_link_3 != blank %}
-        <a href="{{ section.settings.text_link_3 }}" class="text-line text-link">{{ section.settings.text_line_3 | escape }}</a>
-      {% else %}
-        <span class="text-line">{{ section.settings.text_line_3 | escape }}</span>
-      {% endif %}
-    {% endif %}
+    {%- assign current_item = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.settings.text != blank -%}
+        {%- assign current_item = current_item | plus: 1 -%}
+        {%- if current_item > 1 -%}
+          <span class="separator">|</span>
+        {%- endif -%}
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="text-line text-link">{{ block.settings.text | escape }}</a>
+        {%- else -%}
+          <span class="text-line">{{ block.settings.text | escape }}</span>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
   </div>
   
+  {%- if social_icons -%}
   <div class="social-icons">
     {% if settings.sm_facebook_link != blank %}
       <a href="{{ settings.sm_facebook_link }}" class="social-icon" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
@@ -121,6 +117,7 @@
       </a>
     {% endif %}
   </div>
+  {%- endif -%}
 </div>
 
 <style>
@@ -128,7 +125,7 @@
     display: flex;
     justify-content: left;
     align-items: center;
-    height: 60px; /* Standard navigation height */
+    height: 60px;
     padding: 0 20px;
     background: var(--color-background, #ffffff);
   }
@@ -287,6 +284,57 @@
       gap: 8px;
     }
   }
+
+  @media screen and (max-width: 460px) {
+    .center-text {
+      position: relative;
+      height: 1.5em;
+      overflow: hidden;
+    }
+    
+    .center-text .separator {
+      display: none;
+    }
+    
+    .center-text .text-line {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      animation: textRotate {{ text_items | times: 3 }}s infinite;
+    }
+    
+    {% for block in section.blocks %}
+      {% if block.settings.text != blank %}
+        {% assign item_index = forloop.index0 %}
+        .center-text .text-line:nth-child({{ forloop.index | times: 2 | minus: 1 }}) {
+          animation-delay: {{ item_index | times: 3 }}s;
+        }
+      {% endif %}
+    {% endfor %}
+  }
+
+  @keyframes textRotate {
+     0% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    {% assign fade_out_start = 100 | divided_by: text_items | minus: 5 %}
+    {{ fade_out_start }}% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    {% assign fade_out_end = 100 | divided_by: text_items %}
+    {{ fade_out_end }}% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
+  }
 </style>
 
 {% schema %}
@@ -309,46 +357,6 @@
       "default": 0
     },
     {
-      "type": "header",
-      "content": "Center Text"
-    },
-    {
-      "type": "text",
-      "id": "text_line_1",
-      "label": "First Text Line",
-      "default": "Free Shipping"
-    },
-    {
-      "type": "url",
-      "id": "text_link_1",
-      "label": "First Text Link (optional)",
-      "info": "Leave empty if you don't want this text to be clickable"
-    },
-    {
-      "type": "text",
-      "id": "text_line_2",
-      "label": "Second Text Line",
-      "default": "Fast Delivery"
-    },
-    {
-      "type": "url",
-      "id": "text_link_2",
-      "label": "Second Text Link (optional)",
-      "info": "Leave empty if you don't want this text to be clickable"
-    },
-    {
-      "type": "text",
-      "id": "text_line_3",
-      "label": "Third Text Line",
-      "default": "Refer a friend"
-    },
-    {
-      "type": "url",
-      "id": "text_link_3",
-      "label": "Third Text Link (optional)",
-      "info": "Leave empty if you don't want this text to be clickable"
-    },
-    {
       "type": "range",
       "id": "text_size",
       "min": 10,
@@ -357,10 +365,6 @@
       "unit": "px",
       "label": "Text Size",
       "default": 14
-    },
-    {
-      "type": "header",
-      "content": "Social Icons"
     },
     {
       "type": "range",
@@ -373,10 +377,49 @@
       "default": 20
     }
   ],
+  "blocks": [
+    {
+      "type": "text_item",
+      "name": "Text Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Text item"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (optional)"
+        }
+      ]
+    }
+  ],
   "presets": [
     {
       "name": "Logo Section",
-      "category": "Header"
+      "category": "Header",
+      "blocks": [
+        {
+          "type": "text_item",
+          "settings": {
+            "text": "Free Shipping"
+          }
+        },
+        {
+          "type": "text_item",
+          "settings": {
+            "text": "Fast Delivery"
+          }
+        },
+        {
+          "type": "text_item",
+          "settings": {
+            "text": "Refer a friend"
+          }
+        }
+      ]
     }
   ]
 }
