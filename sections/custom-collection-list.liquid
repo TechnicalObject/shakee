@@ -73,7 +73,6 @@
 
         /* Specifically target the h3 element that contains collection_title */
         .section--{{ section.id }} .grid-item-details--custom h3.grid-item__title {
-            font-size: 1.125rem !important;
             margin: 0 !important;
             text-align: left !important;
             display: block !important;
@@ -171,6 +170,10 @@
               background: linear-gradient(to bottom, {{ overlay_color_30 }} 0%, {{ overlay_color_80 }} 75%);
             }
 
+            .section--{{ section.id }} .block-section--{{ block.id }} .grid-item__title {
+              font-size: {{ block.settings.title_font_size | default: 18 }}px !important;
+            }
+
             {% unless section.settings.content-position == 'below-image' %}
               .section--{{ section.id }} .block-section--{{ block.id }} .grid-item__subheading,
               .section--{{ section.id }} .block-section--{{ block.id }} .grid-item__title {
@@ -214,6 +217,10 @@
 
                 <div class="grid-image{% if section.settings.content-position == 'below-image' and section.settings.remove-spacing == false %} block-radius-clip{% endif %}"{% if block.settings.collection == blank and section.settings.content-position == 'below-image' %} data-animate-hover-zoom{% endif %}{% if section.settings.content-position == 'custom' %} data-animate-hover-zoom{% endif %}>
 
+                  {% if section.settings.content-position == 'below-image' and block.settings.collection != blank %}
+                    <a href="{{ collection.url }}" class="grid-image-link" style="display: block; width: 100%; height: 100%;">
+                  {% endif %}
+
                     {% if collection == empty %}
                       {% if block.settings.collection_img %}
                         {% render 'responsive-image' with block.settings.collection_img, class: class, allow_stretch: stretch_img %}
@@ -249,8 +256,8 @@
                       {% render 'responsive-image' with image, class: class, allow_stretch: stretch_img %}
                     {% endif %}
 
-                  {% if block.settings.collection != blank and section.settings.content-position == 'below-image' %}
-                  </a>
+                  {% if section.settings.content-position == 'below-image' and block.settings.collection != blank %}
+                    </a>
                   {% endif %}
                 </div>
 
@@ -279,7 +286,7 @@
                       {% if section.settings.content-position == 'below-image' and block.settings.collection != blank %}
                         <a href="{{ collection.url }}" tabindex="-1">
                       {% endif %}
-                        <h3 class="grid-item__title"{% if section.settings.content-position == 'hover' %} data-animate-hover-block data-animate-order="{{ animation_order }}"{% endif %}>{{ collection_title }}</h3>
+                        <h3 class="grid-item__title" style="font-size: {{ block.settings.title_font_size }}px !important;"{% if section.settings.content-position == 'hover' %} data-animate-hover-block data-animate-order="{{ animation_order }}"{% endif %}>{{ collection_title }}</h3>
                       {% if section.settings.content-position == 'below-image' and block.settings.collection != blank %}
                         </a>
                       {% endif %}
@@ -549,6 +556,21 @@
           "id": "overlay-btn-text",
           "label": "t:all.Button_label",
           "default": "Shop now"
+        },
+        {
+          "type": "range",
+          "id": "title_font_size",
+          "label": "Collection name font size",
+          "min": 12,
+          "max": 48,
+          "step": 1,
+          "unit": "px",
+          "default": 18,
+          "info": "Font size for the collection title"
+        },
+        {
+          "type": "header",
+          "content": "t:all.Color"
         },
         {
           "type": "header",
