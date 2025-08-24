@@ -20,11 +20,11 @@ ul.site-nav li.first-level-dropdown:hover > a {
   transform: translateX(-50%);
 }
 
-.swatch {
-    width: 40px;
-    height: 40px;
-}
-
 li.nav-link-animated--custom {
     visibility: hidden;
+}
+
+.swatch .swatch-items-wrapper .swatch-element.color:not(.image-swatch) label {
+    width: 70px !important;
+    height: 70px !important;
 }
