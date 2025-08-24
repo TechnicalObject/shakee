@@ -1,0 +1,213 @@
+{% comment %}
+  Renders text/color swatches for a product option.
+  Set the extension of your color files below. Use 'png', 'jpeg', 'jpg' or 'gif'.
+
+  Accepts:
+    - swatch_option: The product option to render as a swatch.
+    - option_index: The index of the option.
+    - swatch_section_id: The section id. (required)
+    - size_option_name: The name of the size option.
+    - size_guide_page: The size guide page object.
+    - size_guide_label: The label for the size guide link.
+    - hide_out_of_stock_variants: Boolean to hide out of stock variants.
+
+  Usage:
+    {% render 'swatch' with swatch_option: option, option_index: option_idx, product: product, size_option_name: size_option_name, size_guide_page: size_guide_page, size_guide_label: size_guide_label, hide_out_of_stock_variants: hide_out_of_stock_variants %}
+{% endcomment %}
+
+<safe-load-scripts class="hidden">
+  <script src="{{ 'component-product-swatch.js' | asset_url }}" defer="defer" type="module" data-flow-load-key="product-swatch"></script>
+</safe-load-scripts>
+
+{% liquid 
+  assign file_extension = 'png' 
+  assign color_langs = 'color,colour,couleur,colore,farbe,색,色,färg,farve' | split: ','
+  assign swatch_image_options = settings.show_variant_image_for_options | split: ','
+
+  comment
+    Check if the swatch is a category metafield swatch 
+  endcomment
+  for value in swatch_option.values
+    assign is_category_swatch = false
+    if value.swatch.image != blank
+      assign is_category_swatch = true
+    elsif value.swatch.color != blank
+      assign is_category_swatch = true
+    endif
+  endfor
+
+  comment
+    Check if the swatch should reflect the variant image
+  endcomment
+  assign option_name_formatted = swatch_option.name | camelize
+  for image_option in swatch_image_options
+    assign show_variant_image = false
+    assign image_option_formatted = image_option | camelize
+    if image_option_formatted == option_name_formatted
+      assign show_variant_image = true
+    endif
+    if show_variant_image
+      break
+    endif
+  endfor
+
+  comment
+    Check if the swatch is a regular color swatch 
+  endcomment
+  assign is_color_swatch = false
+  assign downcased_option = swatch_option.name | camelize | downcase
+  if color_langs contains downcased_option
+    assign is_color_swatch = true
+  endif
+%}
+
+{% if swatch_option == blank %}
+  <div class="swatch error">
+    <p>You must include the snippet swatch.liquid with the product option.</p>
+    <p>Use: <code>{% raw %}{% render 'swatch' with swatch_option: 'product option here' %}{% endraw %}</code></p>
+    <p>Example: <code>{% raw %}{% render 'swatch' with swatch_option: option %}{% endraw %}</code></p>
+  </div>
+{% else %}
+  <product-swatch 
+    data-swatch-sold-out-string="{{ 'products.product.sold_out' | t }}"  
+    class="swatch{% if is_color_swatch or is_category_swatch or show_variant_image %} is-color-swatch{% endif %}" 
+    data-option-index="{{ option_index }}"
+    data-section-id="{{ swatch_section_id }}"
+  >
+    {% comment %} ============ OPTION LABEL ============ {% endcomment %}
+    <div class="option-label-wrapper{% if is_color_swatch or is_category_swatch or show_variant_image %} is-color-label{% endif %}">
+      <div>
+        <div class="header label-font">{{ swatch_option.name }}</div>
+        {% if is_color_swatch or is_category_swatch or show_variant_image %}
+          <div class="header product-swatch-color-name" data-color-swatch-name-container>
+            <span data-color-swatch-name>{{ swatch_option.selected_value | truncate: 22 }}</span>
+            <span data-color-swatch-state></span>
+          </div>
+        {% endif %}
+      </div>
+      {% assign formatted_swatch_option_name = swatch_option.name | downcase %}
+      {% assign formatted_size_option_name = size_option_name | downcase %}
+      {%- if formatted_swatch_option_name == formatted_size_option_name and size_guide_page != blank -%}
+        <safe-load-scripts class="hidden">
+          <script src="{{ 'component-size-guide-link.js' | asset_url }}" defer="defer" type="module" data-flow-load-key="size-guide-link"></script>
+        </safe-load-scripts>
+
+        <size-guide-link id="size-guide" class="text-link-animated">
+          <a data-size-guide-link id="size-guide-link" tabindex="0" href="{{ size_guide_page.url }}">{{ size_guide_label | default: size_guide_page.title }}</a>
+        </size-guide-link>
+      {%- endif -%}
+    </div>
+
+    {% comment %} ============ OPTION VARIANTS (SWATCHES) ============ {% endcomment %}
+    <div class="swatch-items-wrapper">
+      {% for value in swatch_option.values %}
+        {% liquid
+          if hide_out_of_stock_variants and value.available == false
+            assign show_variant = false
+          else 
+            assign show_variant = true
+          endif
+
+          assign is_combined_listing = false
+          if value.product_url != blank
+            assign is_combined_listing = true
+            assign show_variant = true
+            assign item_fetch_url = value.product_url | append: '?variant=' | append: value.variant.id
+            assign product_url = value.product_url
+          else
+            assign item_fetch_url = value.variant.url
+            assign product_url = value.variant.product.url
+          endif
+        %}
+
+        {%- capture input_id -%}
+          {{ swatch_section_id }}-{{ option_index }}-{{ forloop.index0 -}}
+        {%- endcapture -%}
+
+        {% if show_variant %}
+          <div 
+            data-swatch-option-available="{{ value.available }}"
+            data-swatch-variant-id="{{ value.variant.id }}"
+            data-selected-swatch-variant-id="{{ swatch_option.selected_value.variant.id }}"
+            data-option="{{ swatch_option.name }}"
+            data-value="{{ value | escape | truncate: 22 }}" 
+            data-media-id="{{ value.variant.featured_media.id }}" 
+            class="swatch-element variant-swatch {% if is_color_swatch or is_category_swatch or show_variant_image %}color {% endif %}{{ value | handle }} {% if value.available %}available{% else %}soldout{% endif %}{% if swatch_option.selected_value == value %} active{% endif %}"
+          >
+
+            <input
+              data-product-variant
+              data-option-value-id="{{ value.id }}"
+              data-is-combined-listing="{{ is_combined_listing }}"
+              data-product-fetch-url="{{ item_fetch_url }}"
+              data-product-url="{{ product_url }}"
+              id="{{ input_id }}"
+              class="visually-hidden"
+              type="radio"
+              name="option-{{ option_index | plus: 1 }}-{{ swatch_section_id }}"
+              value="{{ value | escape }}"
+              {% if swatch_option.selected_value == value %} checked{% endif %}
+            />
+
+            {% if is_color_swatch or is_category_swatch or show_variant_image %}
+              {% liquid 
+                comment 
+                  Define the color value 
+                endcomment
+                assign bg_color = value | camelize | downcase
+                if value contains '#'
+                  assign bg_color = value | downcase
+                endif
+
+                comment 
+                Reassign the color value if the swatch has a category metafield color 
+                endcomment
+                if value.swatch.color
+                  assign bg_color = value.swatch.color
+                endif
+
+                comment 
+                  Define the image url 
+                endcomment
+                assign bg_img_url = value | handle | append: '.' | append: file_extension | file_url
+                unless show_variant_image
+                  comment 
+                  Check if the swatch has a category metafield image 
+                  endcomment
+                  if value.swatch.image
+                    assign bg_img_url = value.swatch.image | image_url: width: 50
+                  endif
+                else
+                  comment 
+                  Check if the variant has a featured media 
+                  endcomment
+                  if value.variant.featured_image
+                    assign bg_img_url = value.variant.featured_image | image_url: width: 50
+                  endif
+                endunless
+              %}
+
+              <label
+                for="{{ input_id }}" 
+                style="{% if bg_img_url contains 'v=' %}background-image: url({{ bg_img_url }}); background-size: cover; background-position: center center;{% else %} background-color: {{ bg_color }};{% endif %}"
+                aria-labelledby="{{ input_id }}"
+              >
+                <span class="sr-only">{{ value }}</span>
+                <span class="product-swatch-sold-out product-swatch-sold-out-background"></span>
+                <span class="product-swatch-sold-out product-swatch-sold-out-foreground"></span>
+              </label>
+            {% else %}
+              <label for="{{ input_id }}" aria-labelledby="{{ input_id }}">
+                {{ value }}
+              </label>
+            {% endif %}
+          </div>
+        {% endif %}
+        {% comment %} ============ VARIANT JSON ============ {% endcomment %}
+        <script type="application/json" data-resource="{{ input_id }}">
+          {{ value.variant | json }}
+        </script>
+      {% endfor %}
+    </div>
+  </product-swatch>
+{% endif %}
