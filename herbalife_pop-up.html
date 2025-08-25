@@ -207,6 +207,18 @@ function wcHidePopUp () {
   document.getElementById('wc_herba_popup').style.display = 'none';
 }
 
+// Add click outside to close functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const popup = document.getElementById('wc_herba_popup');
+  const popupBg = popup.querySelector('.herbalife-bg');
+  
+  popupBg.addEventListener('click', function(e) {
+    if (e.target === popupBg) {
+      wcHidePopUp();
+    }
+  });
+});
+
 var cookie_content = wcGetCookie('wc_popup_herba');
 if (cookie_content != "shown") {
   document.getElementById('wc_herba_popup').style.display = 'block';
