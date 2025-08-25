@@ -69,23 +69,30 @@ var varHTML = `
     right: 15px;
     background: #7ac142;
     border-radius: 50%;
-    font-size: 16px;
-    font-weight: bold;
     color: #fff !important;
-    padding: 8px 12px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
     cursor: pointer;
     transition: background 0.2s ease;
+    border: none;
+    outline: none;
   }
 
   .herbalife-close:hover {
     background: #555;
   }
 
+  .herbalife-close svg {
+    flex-shrink: 0;
+  }
+
   .herbalife-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
   }
 
   .left-col, .right-col {
@@ -94,12 +101,12 @@ var varHTML = `
 
   .left-col.border {
     padding-right: 20px;
-    border-right: 2px solid #e5e5e5;
+    border-right: 1px solid #e5e5e5;
   }
 
   .right-col.border {
     padding-left: 20px;
-    border-left: 2px solid #e5e5e5;
+    border-left: 1px solid #e5e5e5;
   }
 
   .right-col p.copy {
@@ -141,7 +148,11 @@ var varHTML = `
   <div class="herbalife-wrap">
     <div class="herbalife-content">
       <div class="herbalife-info">
-        <a class="herbalife-close" onclick="wcHidePopUp()">×</a>
+        <a class="herbalife-close" onclick="wcHidePopUp()">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 1L1 13M1 1L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </a>
         <p class="para-lead">
           Provozovatelem této webové stránky je Nezávislý Distributor Herbalife Nutrition Daniel Jahoda
         </p>
