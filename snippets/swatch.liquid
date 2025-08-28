@@ -175,14 +175,14 @@
                   Check if the swatch has a category metafield image 
                   endcomment
                   if value.swatch.image
-                    assign bg_img_url = value.swatch.image | image_url: width: 50
+                    assign bg_img_url = value.swatch.image | image_url: width: 70
                   endif
                 else
                   comment 
                   Check if the variant has a featured media 
                   endcomment
                   if value.variant.featured_image
-                    assign bg_img_url = value.variant.featured_image | image_url: width: 50
+                    assign bg_img_url = value.variant.featured_image | image_url: width: 70
                   endif
                 endunless
               %}
@@ -196,6 +196,7 @@
                 <span class="product-swatch-sold-out product-swatch-sold-out-background"></span>
                 <span class="product-swatch-sold-out product-swatch-sold-out-foreground"></span>
               </label>
+              <span class="swatch-label">{{ value }}</span>
             {% else %}
               <label for="{{ input_id }}" aria-labelledby="{{ input_id }}">
                 {{ value }}
