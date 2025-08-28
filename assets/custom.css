@@ -20,7 +20,7 @@ ul.site-nav li.first-level-dropdown:hover > a {
   transform: translateX(-50%);
 }
 
-li.nav-link-animated--custom {
+.bottom--footer---links li.nav-link-animated--custom {
     visibility: hidden;
 }
 
