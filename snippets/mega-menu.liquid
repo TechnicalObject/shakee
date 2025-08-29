@@ -91,7 +91,8 @@
         {% endfor %}
       {% elsif display_type == 'images' %}
         {% for sub_link in link.links %}
-          {% assign collection = collections[sub_link.handle] %}
+          {% assign collection_handle = sub_link.url | replace: '/collections/', '' %}
+          {% assign collection = collections[collection_handle] %}
           {% if collection %}
             <div class="collection-image-item">
               <a href="{{ sub_link.url }}">
