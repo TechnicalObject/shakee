@@ -1,0 +1,228 @@
+{% comment %} Calculate end of current month for sale validity {% endcomment %}
+{% assign current_year = 'now' | date: '%Y' %}
+{% assign current_month = 'now' | date: '%m' %}
+{% assign next_month = current_month | plus: 1 %}
+{% assign next_year = current_year %}
+
+{% if next_month > 12 %}
+  {% assign next_month = 1 %}
+  {% assign next_year = current_year | plus: 1 %}
+{% endif %}
+
+{% assign next_month_first_day = next_year | append: '-' | append: next_month | append: '-01' | date: '%s' %}
+{% assign end_of_month = next_month_first_day | minus: 86400 | date: '%d.%m.%Y' %}
+
+{% style %}
+  .footer-info-section {
+    padding: {{ section.settings.section_padding }}px;
+    background-color: {{ section.settings.background_color }};
+  }
+
+  .footer-info-container {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: {{ section.settings.content_spacing }}px;
+    align-items: flex-start;
+  }
+
+  .address-section {
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    line-height: 1.2;
+  }
+
+  .address-line {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .right-content {
+    text-align: right;
+  }
+
+  .guarantee-section {
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  .guarantee-text {
+    margin: 0;
+  }
+
+  .sale-section {
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    line-height: 1.2;
+  }
+
+  .sale-notice {
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .phone-link {
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+  }
+
+  .phone-link:hover {
+    text-decoration: underline;
+  }
+
+  @media screen and (max-width: 749px) {
+    .footer-info-container {
+      grid-template-columns: 1fr;
+      gap: {{ section.settings.content_spacing | divided_by: 2 }}px;
+      text-align: center;
+    }
+
+    .right-content {
+      text-align: center;
+    }
+
+    .address-line {
+      white-space: normal;
+    }
+
+    .footer-info-section {
+      padding: {{ section.settings.section_padding | times: 0.7 }}px;
+    }
+
+    .address-section,
+    .guarantee-section,
+    .sale-section,
+    .sale-notice {
+      font-size: {{ section.settings.text_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="footer-info-section">
+  <div class="footer-info-container">
+    <div class="address-section">
+      <p class="address-line">
+        {% if shop.address.street != blank %}{{ shop.address.street }}{% endif %}
+        {% if shop.phone != blank %}
+          {% if shop.address.street != blank %}, {% endif %}
+          <a href="tel:{{ shop.phone | replace: ' ', '' }}" class="phone-link">
+            {{ shop.phone }}
+          </a>
+        {% endif %}
+      </p>
+      <p class="address-line">
+        {% if shop.address.zip != blank %}{{ shop.address.zip }}{% endif %}
+        {% if shop.address.city != blank %}{% if shop.address.zip != blank %} {% endif %}{{ shop.address.city }}{% endif %}
+        {% if shop.address.province != blank %}{% if shop.address.city != blank or shop.address.zip != blank %}, {% endif %}{{ shop.address.province }}{% endif %}
+        {% if shop.address.country != blank %}{% if shop.address.province != blank or shop.address.city != blank or shop.address.zip != blank %}, {% endif %}{{ shop.address.country }}{% endif %}
+      </p>
+    </div>
+
+    <div class="right-content">
+      <div class="guarantee-section">
+        <p class="guarantee-text">
+          {{ section.settings.guarantee_text }}
+        </p>
+      </div>
+      <div class="sale-section">
+        <p class="sale-notice">
+          {{ section.settings.sale_text_prefix }} {{ end_of_month }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Footer Information",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "textarea",
+      "id": "guarantee_text",
+      "label": "Guarantee text",
+      "default": "Označení nezávislý člen Herbalife Nutrition pro český trh garantuje 100% originalitu a čerstvost produktů."
+    },
+    {
+      "type": "text",
+      "id": "sale_text_prefix",
+      "label": "Sale text prefix",
+      "default": "Slevy jsou platné do"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 6,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "content_spacing",
+      "min": 10,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "Content spacing",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#242424"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 11,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 13
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer Information"
+    }
+  ]
+}
+{% endschema %}
