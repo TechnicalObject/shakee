@@ -19,8 +19,12 @@
   }
 
   .footer-info-container {
-    max-width: {{ section.settings.max_width }}px;
-    margin: 0 auto;
+    {% unless section.settings.full_width %}
+      max-width: {{ section.settings.max_width }}px;
+      margin: 0 auto;
+    {% else %}
+      padding: 0 {{ section.settings.section_padding }}px;
+    {% endunless %}
     display: grid;
     grid-template-columns: auto 1fr;
     gap: {{ section.settings.content_spacing }}px;
@@ -31,6 +35,28 @@
     color: {{ section.settings.text_color }};
     font-size: {{ section.settings.text_size }}px;
     line-height: 1.2;
+    display: flex;
+    align-items: flex-start;
+    gap: {{ section.settings.image_spacing }}px;
+  }
+
+  .address-icon {
+    width: {{ section.settings.image_size }}px;
+    height: {{ section.settings.image_size }}px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .default-home-icon {
+    width: {{ section.settings.image_size }}px;
+    height: {{ section.settings.image_size }}px;
+    flex-shrink: 0;
+    fill: {{ section.settings.text_color }};
+  }
+
+  .address-content {
+    flex: 1;
   }
 
   .address-line {
@@ -80,6 +106,9 @@
       grid-template-columns: 1fr;
       gap: {{ section.settings.content_spacing | divided_by: 2 }}px;
       text-align: center;
+      {% if section.settings.full_width %}
+        padding: 0 {{ section.settings.section_padding | times: 0.7 }}px;
+      {% endif %}
     }
 
     .right-content {
@@ -100,27 +129,49 @@
     .sale-notice {
       font-size: {{ section.settings.text_size | times: 0.9 }}px;
     }
+
+    .address-section {
+      justify-content: center;
+    }
+
+    .address-icon,
+    .default-home-icon {
+      width: {{ section.settings.image_size | times: 0.8 }}px;
+      height: {{ section.settings.image_size | times: 0.8 }}px;
+    }
   }
 {% endstyle %}
 
 <div class="footer-info-section">
   <div class="footer-info-container">
     <div class="address-section">
-      <p class="address-line">
-        {% if shop.address.street != blank %}{{ shop.address.street }}{% endif %}
-        {% if shop.phone != blank %}
-          {% if shop.address.street != blank %}, {% endif %}
-          <a href="tel:{{ shop.phone | replace: ' ', '' }}" class="phone-link">
-            {{ shop.phone }}
-          </a>
-        {% endif %}
-      </p>
-      <p class="address-line">
-        {% if shop.address.zip != blank %}{{ shop.address.zip }}{% endif %}
-        {% if shop.address.city != blank %}{% if shop.address.zip != blank %} {% endif %}{{ shop.address.city }}{% endif %}
-        {% if shop.address.province != blank %}{% if shop.address.city != blank or shop.address.zip != blank %}, {% endif %}{{ shop.address.province }}{% endif %}
-        {% if shop.address.country != blank %}{% if shop.address.province != blank or shop.address.city != blank or shop.address.zip != blank %}, {% endif %}{{ shop.address.country }}{% endif %}
-      </p>
+      {% if section.settings.address_image != blank %}
+        <img src="{{ section.settings.address_image | image_url: width: section.settings.image_size }}" 
+             alt="Address icon" 
+             class="address-icon">
+      {% else %}
+        <svg class="default-home-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+      {% endif %}
+      
+      <div class="address-content">
+        <p class="address-line">
+          {% if shop.address.street != blank %}{{ shop.address.street }}{% endif %}
+          {% if shop.phone != blank %}
+            {% if shop.address.street != blank %}, {% endif %}
+            <a href="tel:{{ shop.phone | replace: ' ', '' }}" class="phone-link">
+              {{ shop.phone }}
+            </a>
+          {% endif %}
+        </p>
+        <p class="address-line">
+          {% if shop.address.zip != blank %}{{ shop.address.zip }}{% endif %}
+          {% if shop.address.city != blank %}{% if shop.address.zip != blank %} {% endif %}{{ shop.address.city }}{% endif %}
+          {% if shop.address.province != blank %}{% if shop.address.city != blank or shop.address.zip != blank %}, {% endif %}{{ shop.address.province }}{% endif %}
+          {% if shop.address.country != blank %}{% if shop.address.province != blank or shop.address.city != blank or shop.address.zip != blank %}, {% endif %}{{ shop.address.country }}{% endif %}
+        </p>
+      </div>
     </div>
 
     <div class="right-content">
@@ -160,7 +211,43 @@
     },
     {
       "type": "header",
+      "content": "Address Icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "address_image",
+      "label": "Address icon image",
+      "info": "Square image recommended. If no image is selected, a default home icon will be shown."
+    },
+    {
+      "type": "range",
+      "id": "image_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon size",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "image_spacing",
+      "min": 8,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon spacing",
+      "default": 12
+    },
+    {
+      "type": "header",
       "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Stretch to full width",
+      "default": false
     },
     {
       "type": "range",
@@ -170,7 +257,8 @@
       "step": 50,
       "unit": "px",
       "label": "Maximum width",
-      "default": 1200
+      "default": 1200,
+      "info": "Only applies when full width is disabled"
     },
     {
       "type": "range",
