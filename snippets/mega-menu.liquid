@@ -78,11 +78,11 @@
         {% for sub_link in link.links %}
           <li class="dropdown-submenu nav-link-animated--custom" aria-haspopup="true">
             <div class="inner">
-              <p class="h4 mega-menu-link--title"><a class="animated-link--item" href="{{ sub_link.url }}">{{ sub_link.title | escape }}</a></p>
+              <p class="h3 mega-menu-link--title"><a class="animated-link--item" href="{{ sub_link.url }}">{{ sub_link.title | escape }}</a></p>
               <ul class="menu-link">
                 {% for sub_sub_link in sub_link.links %}
                   <li>
-                    <a class="animated-link--item" href="{{ sub_sub_link.url }}">{{ sub_sub_link.title | escape }}</a>
+                    <a href="{{ sub_sub_link.url }}">{{ sub_sub_link.title | escape }}</a>
                   </li>
                 {% endfor %}
               </ul>
