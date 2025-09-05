@@ -1,5 +1,9 @@
-.product-card__image, div[data-product-media-wrapper] .theme-img {
-  background-color: var(--product-background-color) !important;
+.product-card__image {
+  background-color: var(--product-collection-background-color) !important;
+}
+
+div[data-product-media-wrapper] .theme-img {
+  background-color: var(--product-card-background-color) !important;
 }
 
 ul.site-nav li.first-level-dropdown {

@@ -16,8 +16,14 @@
       },
       {
         "type": "color",
-        "id": "product_background_color",
-        "label": "Pozadí produktu",
+        "id": "product_collection_background_color",
+        "label": "Pozadí produktu v kolekcích",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "color",
+        "id": "product_card_background_color",
+        "label": "Pozadí produktu na stránce produktu",
         "default": "rgba(0,0,0,0)"
       },
       {
