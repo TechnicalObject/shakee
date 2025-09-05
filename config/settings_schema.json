@@ -16,6 +16,12 @@
       },
       {
         "type": "color",
+        "id": "product_background_color",
+        "label": "Pozadí produktu",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "color",
         "id": "color_body_text",
         "label": "t:all.Text",
         "default": "#242424"

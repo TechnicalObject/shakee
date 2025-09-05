@@ -1,3 +1,7 @@
+.product-card__image, div[data-product-media-wrapper] .theme-img {
+  background-color: var(--product-background-color) !important;
+}
+
 ul.site-nav li.first-level-dropdown {
   font-weight: bold;
 }
