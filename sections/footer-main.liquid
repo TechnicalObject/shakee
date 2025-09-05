@@ -165,6 +165,12 @@
                     <input type="hidden" name="contact[tags]" value="newsletter">
                     <button type="submit" class="{{ button_classes }} footer-email-submit dynamic-section-button--{{ block.id }}" name="subscribe" id="FooterSubscribe">{{ 'general.newsletter_form.submit' | t }}</button>
                   </div>
+                  <div class="newsletter-privacy-notice">
+                    <p class="privacy-text" style="margin-top: 12px; padding-top: 8px;">
+                      Odesláním formuláře souhlasíte se 
+                      <a href="{% if block.settings.privacy_policy_url != blank %}{{ block.settings.privacy_policy_url }}{% else %}{{ shop.terms_of_service.url }}{% endif %}" target="_blank" class="privacy-link" style="text-decoration: underline;">zásadami ochrany osobních údajů</a>
+                    </p>
+                  </div>
                 {% endif %}
               {% endform %}
             </div>
@@ -330,6 +336,16 @@
           "label": "t:all.Secondary_color",
           "default": "#ffffff",
           "info": "t:all.Secondary_button_color_info"
+        },
+        {
+          "type": "header",
+          "content": "Privacy Policy"
+        },
+        {
+          "type": "url",
+          "id": "privacy_policy_url",
+          "label": "Privacy Policy URL",
+          "info": "Leave blank to use the default Terms of Service URL"
         }
       ]
     },
