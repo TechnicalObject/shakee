@@ -1,0 +1,341 @@
+<style>
+/*============================================================================
+  #Typography
+==============================================================================*/
+
+{% assign header_font = settings.type_header_font %}
+{% assign base_font = settings.type_base_font %}
+
+{% case settings.type_navigation_font %}
+  {% when 'heading' %}
+    {% assign navigation_font = settings.type_header_font %}
+  {% when 'body' %}
+    {% assign navigation_font = settings.type_base_font %}
+{% endcase %}
+
+{{ header_font | font_face: font_display: 'swap' }}
+{{ base_font | font_face: font_display: 'swap' }}
+
+{%- assign base_font_bold = base_font | font_modify: 'weight', 'bolder' -%}
+{%- assign base_font_italic = base_font | font_modify: 'style', 'italic' -%}
+{%- assign base_font_bold_italic = base_font_bold | font_modify: 'style', 'italic' -%}
+{%- assign header_font_bold = header_font | font_modify: 'weight', 'bolder' -%}
+
+{% if header_font_bold %}
+  {{ header_font_bold | font_face: font_display: 'swap' }}
+{% endif %}
+
+{% if base_font_bold %}
+  {{ base_font_bold | font_face: font_display: 'swap' }}
+{% endif %}
+
+{% if base_font_italic %}
+  {{ base_font_italic | font_face: font_display: 'swap' }}
+{% endif %}
+
+{% if base_font_bold_italic %}
+  {{ base_font_bold_italic | font_face: font_display: 'swap' }}
+{% endif %}
+
+{% assign button_font = base_font %}
+{% if settings.type_button_font == 'heading' %}
+  {% assign button_font = header_font %}
+{% endif %}
+
+{% assign label_font = base_font %}
+{% if settings.type_label_font == 'heading' %}
+  {% assign label_font = header_font %}
+{% endif %}
+
+/*============================================================================
+  #General Variables
+==============================================================================*/
+
+:root {
+
+  --font-weight-normal: {{ base_font.weight | default: 400 }};
+  --font-weight-bold: {{ base_font_bold.weight | default: 700 }};
+  --font-weight-header-bold: {{ header_font_bold.weight | default: 700 }};
+
+  --header-font-stack: {{ header_font.family }}, {{ header_font.fallback_families }};
+  --header-font-weight: {{ header_font.weight }};
+  --header-font-style: {{ header_font.style }};
+  --header-text-size: {{ settings.heading_text_size }};
+  --header-text-size-px: {{ settings.heading_text_size }}px;
+  --header-mobile-text-size-px: {{ settings.heading_text_size | at_most: 22 }}px;
+
+  --header-font-case: {{ settings.nav_font_case }};
+  --header-font-size: {{ settings.nav_font_size }};
+  --header-font-size-px: {{ settings.nav_font_size }}px;
+
+  --heading-spacing: {{ settings.heading_spacing | times: 1.0 | divided_by: 100 | append: 'em' }};
+  --heading-line-height: {{ settings.heading_line_height }};
+  --heading-font-case: {{ settings.heading_font_case }};
+  --heading-font-stack: {{ settings.type_header_font }};
+
+  --body-font-stack: {{ base_font.family }}, {{ base_font.fallback_families }};
+  --body-font-weight: {{ base_font.weight }};
+  --body-font-style: {{ base_font.style }};
+
+  --button-font-stack: {{ button_font.family }}, {{ button_font.fallback_families }};
+  --button-font-weight: {{ button_font.weight }};
+  --button-font-style: {{ button_font.style }};
+
+  --label-font-stack: {{ label_font.family }}, {{ label_font.fallback_families }};
+  --label-font-weight: {{ label_font.weight }};
+  --label-font-style: {{ label_font.style }};
+  --label-font-case: {{ settings.label_font_case }};
+  --label-spacing: {{ settings.label_spacing }}px;
+
+  --navigation-font-stack: {{ navigation_font.family }}, {{ navigation_font.fallback_families }};
+  --navigation-font-weight: {{ navigation_font.weight }};
+  --navigation-font-style: {{ navigation_font.style }};
+  --navigation-font-letter-spacing: {{ settings.nav_letter_spacing }}px;
+
+  --base-font-size-int: {{ settings.typography-body-font-size }};
+  --base-font-size: {{ settings.typography-body-font-size }}px;
+
+  --body-font-size-12-to-em: {{ 12 | times: 1.0 | divided_by: settings.typography-body-font-size | round: 2 | append: 'em' }};
+  --body-font-size-16-to-em: {{ 16 | times: 1.0 | divided_by: settings.typography-body-font-size | round: 2 | append: 'em' }};
+  --body-font-size-22-to-em: {{ 22 | times: 1.0 | divided_by: settings.typography-body-font-size | round: 2 | append: 'em' }};
+  --body-font-size-28-to-em: {{ 28 | times: 1.0 | divided_by: settings.typography-body-font-size | round: 2 | append: 'em' }};
+  --body-font-size-36-to-em: {{ 36 | times: 1.0 | divided_by: settings.typography-body-font-size | round: 2 | append: 'em' }};
+
+  /* Heading Sizes */
+
+  {% assign min_heading_size = 16 %}
+  --h1-size: {{ settings.heading_text_size | times: 1.25 | round | at_least: min_heading_size }}px;
+  --h2-size: {{ settings.heading_text_size | at_least: min_heading_size }}px;
+  --h3-size: {{ settings.heading_text_size | times: 0.875 | round | at_least: min_heading_size }}px;
+  --h4-size: {{ settings.heading_text_size | times: 0.75 | round | at_least: min_heading_size }}px;
+  --h5-size: {{ settings.heading_text_size | times: 0.625 | round | at_least: min_heading_size }}px;
+  --h6-size: {{ settings.heading_text_size | times: 0.5 | round | at_least: min_heading_size }}px;
+
+  --sale-badge-color: rgba({{ settings.sale_badge_color.rgba }});
+  --sold-out-badge-color: rgba({{ settings.sold_out_badge_color.rgba }});
+  --custom-badge-color: rgba({{ settings.custom_badge_color.rgba }});
+  --preorder-badge-color: rgba({{ settings.preorder_badge_color.rgba }});
+  --countdown-badge-color: rgba({{ settings.countdown_badge_color.rgba }});
+  --badge-font-color: rgba({{ settings.sold_out_badge_font_color.rgba }});
+
+  --primary-btn-text-color: rgba({{ settings.color_primary_button_text.rgba }});
+  --primary-btn-text-color-opacity50: color-mix(in srgb, var(--primary-btn-text-color), transparent 50%);
+  --primary-btn-bg-color: rgba({{ settings.color_primary_button_background.rgba }});
+  --primary-btn-bg-color-opacity50: color-mix(in srgb, var(--primary-btn-bg-color), transparent 50%);
+
+  --button-text-case: {{ settings.button_text_case }};
+  --button-font-size: {{ settings.button_font_size }};
+  --button-font-size-px: {{ settings.button_font_size }}px;
+  --button-text-spacing-px: {{ settings.button_text_spacing }}px;
+
+  {% if settings.product_card_max_lines > 0 %}
+    --text-line-clamp: {{ settings.product_card_max_lines }};
+  {% else %}
+    --text-line-clamp: none;
+  {% endif %}
+
+  {% case settings.button_style %}
+  {% when 'subtle' %}
+    --alt-btn-border-radius: 0.1rem;
+    {% when 'circle' %}
+    --alt-btn-border-radius: 1.875rem;
+    {% when 'rounded' %}
+    --alt-btn-border-radius: 0.5rem;
+  {% endcase %}
+
+  --text-color: rgba({{ settings.color_body_text.rgba }});
+  --text-color-transparent05: color-mix(in srgb, var(--text-color), transparent 95%);
+  --text-color-transparent10: color-mix(in srgb, var(--text-color), transparent 90%);
+  --text-color-transparent15: color-mix(in srgb, var(--text-color), transparent 85%);
+  --text-color-transparent25: color-mix(in srgb, var(--text-color), transparent 75%);
+  --text-color-transparent30: color-mix(in srgb, var(--text-color), transparent 70%);
+  --text-color-transparent40: color-mix(in srgb, var(--text-color), transparent 60%);
+  --text-color-transparent50: color-mix(in srgb, var(--text-color), transparent 50%);
+  --text-color-transparent5: color-mix(in srgb, var(--text-color), transparent 50%);
+  --text-color-transparent6: color-mix(in srgb, var(--text-color), transparent 40%);
+  --text-color-transparent7: color-mix(in srgb, var(--text-color), transparent 30%);
+  --text-color-transparent8: color-mix(in srgb, var(--text-color), transparent 20%);
+
+  {% if settings.heading_text_size < 24 %}
+    --heading-xl-font-size: 20px;
+    --heading-l-font-size: 20px;
+    --subheading-font-size: 14px;
+  {% elsif settings.heading_text_size >= 24 and settings.heading_text_size < 28 %}
+    --heading-xl-font-size: 24px;
+    --heading-l-font-size: 22px;
+    --subheading-font-size: 16px;
+  {% else %}
+    --heading-xl-font-size: 28px;
+    --heading-l-font-size: 22px;
+    --subheading-font-size: 20px;
+  {% endif %}
+
+  {% if settings.typography-body-font-size < 16 %}
+    --small-body-font-size: 12px;
+  {% else %}
+    --small-body-font-size: 14px;
+  {% endif %}
+
+  --link-color: rgba({{ settings.color_primary.rgba }});
+  --on-sale-color: rgba({{ settings.sale_price_color.rgba }});
+
+  --body-color: rgba({{ settings.color_body_bg.rgba }});
+  --body-color-darken10: {{ settings.color_body_bg | color_darken: 10 }};
+  --body-color-transparent00: color-mix(in srgb, var(--body-color), transparent 100%);
+  --body-color-transparent40: color-mix(in srgb, var(--body-color), transparent 60%);
+  --body-color-transparent50: color-mix(in srgb, var(--body-color), transparent 50%);
+  --body-color-transparent90: color-mix(in srgb, var(--body-color), transparent 10%);
+
+  --body-overlay-color: color-mix(in srgb, var(--body-color-darken10), transparent 30%);
+
+  --body-secondary-color: rgba({{ settings.color_body_bg_secondary.rgba }});
+  --body-secondary-color-transparent00: color-mix(in srgb, var(--body-secondary-color), transparent 100%);
+  --body-secondary-color-darken05: color-mix(in srgb, var(--body-secondary-color), transparent 95%);
+
+  --color-primary-background: {{ settings.color_body_bg }};
+  --color-primary-background-rgb: {{ settings.color_body_bg.red }}, {{ settings.color_body_bg.green }}, {{ settings.color_body_bg.blue }};
+  --color-secondary-background: rgba({{ settings.color_body_bg_secondary.rgba }});
+
+  --border-color: {{ settings.color_body_text | color_modify: 'alpha', 0.25 }};
+  --link-border-color: color-mix(in srgb, var(--link-color), transparent 50%);
+  --border-color-darken10: {{ settings.color_body_text | color_darken: 10 }};
+  --view-in-space-button-background: {{ settings.color_body_text | color_modify: 'lightness', 95 }};
+
+  --header-color: rgba({{ settings.header-bg-color.rgba }});
+  --header-color-darken5-filter: {{ settings.header-bg-color | color_darken: 5 }};
+  --header-color-darken5: color-mix(in srgb, var(--header-color-darken5-filter), transparent 0%);
+
+  --header-border-color: rgba({{ settings.header-border-color.rgba }});
+
+  --announcement-text-size: {{ settings.announcement_text_size }}px;
+  --announcement-text-spacing: {{ settings.announcement_text_spacing }}px;
+
+  --logo-font-size: {{ settings.logo_font_size }}px;
+
+  --overlay-header-text-color: rgba({{ settings.header-transparent-text.rgba }});
+  --nav-text-color: rgba({{ settings.color_primary_navigation.rgba }});
+  --nav-text-color-transparent5: color-mix(in srgb, var(--nav-text-color), transparent 95%);
+  --nav-text-color-transparent10: color-mix(in srgb, var(--nav-text-color), transparent 90%);
+  --nav-text-color-transparent30: color-mix(in srgb, var(--nav-text-color), transparent 70%);
+  --nav-text-color-transparent50: color-mix(in srgb, var(--nav-text-color), transparent 50%);
+
+  --nav-text-hover: rgba({{ settings.color_primary_navigation_hover.rgba }});
+
+  --color-scheme-light-background: rgba({{ settings.colorSchemeLightBackground.rgba }});
+  --color-scheme-light-background-transparent40: color-mix(in srgb, var(--color-scheme-light-background), transparent 60%);
+  --color-scheme-light-background-transparent50: color-mix(in srgb, var(--color-scheme-light-background), transparent 50%);
+  --color-scheme-light-background-rgb: {{ settings.colorSchemeLightBackground.red }}, {{ settings.colorSchemeLightBackground.green }}, {{ settings.colorSchemeLightBackground.blue }};
+
+  --color-scheme-light-text: rgba({{ settings.colorSchemeLightText.rgba }});
+  --color-scheme-light-text-transparent10: color-mix(in srgb, var(--color-scheme-light-text), transparent 90%);
+  --color-scheme-light-text-transparent25: color-mix(in srgb, var(--color-scheme-light-text), transparent 75%);
+  --color-scheme-light-text-transparent40: color-mix(in srgb, var(--color-scheme-light-text), transparent 60%);
+  --color-scheme-light-text-transparent50: color-mix(in srgb, var(--color-scheme-light-text), transparent 50%);
+  --color-scheme-light-text-transparent60: color-mix(in srgb, var(--color-scheme-light-text), transparent 40%);
+  --color-scheme-light-text-transparent80: color-mix(in srgb, var(--color-scheme-light-text), transparent 20%);
+
+  --color-scheme-feature-background: rgba({{ settings.homepage-sections-accent-primary-color.rgba }});
+  --color-scheme-feature-background-transparent40: color-mix(in srgb, var(--color-scheme-feature-background), transparent 60%);
+  --color-scheme-feature-background-transparent50: color-mix(in srgb, var(--color-scheme-feature-background), transparent 50%);
+  --color-scheme-feature-background-rgb: {{ settings.homepage-sections-accent-primary-color.red }}, {{ settings.homepage-sections-accent-primary-color.green }}, {{ settings.homepage-sections-accent-primary-color.blue }};
+
+  --color-scheme-feature-text: rgba({{ settings.homepage-sections-accent-secondary-color.rgba }});
+  --color-scheme-feature-text-transparent10: color-mix(in srgb, var(--color-scheme-feature-text), transparent 90%);
+  --color-scheme-feature-text-transparent25: color-mix(in srgb, var(--color-scheme-feature-text), transparent 75%);
+  --color-scheme-feature-text-transparent40: color-mix(in srgb, var(--color-scheme-feature-text), transparent 60%);
+  --color-scheme-feature-text-transparent50: color-mix(in srgb, var(--color-scheme-feature-text), transparent 50%);
+  --color-scheme-feature-text-transparent60: color-mix(in srgb, var(--color-scheme-feature-text), transparent 40%);
+  --color-scheme-feature-text-transparent80: color-mix(in srgb, var(--color-scheme-feature-text), transparent 20%);
+
+  --homepage-sections-accent-secondary-color-transparent60: color-mix(in srgb, var(--color-scheme-feature-text), transparent 40%);
+
+  --color-scheme-dark-background: rgba({{ settings.colorSchemeDarkBackground.rgba }});
+  --color-scheme-dark-background-transparent40: color-mix(in srgb, var(--color-scheme-dark-background), transparent 60%);
+  --color-scheme-dark-background-transparent50: color-mix(in srgb, var(--color-scheme-dark-background), transparent 50%);
+  --color-scheme-dark-background-rgb: {{ settings.colorSchemeDarkBackground.red }}, {{ settings.colorSchemeDarkBackground.green }}, {{ settings.colorSchemeDarkBackground.blue }};
+
+  --color-scheme-dark-text: rgba({{ settings.colorSchemeDarkText.rgba }});
+  --color-scheme-dark-text-transparent10: color-mix(in srgb, var(--color-scheme-dark-text), transparent 90%);
+  --color-scheme-dark-text-transparent25: color-mix(in srgb, var(--color-scheme-dark-text), transparent 75%);
+  --color-scheme-dark-text-transparent40: color-mix(in srgb, var(--color-scheme-dark-text), transparent 60%);
+  --color-scheme-dark-text-transparent50: color-mix(in srgb, var(--color-scheme-dark-text), transparent 50%);
+  --color-scheme-dark-text-transparent60: color-mix(in srgb, var(--color-scheme-dark-text), transparent 40%);
+  --color-scheme-dark-text-transparent80: color-mix(in srgb, var(--color-scheme-dark-text), transparent 20%);
+
+  --filter-bg-color: {{ settings.color_body_text | color_modify: 'alpha', 0.1 }};
+
+  --menu-drawer-color: rgba({{ settings.mobile-menu-bg.rgba }});
+  --menu-drawer-text-color: rgba({{ settings.mobile-menu-text.rgba }});
+  --menu-drawer-text-color-transparent10: color-mix(in srgb, var(--menu-drawer-text-color), transparent 90%);
+  --menu-drawer-text-color-transparent30: color-mix(in srgb, var(--menu-drawer-text-color), transparent 70%);
+  --menu-drawer-border-color: color-mix(in srgb, var(--menu-drawer-text-color), transparent 75%);
+  --menu-drawer-text-hover-color: rgba({{ settings.mobile-menu-text-hover.rgba }});
+
+  --cart-drawer-color: rgba({{ settings.cart-drawer-bg.rgba }});
+  --cart-drawer-color-transparent50: color-mix(in srgb, var(--cart-drawer-color), transparent 50%);
+  --cart-drawer-text-color: rgba({{ settings.cart-drawer-text.rgba }});
+  --cart-drawer-text-color-transparent10: color-mix(in srgb, var(--cart-drawer-text-color), transparent 90%);
+  --cart-drawer-text-color-transparent25: color-mix(in srgb, var(--cart-drawer-text-color), transparent 75%);
+  --cart-drawer-text-color-transparent40: color-mix(in srgb, var(--cart-drawer-text-color), transparent 60%);
+  --cart-drawer-text-color-transparent50: color-mix(in srgb, var(--cart-drawer-text-color), transparent 50%);
+  --cart-drawer-text-color-transparent70: color-mix(in srgb, var(--cart-drawer-text-color), transparent 30%);
+  --cart-drawer-border-color: color-mix(in srgb, var(--cart-drawer-text-color), transparent 75%);
+
+  --success-color: #28a745;
+  --error-color: #DC3545;
+  --warning-color: #EB9247;
+
+  /* Shop Pay Installments variables */
+  --color-body: rgba({{ settings.color_body_bg_secondary.rgba }});
+  --color-bg: rgba({{ settings.color_body_bg_secondary.rgba }});
+
+  /* Checkbox */
+  --checkbox-size: 16px;
+  --inline-icon-size: 16px;
+  --line-height-base: 1.6;
+
+  /* Grid spacing */
+  --grid-spacing: {{ settings.grid_spacing }}px;
+  {% if settings.grid_spacing == '5' %}
+    --grid-spacing-tight: {{ settings.grid_spacing }}px;
+    --grid-spacing-loose: 10px;
+  {% else %}
+    --grid-spacing-tight: 10px;
+    --grid-spacing-loose: {{ settings.grid_spacing }}px;
+  {% endif %}
+
+  /* Border radius */
+  --block-border-radius: 0;
+  --input-border-radius: 0;
+  --thumbnail-border-radius: 0;
+  --badge-border-radius: 0;
+  {% if settings.border_radius == 'subtle' %}
+    --block-border-radius: 0.2rem;
+    --input-border-radius: 0.1rem;
+    --thumbnail-border-radius: 0.1rem;
+    --badge-border-radius: 0.1rem;
+    --swatch-border-radius: 0.04rem;
+  {% elsif settings.border_radius == 'curved' %}
+    --block-border-radius: 0.7rem;
+    --input-border-radius: 0.4rem;
+    --thumbnail-border-radius: 0.4rem;
+    --badge-border-radius: 0.3rem;
+    --swatch-border-radius: 0.2rem;
+  {% elsif settings.border_radius == 'round' %}
+    --block-border-radius: 1.4rem;
+    --input-border-radius: 1.5rem;
+    --thumbnail-border-radius: 0.7rem;
+    --badge-border-radius: 1rem;
+    --swatch-border-radius: 0.4rem;
+  {% endif %}
+
+  --swatch-border-radius: 0;
+  {% if settings.swatch_style == 'subtle' %}
+    --swatch-border-radius: 0.04rem;
+  {% elsif settings.swatch_style == 'curved' %}
+    --swatch-border-radius: 0.2rem;
+  {% elsif settings.swatch_style == 'circle' %}
+    --swatch-border-radius: 50%;
+  {% endif %}
+}
+</style>
