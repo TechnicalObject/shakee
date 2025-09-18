@@ -63,3 +63,7 @@ ul.site-nav li.first-level-dropdown:hover > a {
   font-size: 12px;
   line-height: 1.2;
 }
+
+.cart--button-update {
+  color: var(--primary-btn-text-color) !important;
+}
