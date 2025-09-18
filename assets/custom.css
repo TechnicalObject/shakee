@@ -1,3 +1,11 @@
+@media (max-width: 1450px) {
+  .site-header {
+      display: none;
+  }
+  .mobile-nav-bar--inner, .mobile-nav-bar-wrapper {
+      display: block !important;
+  }
+}
 .product-card__image {
   background-color: var(--product-collection-background-color) !important;
 }
