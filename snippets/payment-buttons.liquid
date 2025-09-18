@@ -1,0 +1,220 @@
+{% comment %}
+  Renders product buy-buttons.
+  Accepts:
+  - product: {Object} product object. (required)
+  - block: {Object} passing the block information. (optional)
+  - element_id: {String} element id. (required if it's not a block)
+  - product_form_id: {String} product form id. (required)
+  - section_id: {String} id of section to which this snippet belongs. (required)
+  - show_buy_now: {Boolean} whether to show dynamic checkout buttons. 
+  - gift_card_form_enabled: {Boolean} whether to show gift card recipient form. (required)
+  - is_quick_view: {Boolean} whether this is a quick view. (optional)
+
+  Usage:
+    - If it's rendered within a block context:
+      {% render 'payment-buttons' with product: product, block: block, product_form_id: product_form_id, section_id: section.id, show_buy_now: block.settings.show_smart_checkout, gift_card_form_enabled: block.settings.enable_gift_card_recipient_form %}
+    
+    - If it's rendered within a section context (eg. featured product section):
+      {% render 'payment-buttons' with product: product, element_id: section.id, product_form_id: product_form_id, section_id: section.id, show_buy_now: section.settings.show_smart_checkout, gift_card_form_enabled: section.settings.enable_gift_card_recipient_form %}
+{% endcomment %}
+
+{% assign btn_id = element_id %}
+
+{% if block.settings.override_button_colors %}
+  {% assign btn_id = block.id %}
+
+  {% render 'button-color-overrides' with
+    id: btn_id,
+    style: 'filled',
+    text_color: block.settings.button_text_color,
+    background_color: block.settings.button_background_color
+  %}
+
+  <style>
+    .dynamic-section-button--{{ btn_id }}--dynamic .shopify-payment-button__button--unbranded {
+      color: rgba({{ block.settings.button_text_color.rgba }});
+      background-color: rgba({{ block.settings.button_background_color.rgba }});
+    }
+    product-form .paymentButtonsWrapper .dynamic-section-button--{{ btn_id }}--dynamic .shopify-payment-button__button.shopify-payment-button__button--unbranded:hover {
+      color: rgba({{ block.settings.button_text_color.rgba }}) !important;  
+      background-color: rgba({{ block.settings.button_background_color.rgba }}) !important;
+    }
+  </style>
+{% endif %}
+
+<safe-load-scripts class="hidden">
+  <script src="{{ 'component-product-form.js' | asset_url }}" defer="defer" type="module" data-flow-load-key="product-form"></script>
+</safe-load-scripts>
+<div
+  data-block-id="{% if block != blank %}{{ block.id }}{% else %}{{ element_id }}{% endif %}"
+  class="product-form-block" 
+  style="--custom-margin-bottom:{% if block != blank %} {{ block.settings.margin_bottom }}{% else %} 0{% endif %}px;"
+  {% if block != blank %}{{ block.shopify_attributes }}{% endif %}
+>
+  {%- if product != blank -%}
+    {%- liquid
+      assign gift_card_recipient_feature_active = false
+      if product.gift_card? and gift_card_form_enabled and product.available
+        assign gift_card_recipient_feature_active = true
+      endif
+
+      assign show_dynamic_checkout = false
+      if show_buy_now and gift_card_recipient_feature_active == false
+        assign show_dynamic_checkout = true
+      endif
+
+      assign loading_icon_attributes = 'data-loading-icon'
+
+      assign preorder_string = 'products.product.preorder' | t | downcase
+      assign preorder_tag = false
+      for tag in product.tags
+        assign lowecase_tag = tag | downcase
+        if lowecase_tag contains preorder_string
+          assign preorder_tag = true
+        endif
+      endfor
+      assign preorder_product = false
+      if product.available and preorder_tag
+        assign preorder_product = true
+      endif
+    -%}
+
+    <product-form
+      class="product-form"
+      data-hide-errors="{{ gift_card_recipient_feature_active }}"
+      data-section-id="{{ section_id }}"
+      data-gift-wrap-product-id="{{ settings.giftwrap_product_selector.selected_or_first_available_variant.id }}"
+    >
+      {%- form 'product',
+        product,
+        id: product_form_id,
+        novalidate: 'novalidate',
+        data-type: 'add-to-cart-form'
+      -%}
+      
+        {% comment %} ===== Main/selected variant ID ===== {% endcomment %}
+        <input
+          data-replace-content
+          data-updates-on-change
+          data-update-id="variant-{% if block != blank %}{{ block.id }}{% else %}{{ element_id }}{% endif %}"
+          type="hidden"
+          name="id"
+          value="{{ product.selected_or_first_available_variant.id }}"
+          {% if product.selected_or_first_available_variant.available == false %}
+            disabled
+          {% endif %}
+          class="product-variant-id"
+        >
+
+        {% comment %} ===== Selected variant quantity ===== {% endcomment %}
+        <input
+          type="hidden"
+          name="quantity"
+          value="1"
+        >
+
+        {% comment %} ===== Gift card recipient form ===== {% endcomment %}
+        {%- if gift_card_recipient_feature_active -%}
+          {%- render 'gift-card-recipient-form' -%}
+        {%- endif -%}
+
+        {% comment %} ===== Quantity error message ===== {% endcomment %}
+        {% liquid 
+          assign variant_title = product.selected_or_first_available_variant.title
+          if product.has_only_default_variant
+            assign variant_title = product.title
+          endif
+        %}
+        <div 
+          data-updates-on-change
+          data-update-id="qty-error-{% if block != blank %}{{ block.id }}{% else %}{{ element_id }}{% endif %}"
+          data-qty-error-message
+          class="js-qty__error-message errors qty-error hidden" 
+          role="alert"
+        >
+          <span>{{ 'general.forms.quantity_max_error' | t: variant: variant_title }}</span>
+        </div>
+
+        <div class="paymentButtonsWrapper btn-wrapper-default">
+          {% comment %} ===== Add to cart button ===== {% endcomment %}
+          <button
+            data-replace-content
+            data-updates-on-change
+            data-update-id="submit-{% if block != blank %}{{ block.id }}{% else %}{{ element_id }}{% endif %}"
+            id="ProductSubmitButton-{{ section_id }}"
+            type="submit"
+            name="add"
+            class="btn product--add-to-cart-button{% if btn_id %} dynamic-section-button--{{ btn_id }}{% endif %}"
+            {%- if product.selected_or_first_available_variant.available == false -%}
+              disabled
+            {%- endif -%}
+          >
+            {% comment %} ===== Add to cart/Sold out text ===== {% endcomment %}
+            <span
+              data-add-to-cart-text
+              data-unavailable-text="{{ 'products.product.unavailable' | t }}" 
+            >
+              {%- if product.selected_or_first_available_variant.available == false -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- else -%}
+                {%- if preorder_product -%}
+                  {{ 'products.product.preorder' | t }}
+                {%- else -%}
+                  {{ 'products.product.add_to_cart' | t }}
+                {%- endif -%}
+              {%- endif -%}
+            </span>
+
+            {% comment %} ===== "Added" text ===== {% endcomment %}
+            <span 
+              data-cart-added-text
+              style="display: none;"
+            >
+              {{ 'products.product.added' | t }}
+            </span>
+
+            {% comment %} ===== Loading icon ===== {% endcomment %}
+            {% liquid 
+              assign icon_fill = 'rgba(' | append: settings.color_primary_button_text.rgba | append: ')'
+            %}
+            {% render 'theme-icon' with icon: 'circle-notch', iconClasses: 'spin js fa-2x hidden', iconAttributes: loading_icon_attributes, iconSize: '1.6em', icon_fill: icon_fill %}<span class="sr-only">{{ 'collections.paginate.loading' | t }}</span>
+          </button>
+
+          {% comment %} ===== Dynamic buttons ===== {% endcomment %}
+          <div
+            class="width-full{% if btn_id %} dynamic-section-button--{{ btn_id }}--dynamic{% endif %}"
+            data-updates-on-change
+            data-update-id="dynamic-checkout-{% if block != blank %}{{ block.id }}{% else %}{{ element_id }}{% endif %}"
+          >
+            {%- if show_dynamic_checkout and preorder_product == false and product.selected_or_first_available_variant.available -%}
+              {{ form | payment_button }}
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endform -%}
+    </product-form>
+
+    {% if is_quick_view %}
+      {% comment %} View more button {% endcomment %}
+      <div class="quick-view-view-more-wrapper text-link-animated">
+        <a href="{{ product.url }}" class="quick-view-view-more btn--underlined" aria-label="{{ 'products.general.view_details' | t }}: {{ product.title }}">
+          {{ 'products.general.view_details' | t }}
+        </a>
+      </div>
+    {% endif %}
+  {%- else -%}
+    {% comment %} ===== Empty product button ===== {% endcomment %}
+    <div class="product-form">
+      <div class="product-form__buttons form">
+        <button
+          type="submit"
+          name="add"
+          class="product-form__submit button button--full-width button--primary"
+          disabled
+        >
+          {{ 'products.product.sold_out' | t }}
+        </button>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
