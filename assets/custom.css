@@ -67,3 +67,12 @@ ul.site-nav li.first-level-dropdown:hover > a {
 .cart--button-update {
   color: var(--primary-btn-text-color) !important;
 }
+
+.product--add-to-cart-button:hover, .quick-add-button:hover, .quick-add-button-variants:hover {
+  background-color: var(--primary-btn-text-color);
+  color: white;
+}
+
+#slide-up .popup--close-btn {
+  color: white;
+}
