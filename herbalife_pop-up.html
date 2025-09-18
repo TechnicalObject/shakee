@@ -90,6 +90,25 @@ var varHTML = `
     flex-shrink: 0;
   }
 
+  .herbalife-close-mobile {
+    display: none;
+    background: #7ac142;
+    border: none;
+    border-radius: 8px;
+    color: #fff !important;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin: 20px auto 0 auto;
+    text-align: center;
+  }
+
+  .herbalife-close-mobile:hover {
+    background: #555;
+  }
+
   .herbalife-row {
     display: flex;
     flex-wrap: wrap;
@@ -127,6 +146,14 @@ var varHTML = `
 
   /* Responsive */
   @media screen and (max-width: 767px) {
+    .herbalife-close {
+      display: none;
+    }
+    
+    .herbalife-close-mobile {
+      display: block;
+    }
+    
     .herbalife-row {
       flex-direction: column;
     }
@@ -179,6 +206,7 @@ var varHTML = `
             </p>
           </div>
         </div>
+        <button class="herbalife-close-mobile" onclick="wcHidePopUp()">Zavřít</button>
       </div>
     </div>
   </div>
