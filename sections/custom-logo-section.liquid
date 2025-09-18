@@ -14,7 +14,7 @@
 
 <div class="logo-section">
   <div class="logo-container">
-    <a href="{{ section.settings.logo_link | default: '/pages/contact' }}" class="logo-link">
+    <a href="/pages/contact" class="logo-link">
       {% if section.settings.logo != blank %}
         {% render 'responsive-image' with section.settings.logo, alt: alt | escape, props: 'itemprop="logo"', allow_stretch: true, blur: false, class: 'logo-image', loading: 'eager' %}
       {% else %}
@@ -359,13 +359,6 @@
       "type": "image_picker",
       "id": "logo",
       "label": "Logo Image"
-    },
-    {
-      "type": "url",
-      "id": "logo_link",
-      "label": "Logo Link",
-      "default": "/",
-      "info": "Link for when logo is clicked. Defaults to contact page if left empty."
     },
     {
       "type": "range",
