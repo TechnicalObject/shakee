@@ -1,0 +1,746 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "product-form": {
+      "type": "template--product",
+      "blocks": {
+        "star_rating_Xzpi9G": {
+          "type": "star_rating",
+          "settings": {
+            "show_rating_as": "average_rating",
+            "star_size": 16,
+            "show_product_rating_if_no_reviews": false,
+            "no_reviews_label": "No reviews",
+            "margin_bottom": 5
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "title_font": "h1",
+            "margin_bottom": 0
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "price_font": "h3",
+            "shipping_policy": false,
+            "tax_included": false,
+            "margin_bottom": 25
+          }
+        },
+        "f0f0e917-92a5-4957-a68e-2d0bb38d7819": {
+          "type": "separator",
+          "settings": {
+            "margin_bottom": 15
+          }
+        },
+        "2f3ddc8d-6514-403d-a884-88c9a0294300": {
+          "type": "stock-level-indicator",
+          "settings": {
+            "stock-range": 20,
+            "stock-level-notice": "always",
+            "show-stock-count": false,
+            "in-stock-message": "Ready to ship",
+            "low-stock-message": "Selling fast!",
+            "out-of-stock-message": "Back in stock soon",
+            "preorder-message": "Preorder today",
+            "stock-level-indicator-style": "classic",
+            "bar-indicator-color": "standard",
+            "stock_indicator_animation": true,
+            "margin_bottom": 8
+          }
+        },
+        "a7717974-ed85-4cde-80ef-4751178acf57": {
+          "type": "text-with-icon",
+          "settings": {
+            "icon": "truck",
+            "text": "Doprava zdarma od {{ product.metafields.custom.doprava_zdarma.value }} Kč",
+            "link": "",
+            "margin_bottom": 8,
+            "text_color": "{{ metaobjects.barvy[\"barvy-shakee\"].zvyrazneny_text.value }}"
+          }
+        },
+        "text_with_icon_dtPE3H": {
+          "type": "text-with-icon",
+          "settings": {
+            "icon": "price-tag",
+            "text": "Příklad: kup 5 dostaň 1 zdarma",
+            "link": "",
+            "margin_bottom": 17,
+            "text_color": "#242424"
+          }
+        },
+        "separator_j9tcaD": {
+          "type": "separator",
+          "settings": {
+            "margin_bottom": 30
+          }
+        },
+        "options": {
+          "type": "options",
+          "settings": {
+            "variant_style": "swatches",
+            "hide_out_of_stock_variants": false,
+            "thumbnail_changes_variant": true,
+            "size_guide_label": "Size guide",
+            "size_guide_page": "",
+            "size_option_name": "Size",
+            "margin_bottom": 20
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {
+            "margin_bottom": 30
+          }
+        },
+        "checkbox_bWpbGB": {
+          "type": "checkbox",
+          "disabled": true,
+          "settings": {
+            "title": "I understand this product needs to be frozen immediately or consumed within 24hrs of delivery",
+            "checkbox_hint": "",
+            "checkbox_required": true,
+            "margin_bottom": 10
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_smart_checkout": true,
+            "enable_gift_card_recipient_form": true,
+            "margin_bottom": 20,
+            "override_button_colors": false,
+            "button_background_color": "#e68819",
+            "button_text_color": "#ffffff"
+          }
+        },
+        "a55b9011-1b1a-4353-9d97-7bdcd60949f2": {
+          "type": "product-description",
+          "settings": {
+            "collapsible_tab": true,
+            "icon": "none",
+            "heading": "Popis",
+            "open_close_icon": "caret",
+            "open_by_default": true,
+            "margin_bottom": 0
+          }
+        },
+        "b0c19132-8e54-4664-b8ce-0a8c7f1f7737": {
+          "type": "collapsible-tab",
+          "settings": {
+            "heading": "Ingredience",
+            "open_close_icon": "caret",
+            "open_by_default": false,
+            "icon": "none",
+            "text": "<p>Test. Share some information about your product</p>",
+            "page": "",
+            "margin_bottom": 0
+          }
+        },
+        "9c341458-2d2c-4317-a2cc-346e220f53e0": {
+          "type": "collapsible-tab",
+          "settings": {
+            "heading": "Skladování",
+            "open_close_icon": "caret",
+            "open_by_default": false,
+            "icon": "none",
+            "text": "<p>Share some information about your product</p>",
+            "page": "",
+            "margin_bottom": 0
+          }
+        },
+        "b3864090-4f25-4db2-bddb-c549e9472be6": {
+          "type": "collapsible-tab",
+          "settings": {
+            "heading": "Dopravné",
+            "open_close_icon": "caret",
+            "open_by_default": false,
+            "icon": "none",
+            "text": "<p>We offer free shipping on orders over $50. Orders processed here will take 5-7 business days to arrive. Delivery details will be provided in your confirmation email.</p>",
+            "page": "",
+            "margin_bottom": 40
+          }
+        },
+        "fbfe241f-1b44-41cd-ae22-e866bdad9aaf": {
+          "type": "cross-sells",
+          "settings": {
+            "icon": "none",
+            "title": "You may also like...",
+            "cross_sell_product_1": "",
+            "cross_sell_product_2": "",
+            "cross_sell_product_3": "",
+            "collapsible_tab": false,
+            "open_close_icon": "plus_minus",
+            "open_by_default": false,
+            "margin_bottom": 20
+          }
+        },
+        "4fdb087c-4728-4785-b270-a71a092b7898": {
+          "type": "social_sharing",
+          "settings": {
+            "margin_bottom": 20
+          }
+        }
+      },
+      "block_order": [
+        "star_rating_Xzpi9G",
+        "title",
+        "price",
+        "f0f0e917-92a5-4957-a68e-2d0bb38d7819",
+        "2f3ddc8d-6514-403d-a884-88c9a0294300",
+        "a7717974-ed85-4cde-80ef-4751178acf57",
+        "text_with_icon_dtPE3H",
+        "separator_j9tcaD",
+        "options",
+        "quantity",
+        "checkbox_bWpbGB",
+        "buy_buttons",
+        "a55b9011-1b1a-4353-9d97-7bdcd60949f2",
+        "b0c19132-8e54-4664-b8ce-0a8c7f1f7737",
+        "9c341458-2d2c-4317-a2cc-346e220f53e0",
+        "b3864090-4f25-4db2-bddb-c549e9472be6",
+        "fbfe241f-1b44-41cd-ae22-e866bdad9aaf",
+        "4fdb087c-4728-4785-b270-a71a092b7898"
+      ],
+      "settings": {
+        "enable_sticky": true,
+        "media_position": "left",
+        "image_size": "medium",
+        "image_shape": "square",
+        "image-display": "thumbnails",
+        "thumbnail_position": "below",
+        "image_display_mobile": "slider",
+        "enable_video_loop": true,
+        "enable_autoplay": false,
+        "show_video_controls": false,
+        "app_margin_bottom": 20
+      }
+    },
+    "custom_image_with_text_slideshow_ffm4mw": {
+      "type": "custom-image-with-text-slideshow",
+      "blocks": {
+        "image_and_text_ndzNVd": {
+          "type": "image_and_text",
+          "settings": {
+            "image": "shopify://shop_images/Obrazky_e-shop_ctverce.png",
+            "subheading": "",
+            "heading": "Přehled",
+            "text": "<p>Zvyšte svůj denní příjem bílkovin a klíčových vitamínů a minerálů pomocí nápoje Protein Drink Mix.<br/><br/>Vychutnejte si Protein Drink Mix samostatně jako vysokoproteinovou svačinu, protože každá dávka dvou odměrek obsahuje 15 gramů kvalitních bílkovin a 22 klíčových vitamínů a minerálů, nebo jej přidejte do svého oblíbeného koktejlu či smoothie a získejte tak další dávku bílkovin.<br/><br/>Zařaďte tento všestranný proteinový prášek do svého každodenního režimu. Protein Drink Mix je vhodný pro vegetariány, má jemnou vanilkovou příchuť a lze jej přizpůsobit vašemu životnímu stylu, chuti a dietním potřebám. Jednoduše jej smíchejte s vodou nebo přidejte do svého oblíbeného koktejlu Formula 1 Vyvážené jídlo a získejte výživný nápoj s bohatou krémovou konzistencí.<br/><br/>Zvyšte svůj denní příjem bílkovin lahodným nápojem s vanilkovou příchutí, který si snadno a rychle připravíte. Převezměte kontrolu nad svými nutričními potřebami a dodejte si bílkoviny, kdykoli je budete potřebovat.</p>",
+            "page": "",
+            "slide_link": "",
+            "first_button_link": "",
+            "first_button_label": "",
+            "second_button_link": "",
+            "second_button_label": "",
+            "buttons_style": "filled",
+            "override_button_colors": false,
+            "color_button_background": "#e68819",
+            "color_button_text": "#ffffff",
+            "media_position_desktop": "right",
+            "text_position_desktop": "center",
+            "text_alignment_desktop": "left",
+            "media_position_mobile": "top",
+            "text_alignment_mobile": "center",
+            "text_color": "rgba(0,0,0,0)",
+            "background_color": "rgba(0,0,0,0)"
+          }
+        },
+        "image_and_text_qWNG7D": {
+          "type": "image_and_text",
+          "settings": {
+            "subheading": "",
+            "heading": "Vlastnosti",
+            "text": "<p>Protein Drink Mix:</p><ul><li>Poskytuje 15 g vysoce kvalitních bílkovin v jedné porci</li><li>Poskytuje 22 klíčových vitamínů a minerálů v jedné porci</li><li>Obsahuje klíčové vitamíny skupiny B</li><li>Je vhodný pro vegetariány</li><li>Neobsahuje cukr</li><li>Nabízí snadnou dávku bílkovin při míchání</li><li>Obsahuje 21 porcí</li></ul>",
+            "page": "",
+            "slide_link": "",
+            "first_button_link": "",
+            "first_button_label": "",
+            "second_button_link": "",
+            "second_button_label": "",
+            "buttons_style": "filled",
+            "override_button_colors": false,
+            "color_button_background": "#e68819",
+            "color_button_text": "#ffffff",
+            "media_position_desktop": "left",
+            "text_position_desktop": "center",
+            "text_alignment_desktop": "left",
+            "media_position_mobile": "top",
+            "text_alignment_mobile": "center",
+            "text_color": "rgba(0,0,0,0)",
+            "background_color": "rgba(0,0,0,0)"
+          }
+        },
+        "image_and_text_qQHL7b": {
+          "type": "image_and_text",
+          "settings": {
+            "image": "shopify://shop_images/pdm-obsah.png",
+            "subheading": "",
+            "heading": "Co obsahuje",
+            "text": "<h6>Složení</h6><p>Izolát <strong>sójové</strong> bílkoviny (47 %), maltodextrin, kaseinát vápenatý (<strong>mléko</strong>), creamer (slunečnicovy olej, maltodextrin, kaseinát sodný (<strong>mléko</strong>)), aromata, fosforečnan hořečnatý, emulgátor (<strong>sójový</strong> lecitin), chlorid sodný, chlorid draselný, zahušťovadla (guma guar, xanthan), fosforečnan vápenatý, oxid hořečnatý, sladidlo (sukralosa), L-askorbová kyselina, β-karoten, DL-α-tokoferyl-acetát, nikotinamid, oxid zinečnatý, D-pantothenát vápenatý, uhličitan manganatý, protispékavá látka (oxid křemičitý), kyanokobalamin, cholekalciferol, pyridoxin-hydrochlorid, thiamin-hydrochlorid, riboflavin, citrát měďnatý, kyselina pteroylmonoglutamová, jodiddraselný, seleničitan sodný, D-biotin.</p><h6>Informace o alergenech</h6><p>OBSAHUJE SÓJU A MLÉKO.</p>",
+            "page": "",
+            "slide_link": "",
+            "first_button_link": "",
+            "first_button_label": "",
+            "second_button_link": "",
+            "second_button_label": "",
+            "buttons_style": "filled",
+            "override_button_colors": false,
+            "color_button_background": "#e68819",
+            "color_button_text": "#ffffff",
+            "media_position_desktop": "right",
+            "text_position_desktop": "top",
+            "text_alignment_desktop": "left",
+            "media_position_mobile": "top",
+            "text_alignment_mobile": "center",
+            "text_color": "rgba(0,0,0,0)",
+            "background_color": "rgba(0,0,0,0)"
+          }
+        },
+        "image_and_text_giaKED": {
+          "type": "image_and_text",
+          "settings": {
+            "subheading": "",
+            "heading": "Návod k použití",
+            "text": "<p>Vychutnejte si Protein Drink Mix jako výživný nápoj. Před každým použitím nádobku jemně protřepejte. Smíchejte dvě polévkové lžíce (28 g) prášku s 250 ml studené vody a vychutnejte si ho. Užívejte jako dopolední nebo odpolední svačinu, abyste splnili své osobní denní požadavky na bílkoviny.</p><p>Hledáte výživné jídlo bez použití mléka nebo sójového nápoje? Vyzkoušejte Formula 1 s Protein Drink Mix a vodou. Smíchejte dvě odměrky Formula 1 (26 g) se dvěma odměrkami PDM (28 g) a 300 ml vody. Užívejte tento produkt podle pokynů uvedených na etiketě Formula 1.</p><p>Tento produkt si dopřejte v rámci vyvážené a pestré stravy, jako součást zdravého aktivního životního stylu.</p><p>Skladujte je se zavřeným víkem na chladném a suchém místě.</p>",
+            "page": "",
+            "slide_link": "",
+            "first_button_link": "",
+            "first_button_label": "",
+            "second_button_link": "",
+            "second_button_label": "",
+            "buttons_style": "filled",
+            "override_button_colors": false,
+            "color_button_background": "#e68819",
+            "color_button_text": "#ffffff",
+            "media_position_desktop": "left",
+            "text_position_desktop": "top",
+            "text_alignment_desktop": "left",
+            "media_position_mobile": "top",
+            "text_alignment_mobile": "center",
+            "text_color": "rgba(0,0,0,0)",
+            "background_color": "rgba(0,0,0,0)"
+          }
+        }
+      },
+      "block_order": [
+        "image_and_text_ndzNVd",
+        "image_and_text_qWNG7D",
+        "image_and_text_qQHL7b",
+        "image_and_text_giaKED"
+      ],
+      "name": "Cust img txt slide",
+      "settings": {
+        "title": "",
+        "description": "",
+        "tab_active_background_color": "{{ metaobjects.barvy[\"barvy-shakee\"].primarni_tlacitko.value }}",
+        "tab_active_border_color": "{{ metaobjects.barvy[\"barvy-shakee\"].primarni_tlacitko.value }}",
+        "tab_active_text_color": "{{ metaobjects.barvy[\"barvy-shakee\"].primarni_tlacitko_kontrastni.value }}",
+        "heading_font_size_desktop": 28,
+        "text_font_size_desktop": 16,
+        "heading_font_size_mobile": 28,
+        "text_font_size_mobile": 16,
+        "image_size": "medium",
+        "image_shape": "square",
+        "hover_navigation_desktop": "none",
+        "section_width": "content",
+        "section_padding_top": 0,
+        "section_padding_bottom": 35,
+        "colors": "white",
+        "override_navigation_button_colors": false,
+        "button_background_color": "#e68819",
+        "button_text_color": "#ffffff"
+      }
+    },
+    "image_with_text_overlay_Y3Y9AG": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_RXLJL3": {
+          "type": "heading",
+          "settings": {
+            "title": "Doporučeno sportovci",
+            "font_size_desktop": 28,
+            "font_size_mobile": 28,
+            "heading_bottom_spacing": 16
+          }
+        },
+        "text_DpX8dt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our story started in 2001. Our global health brand was born when we brought the phenomenal tastes of Queensland, Australia back home to a small town on the east coast, with an even smaller kitchen!</p>",
+            "font_size_desktop": 16,
+            "font_size_mobile": 16,
+            "text_bottom_spacing": 0
+          }
+        }
+      },
+      "block_order": [
+        "heading_RXLJL3",
+        "text_DpX8dt"
+      ],
+      "settings": {
+        "image_desktop": "shopify://shop_images/H24_3.jpg",
+        "height_desktop": "550px",
+        "text_position_desktop": "bottom_left",
+        "text_alignment_desktop": "left",
+        "caption_width_desktop": 50,
+        "height_mobile": "400px",
+        "text_position_mobile": "bottom_center",
+        "text_alignment_mobile": "left",
+        "section_link": "",
+        "animation_style": "parallax",
+        "section_width": "full",
+        "section_margin_top": 0,
+        "section_margin_bottom": 0,
+        "text_color": "#242424",
+        "caption_bg_color": "#ffffff",
+        "image_overlay_color": "#ffffff",
+        "image_overlay_opacity": 0
+      }
+    },
+    "f986e408-5557-4aaf-80fb-9cd7e2059a61": {
+      "type": "template--product--info-columns",
+      "blocks": {
+        "988fc3e8-03ca-407d-b680-304338edba69": {
+          "type": "text",
+          "settings": {
+            "heading": "",
+            "text": "<p>REVITALIZING BREAK</p><h2>Elevate your lunchtime routine</h2><p>Whether you're looking for a quick and convenient snack or a light yet fulfilling lunch option, our Super Detox smoothies offer the perfect balance of flavors and detoxifying ingredients</p>",
+            "button_link": "",
+            "button_text": ""
+          }
+        },
+        "template--14831909634118__f986e408-5557-4aaf-80fb-9cd7e2059a61-image_and_text-2": {
+          "type": "image_and_text",
+          "settings": {
+            "image": "shopify://shop_images/H24_2.webp",
+            "grid_image_size": "natural",
+            "heading": "",
+            "text": "",
+            "button_link": "",
+            "button_text": ""
+          }
+        },
+        "60467331-9399-4a07-bb8b-69e36ad7fea2": {
+          "type": "image_and_text",
+          "settings": {
+            "image": "shopify://shop_images/Instantni_bylinny_broskev_2.webp",
+            "grid_image_size": "natural",
+            "heading": "",
+            "text": "",
+            "button_link": "",
+            "button_text": ""
+          }
+        }
+      },
+      "block_order": [
+        "988fc3e8-03ca-407d-b680-304338edba69",
+        "template--14831909634118__f986e408-5557-4aaf-80fb-9cd7e2059a61-image_and_text-2",
+        "60467331-9399-4a07-bb8b-69e36ad7fea2"
+      ],
+      "settings": {
+        "title": "",
+        "description": "",
+        "maximum_width": 500,
+        "override_border_radius": false,
+        "buttons_style": "underlined",
+        "override_button_colors": false,
+        "button_background_color": "#e68819",
+        "button_text_color": "#ffffff",
+        "hover_navigation_desktop": "left-and-right",
+        "columns_per_row": 3,
+        "vertical_alignment": "center",
+        "text_alignment": "left",
+        "text_alignment_mobile": "center",
+        "section_width": "content",
+        "section_padding_top": 60,
+        "section_padding_bottom": 60,
+        "colors": "white"
+      }
+    },
+    "460d6567-b3ab-4cca-8b8a-bddf9a7a02e4": {
+      "type": "testimonials",
+      "blocks": {
+        "template--14831909634118__460d6567-b3ab-4cca-8b8a-bddf9a7a02e4-text-1": {
+          "type": "text",
+          "settings": {
+            "stars": 5,
+            "testimonial_text": "<p>\"I absolutely love these smoothies! They are the perfect way to start my day with a burst of energy.\"</p>",
+            "customer_name": "Helen Smith",
+            "link": ""
+          }
+        },
+        "040df02c-88a3-42b1-a37f-8d1e0b88f018": {
+          "type": "text",
+          "settings": {
+            "stars": 5,
+            "testimonial_text": "<p>\"Refreshingly tropical, but not too over-sweet.\"</p>",
+            "customer_name": "John Locke",
+            "link": ""
+          }
+        },
+        "6b1f201a-d276-4a03-b93f-6b3727c8ef38": {
+          "type": "text",
+          "settings": {
+            "stars": 5,
+            "testimonial_text": "<p>\"A burst of Summer in a glass! So excited these come in bigger sizes now.\"</p>",
+            "customer_name": "Salome Thornfield",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "template--14831909634118__460d6567-b3ab-4cca-8b8a-bddf9a7a02e4-text-1",
+        "040df02c-88a3-42b1-a37f-8d1e0b88f018",
+        "6b1f201a-d276-4a03-b93f-6b3727c8ef38"
+      ],
+      "settings": {
+        "title": "Reference zákazníků",
+        "description": "",
+        "circle_images": true,
+        "section_padding_top": 60,
+        "section_padding_bottom": 60,
+        "colors": "light"
+      }
+    },
+    "a61cc3b0-560a-47ac-bb32-3dfdc743f6d8": {
+      "type": "template--product--info-columns",
+      "blocks": {
+        "6acce243-7f16-4919-a4ec-23bfed76f25e": {
+          "type": "image_and_text",
+          "settings": {
+            "grid_image_size": "natural",
+            "heading": "",
+            "text": "",
+            "button_link": "",
+            "button_text": ""
+          }
+        },
+        "3e0575bb-b6a4-4e25-9bd4-99f3e8fde78d": {
+          "type": "image_and_text",
+          "settings": {
+            "grid_image_size": "natural",
+            "heading": "",
+            "text": "",
+            "button_link": "",
+            "button_text": ""
+          }
+        },
+        "6fdd72e9-3514-4b4f-98da-c977b9810b86": {
+          "type": "text",
+          "settings": {
+            "heading": "",
+            "text": "<p>SUPPORT YOUR WELL-BEING LIFESTYLE</p><h2>The benefits of Super Detox smoothies</h2><p>Super Detox smoothies help detoxify and cleanse your body with antioxidants, boost energy levels, support digestive health, hydrate skin, and help weight management.</p>",
+            "button_link": "",
+            "button_text": ""
+          }
+        }
+      },
+      "block_order": [
+        "6acce243-7f16-4919-a4ec-23bfed76f25e",
+        "3e0575bb-b6a4-4e25-9bd4-99f3e8fde78d",
+        "6fdd72e9-3514-4b4f-98da-c977b9810b86"
+      ],
+      "settings": {
+        "title": "",
+        "description": "",
+        "maximum_width": 500,
+        "override_border_radius": false,
+        "buttons_style": "underlined",
+        "override_button_colors": false,
+        "button_background_color": "#e68819",
+        "button_text_color": "#ffffff",
+        "hover_navigation_desktop": "left-and-right",
+        "columns_per_row": 3,
+        "vertical_alignment": "center",
+        "text_alignment": "left",
+        "text_alignment_mobile": "center",
+        "section_width": "content",
+        "section_padding_top": 60,
+        "section_padding_bottom": 60,
+        "colors": "white"
+      }
+    },
+    "dcfe78c8-3b44-44bb-88ef-3b68acb60aa5": {
+      "type": "image-with-text",
+      "settings": {
+        "image": "shopify://shop_images/Herbalife_NR1_CZ_Banner.jpg",
+        "layout": "left",
+        "title": "",
+        "text": "",
+        "text_alignment": "center",
+        "text_overlapping_image": true,
+        "button_link": "",
+        "button_label": "",
+        "buttons_style": "filled",
+        "override_button_colors": false,
+        "button_background_color": "#e68819",
+        "button_text_color": "#ffffff",
+        "section-width": "content",
+        "section_padding_top": 0,
+        "section_padding_bottom": 0,
+        "colors": "white"
+      }
+    },
+    "product-recommendations": {
+      "type": "template--product--recommendations",
+      "settings": {
+        "title": "You may also like",
+        "description": "",
+        "layout_style": "slider",
+        "products_to_show": 8,
+        "grid-desktop": 4,
+        "grid-mobile": "2",
+        "section_padding_top": 60,
+        "section_padding_bottom": 60,
+        "colors": "white",
+        "override_button_colors": false,
+        "button_background_color": "#e68819",
+        "button_text_color": "#ffffff"
+      }
+    },
+    "a2ebb565-046e-4619-8629-524262ee6f16": {
+      "type": "countdown",
+      "blocks": {
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-timer_complete_message-1": {
+          "type": "timer_complete_message",
+          "settings": {
+            "text": "You've just missed this offer"
+          }
+        },
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-heading-1": {
+          "type": "heading",
+          "settings": {
+            "heading": "Summer flash sale"
+          }
+        },
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-text-1": {
+          "type": "text",
+          "settings": {
+            "text": "10% off all immunity-boosting smoothies"
+          }
+        },
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-countdown_timer-1": {
+          "type": "countdown_timer",
+          "settings": {
+            "hide_when_complete": false,
+            "end_date": "",
+            "end_time": "",
+            "time_labels": true
+          }
+        },
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-button-1": {
+          "type": "button",
+          "settings": {
+            "link": "/",
+            "label": "Shop sale",
+            "buttons_style": "filled",
+            "override_button_colors": false,
+            "button_background_color": "#e68819",
+            "button_text_color": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-timer_complete_message-1",
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-heading-1",
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-text-1",
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-countdown_timer-1",
+        "template--14831909634118__a2ebb565-046e-4619-8629-524262ee6f16-button-1"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/banner_8348894e-9df6-4d0d-9ed2-ed147d95626d_png.webp",
+        "height_desktop": "original",
+        "text_alignment": "center",
+        "section_width": "content",
+        "section_margin_top": 0,
+        "section_margin_bottom": 0,
+        "text_color": "#ffffff",
+        "background_color": "#e6e5e7",
+        "overlay_color": "#262428",
+        "overlay_opacity": 62
+      }
+    },
+    "be11c98a-1496-4383-9104-a01bd8e6a524": {
+      "type": "template--product--info-columns",
+      "blocks": {
+        "template--14831909634118__be11c98a-1496-4383-9104-a01bd8e6a524-image_and_text-1": {
+          "type": "image_and_text",
+          "settings": {
+            "grid_image_size": "wide",
+            "heading": "In season flavours",
+            "text": "<p>New seasonal flavors will bring you a tantalizing taste experience like never before.</p>",
+            "button_link": "/",
+            "button_text": "Shop now"
+          }
+        },
+        "template--14831909634118__be11c98a-1496-4383-9104-a01bd8e6a524-image_and_text-2": {
+          "type": "image_and_text",
+          "settings": {
+            "grid_image_size": "wide",
+            "heading": "New store in San Antonio",
+            "text": "<p>Grab your favourite flavours at our new flagship store in San antonio</p>",
+            "button_link": "/",
+            "button_text": "View map"
+          }
+        },
+        "e144c5c9-4020-4afb-9d9d-abac6e9eb831": {
+          "type": "image_and_text",
+          "settings": {
+            "grid_image_size": "wide",
+            "heading": "Sale! Up to 30% off",
+            "text": "<p>Get ready for a refreshing deal! Enjoy our delicious smoothies at unbeatable prices.</p>",
+            "button_link": "/",
+            "button_text": "Shop sale"
+          }
+        }
+      },
+      "block_order": [
+        "template--14831909634118__be11c98a-1496-4383-9104-a01bd8e6a524-image_and_text-1",
+        "template--14831909634118__be11c98a-1496-4383-9104-a01bd8e6a524-image_and_text-2",
+        "e144c5c9-4020-4afb-9d9d-abac6e9eb831"
+      ],
+      "settings": {
+        "title": "",
+        "description": "",
+        "maximum_width": 500,
+        "override_border_radius": false,
+        "buttons_style": "underlined",
+        "override_button_colors": false,
+        "button_background_color": "#e68819",
+        "button_text_color": "#ffffff",
+        "hover_navigation_desktop": "left-and-right",
+        "columns_per_row": 3,
+        "vertical_alignment": "top",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "section_width": "content",
+        "section_padding_top": 0,
+        "section_padding_bottom": 60,
+        "colors": "white"
+      }
+    }
+  },
+  "order": [
+    "product-form",
+    "custom_image_with_text_slideshow_ffm4mw",
+    "image_with_text_overlay_Y3Y9AG",
+    "f986e408-5557-4aaf-80fb-9cd7e2059a61",
+    "460d6567-b3ab-4cca-8b8a-bddf9a7a02e4",
+    "a61cc3b0-560a-47ac-bb32-3dfdc743f6d8",
+    "dcfe78c8-3b44-44bb-88ef-3b68acb60aa5",
+    "product-recommendations",
+    "a2ebb565-046e-4619-8629-524262ee6f16",
+    "be11c98a-1496-4383-9104-a01bd8e6a524"
+  ]
+}
