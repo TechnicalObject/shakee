@@ -223,6 +223,7 @@
                         {% render 'product-pricing', current_variant: current_variant %}
                         {% render 'unit-price-measurement-variant', variant: current_variant %}
                       </div>
+                      <span>Nejnižší cena za posledních 30 dní {{ current_variant.price | money_with_currency }}</span>
 
                       {%- liquid
                         if cart.taxes_included and block.settings.tax_included
