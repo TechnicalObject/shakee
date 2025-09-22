@@ -197,6 +197,7 @@
                       {{ block.shopify_attributes }}
                     >
                       <h1 class="{{ block.settings.title_font }} product-details-product-title">{{ product.title | escape }}</h1>
+                      <h3>{{ current_variant.title }}</h3>
                     </div>
 
                   {% when 'separator' %}
