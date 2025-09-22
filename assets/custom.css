@@ -84,3 +84,8 @@ ul.site-nav li.first-level-dropdown:hover > a {
 #slide-up .popup--close-btn {
   color: white;
 }
+
+.sale-badge.badge {
+  scale: 1.3;
+  font-weight: bold !important;
+}
