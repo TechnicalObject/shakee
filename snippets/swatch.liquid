@@ -77,7 +77,7 @@
     {% comment %} ============ OPTION LABEL ============ {% endcomment %}
     <div class="option-label-wrapper{% if is_color_swatch or is_category_swatch or show_variant_image %} is-color-label{% endif %}">
       <div>
-        <div class="header label-font">{{ swatch_option.name }}</div>
+        <div class="header label-font"><strong>{{ swatch_option.name }}</strong></div>
         {% if is_color_swatch or is_category_swatch or show_variant_image %}
           <div class="header product-swatch-color-name" data-color-swatch-name-container>
             <span data-color-swatch-name>{{ swatch_option.selected_value | truncate: 22 }}</span>
