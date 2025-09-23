@@ -1,0 +1,35 @@
+{% comment %}
+  BEGIN: QR code content box for bank transfers by Digismoothie
+{% endcomment %}
+
+{% if order.financial_status == 'pending' %}
+  {% assign has_pending_payment = true %}
+{% else %}
+  {% assign has_pending_payment = false %}
+{% endif %}
+  {% if has_pending_payment %}
+    <p>Your text:</p>
+<ul><li>Bank account number: <b>[BANK-ACCOUNT]</b></li><li>Amount: <b>{{ total_price | money_with_currency }}</b></li><li>Refenrece: <b>{{ order_number }}</b></li></ul>
+
+{%- liquid
+    # Make sure to change these input variables
+    assign bank_account_number = '[BANK-ACCOUNT]'
+    assign bank_code = '[BANK-CODE]'
+    assign due_days = 0
+    assign qr_code_size = 150
+  
+    # Do not change these
+    assign compatible_order = order
+    if first_time_accessed
+      assign compatible_order = checkout.order
+    endif
+    assign bank_amount = compatible_order.total_price | divided_by: 100.0 | round: 2
+    assign seconds = due_days | times: 24 | times: 60 | times: 60
+    assign due_date = order.created_at | date: "%s" | plus: seconds | date: "%Y-%m-%d"
+  -%}
+  
+<img style="margin-left:45px" src="https://api.paylibo.com/paylibo/generator/czech/image?accountNumber={{ bank_account_number }}&bankCode={{ bank_code }}&amount={{ bank_amount }}&currency=CZK&vs={{ order_number }}&message=Shopify+obj.+{{ order_number }}&date={{ due_date }}" width="{{ qr_code_size }}">
+  
+  {% comment %}
+    END: QR code content box for bank transfers by Digismoothie
+  {% endcomment %}
