@@ -9,12 +9,12 @@
 {% endif %}
   {% if has_pending_payment %}
     <p>Your text:</p>
-<ul><li>Bank account number: <b>[BANK-ACCOUNT]</b></li><li>Amount: <b>{{ total_price | money_with_currency }}</b></li><li>Refenrece: <b>{{ order_number }}</b></li></ul>
+<ul><li>Bank account number: <b>[BANK-ACCOUNT]</b></li><li>Amount: <b>{{ total_price | money_with_currency }}</b></li><li>Reference: <b>{{ order_number }}</b></li></ul>
 
 {%- liquid
     # Make sure to change these input variables
-    assign bank_account_number = '[BANK-ACCOUNT]'
-    assign bank_code = '[BANK-CODE]'
+    assign bank_account_number = '1891137047'
+    assign bank_code = '3030'
     assign due_days = 0
     assign qr_code_size = 150
   
@@ -33,3 +33,4 @@
   {% comment %}
     END: QR code content box for bank transfers by Digismoothie
   {% endcomment %}
+{% endif %}
