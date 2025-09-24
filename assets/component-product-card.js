@@ -9993,10 +9993,18 @@ class ProductCard extends HTMLElement {
     if (!element || !this.salePriceContainer || !this.regularPriceContainer) return;
 
     const variantPrice = element.dataset.variantPrice;
-    const variantPriceValue = element.dataset.variantPriceValue;
+    const variantPriceValue = Number(element.dataset.variantPriceValue);
     const variantComparePrice = element.dataset.variantCompareAtPrice;
-    const variantComparePriceValue = element.dataset.variantCompareAtPriceValue;
+    const variantComparePriceValue = Number(element.dataset.variantCompareAtPriceValue);
     const salePriceEl = this.salePriceContainer.querySelector('.price--sale-price');
+    // if (element.dataset.productTitle === 'Formula 3 - Proteinový doplněk v prášku - 43g') {
+    //   console.log('typeof(variantPriceValue)', typeof(variantPriceValue));
+    //   console.log('typeof(variantComparePriceValue)', typeof(variantComparePriceValue));
+    //   console.log('variantPriceValue', variantPriceValue);
+    //   console.log('variantComparePriceValue', variantComparePriceValue);
+    //   console.log(`variantComparePriceValue (${variantComparePriceValue}) > variantPriceValue (${variantPriceValue})`, parseInt(variantComparePriceValue) > parseInt(variantPriceValue));
+    //   console.log(salePriceEl);
+    // }
     const compareAtPriceEl = this.salePriceContainer.querySelector('.price--compare-at-price');
     const fromText = this.querySelectorAll('.price--from-text');
 
