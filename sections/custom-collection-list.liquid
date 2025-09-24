@@ -208,7 +208,7 @@
             }
 
             .section--{{ section.id }} .block-section--{{ block.id }} .grid-item__title {
-              font-size: {{ block.settings.title_font_size | default: 18 }}px !important;
+              font-size: clamp(1.2rem, 2.5vw, 2rem) !important;
             }
 
             {% unless section.settings.content-position == 'below-image' %}
@@ -323,7 +323,7 @@
                       {% if section.settings.content-position == 'below-image' and block.settings.collection != blank %}
                         <a href="{{ collection.url }}" tabindex="-1">
                       {% endif %}
-                        <h3 class="grid-item__title" style="font-size: {{ block.settings.title_font_size }}px !important;"{% if section.settings.content-position == 'hover' %} data-animate-hover-block data-animate-order="{{ animation_order }}"{% endif %}>{{ collection_title }}</h3>
+                        <h3 class="grid-item__title" style="font-size: clamp(1.2rem, 2.5vw, 2rem);"{% if section.settings.content-position == 'hover' %} data-animate-hover-block data-animate-order="{{ animation_order }}"{% endif %}>{{ collection_title }}</h3>
                       {% if section.settings.content-position == 'below-image' and block.settings.collection != blank %}
                         </a>
                       {% endif %}
@@ -593,17 +593,6 @@
           "id": "overlay-btn-text",
           "label": "t:all.Button_label",
           "default": "Shop now"
-        },
-        {
-          "type": "range",
-          "id": "title_font_size",
-          "label": "Collection name font size",
-          "min": 12,
-          "max": 48,
-          "step": 1,
-          "unit": "px",
-          "default": 18,
-          "info": "Font size for the collection title"
         },
         {
           "type": "header",
