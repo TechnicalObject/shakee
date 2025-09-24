@@ -197,7 +197,9 @@
                       {{ block.shopify_attributes }}
                     >
                       <h1 class="{{ block.settings.title_font }} product-details-product-title">{{ product.title | escape }}</h1>
-                      <h3>{{ current_variant.title }}</h3>
+                      {% if current_variant.title  != 'Default Title' and current_variant.title  != blank %}
+                        <h3 style='margin-top: 10px;'>{{ current_variant.title }}</h3>
+                      {% endif %}
                     </div>
 
                   {% when 'separator' %}
