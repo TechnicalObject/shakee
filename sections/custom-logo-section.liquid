@@ -245,6 +245,8 @@
       left: 50%;
       transform: translateX(-50%);
       opacity: 0;
+      pointer-events: none;
+      z-index: 1;
       animation: textRotate {{ text_items | times: 3 }}s infinite;
     }
     
@@ -253,6 +255,7 @@
         {% assign item_index = forloop.index0 %}
         .center-text .text-line:nth-child({{ forloop.index | times: 2 | minus: 1 }}) {
           animation-delay: {{ item_index | times: 3 }}s;
+          animation-name: textRotateWithInteraction;
         }
       {% endif %}
     {% endfor %}
@@ -319,24 +322,39 @@
     }
   }
 
-  @keyframes textRotate {
+  @keyframes textRotateWithInteraction {
     0% {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+      z-index: 10;
     }
-    {% assign fade_out_start = 100 | divided_by: text_items | minus: 5 %}
+    {% assign fade_out_start = 100 | divided_by: text_items | minus: 8 %}
     {{ fade_out_start }}% {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+      z-index: 10;
+    }
+    {% assign fade_out_mid = 100 | divided_by: text_items | minus: 3 %}
+    {{ fade_out_mid }}% {
+      opacity: 0.5;
+      transform: translateX(-50%) translateY(-5px);
+      pointer-events: none;
+      z-index: 1;
     }
     {% assign fade_out_end = 100 | divided_by: text_items %}
     {{ fade_out_end }}% {
       opacity: 0;
       transform: translateX(-50%) translateY(-10px);
+      pointer-events: none;
+      z-index: 1;
     }
     100% {
       opacity: 0;
       transform: translateX(-50%) translateY(-10px);
+      pointer-events: none;
+      z-index: 1;
     }
   }
 </style>
