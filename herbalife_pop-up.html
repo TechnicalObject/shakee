@@ -254,7 +254,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 var cookie_content = wcGetCookie('wc_popup_herba');
-if (cookie_content != "shown") {
+var hostname = window.location.hostname;
+console.log(hostname);
+if (cookie_content != "shown" && hostname.includes('shopify.com')) {
   document.getElementById('wc_herba_popup').style.display = 'block';
   wcSetCookie('wc_popup_herba', 'shown', 30);
 }
