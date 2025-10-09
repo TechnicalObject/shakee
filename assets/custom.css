@@ -13,7 +13,7 @@
 }
 
 /* For better responsive behavior */
-@media screen and (max-width: 1100px) {
+@media screen and (max-width:1150px) {
   .site-header {
       display: none;
   }
