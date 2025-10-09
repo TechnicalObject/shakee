@@ -1,0 +1,22 @@
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var hostname = window.location.hostname;
+
+    if (hostname.includes('shopify.com')) {
+      const hideElements = () => {
+        const banner = document.getElementById("shopify-pc__banner");
+        const slideUp = document.getElementById("slide-up");
+
+        if (banner) banner.style.setProperty('display', 'none', 'important');
+        if (slideUp) slideUp.style.setProperty('display', 'none', 'important');
+      };
+
+      // Run once immediately
+      hideElements();
+
+      // Observe for future DOM changes (Shopify injects dynamically)
+      const observer = new MutationObserver(hideElements);
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+  });
+</script>
