@@ -70,8 +70,8 @@ var varHTML = `
     background: #7ac142;
     border-radius: 50%;
     color: #fff !important;
-    width: 36px;
-    height: 36px;
+    width: 25px;
+    height: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -91,7 +91,7 @@ var varHTML = `
   }
 
   .herbalife-close-mobile {
-    display: none;
+    display: block;
     background: #7ac142;
     border: none;
     border-radius: 28px;
@@ -136,22 +136,26 @@ var varHTML = `
 
   .herbalife-info p a {
     font-weight: bold;
-    color: #7ac142 !important;
     text-decoration: none;
+  }
+
+  .herbalife-green-link {
+    color: #7ac142 !important;
   }
 
   .herbalife-info p a:hover {
     text-decoration: underline;
   }
 
+  .bottom-text {
+    margin-top: 20px;
+    text-align: center;
+  }
+
   /* Responsive */
   @media screen and (max-width: 767px) {
     .herbalife-close {
       display: none;
-    }
-    
-    .herbalife-close-mobile {
-      display: block;
     }
     
     .herbalife-row {
@@ -166,6 +170,19 @@ var varHTML = `
     }
     .right-col.border {
       margin-top: 15px;
+    }
+
+    .herbalife-info h1 {
+      font-size: 15px;
+    }
+
+    .herbalife-info p {
+      font-size: 12px;
+    }
+
+    .bottom-text {
+      margin-top: 0px;
+      text-align: left;
     }
   }
 
@@ -195,18 +212,24 @@ var varHTML = `
             <p>
               Váš osobní vztah s Vaším Distributorem Herbalife Nutrition je zcela klíčový pro dosažení Vašich nutričních cílů. 
               Pokud Daniel Jahoda není Váš osobní Distributor, doporučujeme Vám zakoupit produkty u svého osobního Distributora. 
-              V opačném případě, <a href="#" onclick="wcHidePopUp()">klikněte zde</a> pokračujte dále na webovou stránku.
+              V opačném případě, <a href="#" class="herbalife-green-link" onclick="wcHidePopUp()">klikněte zde</a> pokračujte dále na webovou stránku.
             </p>
           </div>
           <div class="right-col border">
-            <h1>UŽ JSTE NEZÁVISLÝM DISTRIBUTOREM NEBO PREFEROVANÝM ZÁKAZNÍKEM HERBALIFE NUTRITION?</h1>
+            <h1>Už jste nezávislým distributorem nebo preferovaným zákazníkem Herbalife Nutrition?</h1>
             <p>
               K uskutečnění nákupu prostřednictvím Vašeho vlastního účtu a získání plného kreditu prosím přejděte na 
               <a href="http://cz.myherbalife.com">myherbalife.com</a>
             </p>
           </div>
+          <div class="bottom-text">
+            <h1>Dovolte mi pomoci Vám dosáhnout Vašich cílů</h1>
+            <p>
+              Zákazníci mají větší šanci dosáhnout svých cílů se správnými produkty, vztahem s jejich nezávislým Distributorem Herbalife a být součásti komunity. Máte-li zájem o bezplatnou personalizovanou podporu k dosažení Vašich cílů, prosím kontaktujte mě pomocí výše uvedených údajů.
+            </p>
+          </div>
         </div>
-        <button class="herbalife-close-mobile" onclick="wcHidePopUp()">Zavřít</button>
+        <button class="herbalife-close-mobile" onclick="wcHidePopUp()">Pokračovat</button>
       </div>
     </div>
   </div>
@@ -256,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
 var cookie_content = wcGetCookie('wc_popup_herba');
 var hostname = window.location.hostname;
 console.log(hostname);
-if (cookie_content != "shown" && hostname.includes('shopify.com')) {
+if (cookie_content != "shown" && !hostname.includes('shopify.com')) {
   document.getElementById('wc_herba_popup').style.display = 'block';
   wcSetCookie('wc_popup_herba', 'shown', 30);
 }
