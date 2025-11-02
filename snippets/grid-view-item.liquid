@@ -134,6 +134,25 @@
       assign truncate_value = 80
     endif
   endif
+
+  comment
+    Use variant-specific data when variant is passed
+  endcomment
+  if variant
+    assign current_variant = variant
+    assign display_title = variant_title | default: product.title
+    assign variant_url = product.url | append: '?variant=' | append: variant.id
+    if collection
+      assign variant_url = variant_url | within: collection
+    endif
+  else
+    assign current_variant = product.selected_or_first_available_variant
+    assign display_title = product.title
+    assign variant_url = product.url
+    if collection
+      assign variant_url = variant_url | within: collection
+    endif
+  endif
 %}
 
 {% if enable_badges and badge_anim_order %}
@@ -168,13 +187,13 @@
 
 <product-card
   class="grid-view-item {{ alignment_class }}"
-  data-product-available="{{ product.available }}"
+  data-product-available="{{ current_variant.available }}"
   data-product-variants-size="{{ product.variants.size }}"
-  data-product-id="{{ product.variants.first.id }}"
-  data-product-url="{{ product.url | within: collection }}"
+  data-product-id="{{ current_variant.id }}"
+  data-product-url="{{ variant_url }}"
   data-grid-count-desktop="{{ grid_count_desktop }}"
   data-grid-count-mobile="{{ grid_count_mobile }}"
-  data-current_variant="{{ product.selected_or_first_available_variant | json | escape }}"
+  data-current_variant="{{ current_variant | json | escape }}"
   {% if animate %}
     data-animate
     data-animate-order="{{ animate_order }}"
@@ -189,7 +208,7 @@
         assign preorder_string = 'products.product.preorder' | t | downcase
         assign preorder_product = false
 
-        if product.available
+        if current_variant.available
           for tag in product.tags
             assign lowecase_tag = tag | downcase
             if lowecase_tag contains preorder_string
@@ -201,23 +220,23 @@
 
         assign add_to_cart_text = 'products.product.add_to_cart' | t
         assign add_to_cart_translation_key = 'addToCart'
-        assign live_region_text = 'products.general.add_product_to_cart' | t: product: product.title
+        assign live_region_text = 'products.general.add_product_to_cart' | t: product: display_title
         if preorder_product
           assign add_to_cart_text = 'products.product.preorder' | t
           assign add_to_cart_translation_key = 'preorder'
-          assign live_region_text = 'products.general.preorder_product' | t: product: product.title
+          assign live_region_text = 'products.general.preorder_product' | t: product: display_title
         endif
       -%}
 
-      <a href="{{ product.url | within: collection }}" title="{{ product.title }}" class="grid__image grid__image__match {% if settings.product-grid == 'natural' %} image-height--natural{% endif %}" tabindex="-1" data-product-card-link>
+      <a href="{{ variant_url }}" title="{{ display_title }}" class="grid__image grid__image__match {% if settings.product-grid == 'natural' %} image-height--natural{% endif %}" tabindex="-1" data-product-card-link>
         {% if image_crop %}<div class="aspect-ratio {{ image_crop }}">{% endif %}
           
           {% comment %} Badge container {% endcomment %}
           {% if enable_badges %}
             <div data-product-badge>
-              {% if product.available %}
+              {% if current_variant.available %}
                 {% comment %} Always show sale/discount badge if applicable {% endcomment %}
-                {% render 'badge' with badge: 'sale', badge_product: product, use_variant: true, attributes: badge_attributes %}
+                {% render 'badge' with badge: 'sale', badge_product: product, variant: current_variant, use_variant: true, attributes: badge_attributes %}
                 
                 {% comment %} Show preorder badge {% endcomment %}
                 {% if preorder_product %}
@@ -239,8 +258,16 @@
             </div>
           {% endif %}
 
+          {% comment %} Use variant-specific image if available {% endcomment %}
+          {% liquid
+            assign featured_image = product.featured_media
+            if variant and variant.featured_media
+              assign featured_image = variant.featured_media
+            endif
+          %}
+
           {% if product.media.size > 0 %}
-            {% assign image = product.featured_media %}
+            {% assign image = featured_image %}
             {% assign img_alt = image.alt %}
             {% if img_alt == product.title %}
               {% assign img_alt = '' %}
@@ -271,8 +298,9 @@
       <div class="product-card-image--bottom-wrapper">
         {% if quick_shop_desktop_enabled or quick_shop_mobile_enabled %}
           {% if settings.quick_shop_button_display == 'over_image' %}
-            <div data-product-added="{{ 'products.general.product_added_to_cart' | t: product: product.title }}" class="quick-add-wrapper{% if product.variants.size == 1 %} is-singular{% endif %}">
-              {% if product.variants.size > 1 and product.available %}
+            <div data-product-added="{{ 'products.general.product_added_to_cart' | t: product: display_title }}" class="quick-add-wrapper{% if product.variants.size == 1 %} is-singular{% endif %}">
+              {% comment %} Disabled because of modifications {% endcomment %}
+              {% if product.variants.size > 1 and current_variant.available and false %}
                 {% if quick_shop_desktop_enabled %}
                   {% render 'quick-view-modal', quick_view_product: product, link_type: 'desktop' %}
                 {% endif %}
@@ -280,9 +308,9 @@
                 {% if quick_shop_mobile_enabled %}
                   {% render 'quick-view-modal', quick_view_product: product, link_type: 'mobile' %}
                 {% endif %}
-              {% elsif product.available %}
+              {% elsif current_variant.available %}
                 {% form 'product', product, id: "CollectionAddToCartForm" %}
-                  <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
+                  <input type="hidden" name="id" value="{{ current_variant.id }}" />
                   {% if settings.cart_type == "drawer" %}
                     <input type="hidden" name="sections" value="cart-drawer" />
                   {% endif %}
@@ -300,11 +328,11 @@
                 {% endform %}
               {% else %}
                 {% if quick_shop_desktop_enabled %}
-                  <a aria-label="{{ product.title }} - {{ 'products.product.sold_out' | t }}" class="btn sold-out-button sold-out-button-desktop disabled" tabindex="0" href="{{ product.url | within: collection }}">{{ 'products.product.sold_out' | t }}</a>
+                  <a aria-label="{{ display_title }} - {{ 'products.product.sold_out' | t }}" class="btn sold-out-button sold-out-button-desktop disabled" tabindex="0" href="{{ variant_url }}">{{ 'products.product.sold_out' | t }}</a>
                 {% endif %}
 
                 {% if quick_shop_mobile_enabled %}
-                  <a aria-label="{{ product.title }} - {{ 'products.product.sold_out' | t }}" class="sold-out-button sold-out-button-mobile icon-btn-focus-inner-muted" tabindex="0" href="{{ product.url | within: collection }}"><span class="round-icon-btn-sm">{% render 'theme-icon' with icon: 'shopping-bag', iconClasses: 'quick-view-mobile-icon', iconSize: 16 %}</span></a>
+                  <a aria-label="{{ display_title }} - {{ 'products.product.sold_out' | t }}" class="sold-out-button sold-out-button-mobile icon-btn-focus-inner-muted" tabindex="0" href="{{ variant_url }}"><span class="round-icon-btn-sm">{% render 'theme-icon' with icon: 'shopping-bag', iconClasses: 'quick-view-mobile-icon', iconSize: 16 %}</span></a>
                 {% endif %}
               {% endif %}
             </div>
@@ -320,13 +348,13 @@
 
     {% if settings.show_product_card_title %}
       <div class="product-grid--title {{ title_font }}">
-        <a{% unless settings.product_card_text_alignment == 'right' %} class="text-truncate--line"{% endunless %} href="{{ product.url | within: collection }}" data-product-card-link>{% if settings.product_card_max_lines > 0 and settings.product_card_text_alignment == 'right' %}{{ product.title | truncate: truncate_value }}{% else %}{{ product.title }}{% endif %}</a>
+        <a{% unless settings.product_card_text_alignment == 'right' %} class="text-truncate--line"{% endunless %} href="{{ variant_url }}" data-product-card-link>{% if settings.product_card_max_lines > 0 and settings.product_card_text_alignment == 'right' %}{{ display_title | truncate: truncate_value }}{% else %}{{ display_title }}{% endif %}</a>
       </div>
     {% endif %}
 
     {% if price_enabled %}
       <div class="product-grid--price {{ price_font }}">
-        {%- render 'product-grid-item-price', price_product: product, collection: collection -%}
+        {%- render 'product-grid-item-price', price_product: product, variant: current_variant, collection: collection -%}
       </div>
     {% endif %}
 
@@ -344,16 +372,16 @@
       %}
     {% endif %}
 
-    {% if card_color_swatches_enabled %}
+    {% comment %} {% if card_color_swatches_enabled %}
       {% for option in product.options_with_values %}
         {% render 'card-color-swatch' with swatch_product: product, swatch_option: option, hide_out_of_stock_variants: false, show_color_label: show_color_label, option_index: forloop.index %}
       {% endfor %}
-    {% endif %}
+    {% endif %} {% endcomment %}
   </div>
 
   {% if quick_shop_desktop_enabled or quick_shop_mobile_enabled %}
     {% if settings.quick_shop_button_display == 'below_image' %}
-      <div data-product-added="{{ 'products.general.product_added_to_cart' | t: product: product.title }}" class="quick-add-wrapper quick-shop--block{% if product.variants.size == 1 %} is-singular{% endif %}{% if quick_shop_mobile_only %} large-hide{% elsif quick_shop_desktop_only %} small-hide{% endif %}{% if settings.quick_shop_button_style == 'underlined' %} text-link-animated{% endif %}">
+      <div data-product-added="{{ 'products.general.product_added_to_cart' | t: product: display_title }}" class="quick-add-wrapper quick-shop--block is-singular{% if quick_shop_mobile_only %} large-hide{% elsif quick_shop_desktop_only %} small-hide{% endif %}{% if settings.quick_shop_button_style == 'underlined' %} text-link-animated{% endif %}">
         {% liquid
           case settings.quick_shop_button_style
             when 'filled'
@@ -367,11 +395,12 @@
             assign button_classes = 'dynamic-section-button--grid-item--' | append: section_id | append: ' ' | append: button_classes
           endif
         %}
-        {% if product.variants.size > 1 and product.available %}
+        {% comment %} Disabled because of modifications {% endcomment %}
+        {% if product.variants.size > 1 and current_variant.available and false  %}
             {% render 'quick-view-modal', quick_view_product: product, link_type: 'general', button_classes: button_classes %}
-        {% elsif product.available %}
+        {% elsif current_variant.available %}
           {% form 'product', product, id: "CollectionAddToCartForm" %}
-            <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
+            <input type="hidden" name="id" value="{{ current_variant.id }}" />
             {% if settings.cart_type == "drawer" %}
               <input type="hidden" name="sections" value="cart-drawer" />
             {% endif %}
@@ -381,7 +410,7 @@
             <div aria-live="polite" class="sr-only">{{ live_region_text }}</div>
           {% endform %}
         {% else %}
-          <a class="{{ button_classes }} sold-out-button sold-out-button-desktop disabled" tabindex="-1" href="{{ product.url | within: collection }}">{{ 'products.product.sold_out' | t }}</a>
+          <a class="{{ button_classes }} sold-out-button sold-out-button-desktop disabled" tabindex="-1" href="{{ variant_url }}">{{ 'products.product.sold_out' | t }}</a>
         {% endif %}
       </div>
     {% endif %}

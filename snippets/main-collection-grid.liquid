@@ -3,6 +3,12 @@
 
 {% assign display-total-collection-products-total = display-total-collection-products-number-rows | times: display-total-collection-products-per-row %}
 
+{% comment %} Calculate total variants for pagination {% endcomment %}
+{% assign total_variants = 0 %}
+{% for product in collection.products %}
+  {% assign total_variants = total_variants | plus: product.variants.size %}
+{% endfor %}
+
 {% paginate collection.products by display-total-collection-products-total %}
 
   {% capture paginate_style %}
@@ -69,34 +75,46 @@
           data-grid-id="{{ section.id }}"
           id="template--collection"
         >
+          {% assign variant_index = 0 %}
           {% for product in collection.products %}
-            <div class="grid__item {{ grid_item_width }} show-on-scroll">
-              {%- liquid
-                assign loading = 'lazy'
-                if forloop.index <= desktop_products_per_row
-                  assign loading = 'eager'
-                endif
+            {% for variant in product.variants %}
+              {% assign variant_index = variant_index | plus: 1 %}
+              <div class="grid__item {{ grid_item_width }} show-on-scroll">
+                {%- liquid
+                  assign loading = 'lazy'
+                  if variant_index <= desktop_products_per_row
+                    assign loading = 'eager'
+                  endif
 
-                assign animate_order = forloop.index | modulo: desktop_products_per_row
-                if animate_order == 0
-                  assign animate_order = desktop_products_per_row
-                endif
-                assign badge_anim_order = animate_order | plus: 2
+                  assign animate_order = variant_index | modulo: desktop_products_per_row
+                  if animate_order == 0
+                    assign animate_order = desktop_products_per_row
+                  endif
+                  assign badge_anim_order = animate_order | plus: 2
 
-                assign animate_order_ipad = forloop.index | modulo: 2
-                if animate_order_ipad == 0
-                  assign animate_order_ipad = 2
-                endif
-                assign badge_anim_order_ipad = animate_order_ipad | plus: 2
+                  assign animate_order_ipad = variant_index | modulo: 2
+                  if animate_order_ipad == 0
+                    assign animate_order_ipad = 2
+                  endif
+                  assign badge_anim_order_ipad = animate_order_ipad | plus: 2
 
-                assign animate_order_mobile = forloop.index | modulo: mobile_products_per_row
-                if animate_order_mobile == 0
-                  assign animate_order_mobile = mobile_products_per_row
-                endif
-                assign badge_anim_order_mobile = animate_order_mobile | plus: 2
-              -%}
-              {% render 'grid-view-item', product: product, collection: collection, enable_badges: settings.show_badges, grid_count_desktop: desktop_products_per_row, grid_count_mobile: mobile_products_per_row, loading: loading, badge_anim_order: badge_anim_order, badge_anim_order_mobile: badge_anim_order_mobile, badge_anim_order_ipad: badge_anim_order_ipad, animate: true, animate_order: animate_order, animate_order_ipad: animate_order_ipad, animate_order_mobile: animate_order_mobile %}
-            </div>
+                  assign animate_order_mobile = variant_index | modulo: mobile_products_per_row
+                  if animate_order_mobile == 0
+                    assign animate_order_mobile = mobile_products_per_row
+                  endif
+                  assign badge_anim_order_mobile = animate_order_mobile | plus: 2
+
+                  comment
+                    Create a modified product title with variant name
+                  endcomment
+                  assign variant_title = product.title
+                  if variant.title != 'Default Title'
+                    assign variant_title = product.title | append: ' - ' | append: variant.title
+                  endif
+                -%}
+                {% render 'grid-view-item', product: product, variant: variant, variant_title: variant_title, collection: collection, enable_badges: settings.show_badges, grid_count_desktop: desktop_products_per_row, grid_count_mobile: mobile_products_per_row, loading: loading, badge_anim_order: badge_anim_order, badge_anim_order_mobile: badge_anim_order_mobile, badge_anim_order_ipad: badge_anim_order_ipad, animate: true, animate_order: animate_order, animate_order_ipad: animate_order_ipad, animate_order_mobile: animate_order_mobile %}
+              </div>
+            {% endfor %}
           {% else %}
             {% if collection.handle == 'all' and collection.all_vendors.size == 0 and collection.all_types.size == 0 %}
               {% for i in (1..display-total-collection-products-total) %}
