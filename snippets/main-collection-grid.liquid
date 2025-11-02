@@ -1,0 +1,124 @@
+{% assign display-total-collection-products-number-rows = desktop_products_per_row %}
+{% assign display-total-collection-products-per-row = products_per_page %}
+
+{% assign display-total-collection-products-total = display-total-collection-products-number-rows | times: display-total-collection-products-per-row %}
+
+{% paginate collection.products by display-total-collection-products-total %}
+
+  {% capture paginate_style %}
+    {% if paginate.pages > 1 %}
+      {% if pagination_options == 'pagination_infinite_scrolling' %}
+        <div style="display: none" class="pagination-loading">
+          {% liquid 
+            assign icon_fill = 'rgba(' | append: settings.color_primary_button_text.rgba | append: ')'
+          %}
+          {% render 'theme-icon' with icon: 'circle-notch', iconClasses: 'spin flex-full', icon_fill: icon_fill, iconSize: '20' %}
+          <span class="sr-only">{{ 'collections.paginate.load_more' | t }}</span>
+        </div>
+      {% endif %}
+
+      <div
+        class="pagination{% if pagination_options == 'pagination_infinite_scrolling' %} pagination-infinite{% elsif pagination_options == 'pagination_load_more' %} pagination--load-more{% endif %}"
+        data-paginate-items="{{ paginate.items }}"
+        data-paginate-offset="{{ paginate.current_offset }}"
+        data-paginate-size="{{ paginate.page_size }}"
+      >
+        {% render 'pagination', paginate: paginate %}
+      </div>
+    {% endif %}
+  {% endcapture %}
+
+{% case desktop_products_per_row %}
+  {% when 2 %}
+    {% assign desktop_item_width = 'large--one-half' %}
+  {% when 3 %}
+    {% assign desktop_item_width = 'large--one-third' %}
+  {% when 4 %}
+    {% assign desktop_item_width = 'large--one-quarter' %}
+  {% when 5 %}
+    {% assign desktop_item_width = 'large--one-fifth' %}
+  {% when 6 %}
+    {% assign desktop_item_width = 'large--one-sixth' %}
+{% endcase %}
+
+{% assign tablet_item_width = 'medium--one-half' %}
+
+{% case mobile_products_per_row %}
+  {% when "1" %}
+    {% assign mobile_item_width = 'small--one-whole' %}
+  {% when "2" %}
+    {% assign mobile_item_width = 'small--one-half' %}
+{% endcase %}
+
+{%- assign grid_item_width = desktop_item_width | append: ' ' | append: tablet_item_width | append: ' ' | append: mobile_item_width -%}
+
+  <div
+    id="CollectionProductGrid"
+    data-section-id="{{ section.id }}"
+    data-wetheme-section-type="template--collection"
+    data-wetheme-section-id="{{ section.id }}"
+  >
+
+    <div class="collection-style--grid">
+      <div class="collection-main-body grid-uniform">
+
+        <input type="hidden" id="grid_item_width_classes" value="{{ grid_item_width }}" />
+
+        <div
+          class="collection-main-body-inner product-grid--wrapper"
+          data-grid-id="{{ section.id }}"
+          id="template--collection"
+        >
+          {% for product in collection.products %}
+            <div class="grid__item {{ grid_item_width }} show-on-scroll">
+              {%- liquid
+                assign loading = 'lazy'
+                if forloop.index <= desktop_products_per_row
+                  assign loading = 'eager'
+                endif
+
+                assign animate_order = forloop.index | modulo: desktop_products_per_row
+                if animate_order == 0
+                  assign animate_order = desktop_products_per_row
+                endif
+                assign badge_anim_order = animate_order | plus: 2
+
+                assign animate_order_ipad = forloop.index | modulo: 2
+                if animate_order_ipad == 0
+                  assign animate_order_ipad = 2
+                endif
+                assign badge_anim_order_ipad = animate_order_ipad | plus: 2
+
+                assign animate_order_mobile = forloop.index | modulo: mobile_products_per_row
+                if animate_order_mobile == 0
+                  assign animate_order_mobile = mobile_products_per_row
+                endif
+                assign badge_anim_order_mobile = animate_order_mobile | plus: 2
+              -%}
+              {% render 'grid-view-item', product: product, collection: collection, enable_badges: settings.show_badges, grid_count_desktop: desktop_products_per_row, grid_count_mobile: mobile_products_per_row, loading: loading, badge_anim_order: badge_anim_order, badge_anim_order_mobile: badge_anim_order_mobile, badge_anim_order_ipad: badge_anim_order_ipad, animate: true, animate_order: animate_order, animate_order_ipad: animate_order_ipad, animate_order_mobile: animate_order_mobile %}
+            </div>
+          {% else %}
+            {% if collection.handle == 'all' and collection.all_vendors.size == 0 and collection.all_types.size == 0 %}
+              {% for i in (1..display-total-collection-products-total) %}
+                {% capture svg_index %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                {% capture svg_index_reversed %}{% cycle 6, 5, 4, 3, 2, 1 %}{% endcapture %}
+                <div class="grid__item {{ grid_item_width }}">
+                  {% render 'grid-view-item-placeholder', svg_index: svg_index, svg_index_reversed: svg_index_reversed %}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% comment %}
+                If collection exists but is empty, display message
+              {% endcomment %}
+              <div class="grid__item">
+                <p>{{ 'collections.general.no_matches' | t }}</p>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {{ paginate_style }}
+  </div>
+
+{% endpaginate %}
