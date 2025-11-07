@@ -281,12 +281,21 @@
             {% endif %}
 
             {% if settings.hover-effect and product.media.size > 1 %}
-              {% assign image = product.media[1] %}
-              {% assign img_alt = image.alt %}
+              {% comment %} Use variant metafield image if available, otherwise use second product image {% endcomment %}
+              {% liquid
+                assign secondary_image = null
+                if current_variant.metafields.custom.variant_image_2
+                  assign secondary_image = current_variant.metafields.custom.variant_image_2
+                else
+                  assign secondary_image = product.media[1]
+                endif
+              %}
+              
+              {% assign img_alt = secondary_image.alt %}
               {% if img_alt == product.title %}
                 {% assign img_alt = '' %}
               {% endif %}
-              {% render 'responsive-image' with image, alt: img_alt, wrapper_class: "product-card__image product-card__image--secondary", allow_stretch: true, blur: false, class: 'block-radius' %}
+              {% render 'responsive-image' with secondary_image, alt: img_alt, wrapper_class: "product-card__image product-card__image--secondary", allow_stretch: true, blur: false, class: 'block-radius' %}
             {% endif %}
           {% else %}
             {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
