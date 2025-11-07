@@ -1,0 +1,47 @@
+{% comment %}
+  BEGIN: QR code content box for bank transfers by Digismoothie
+{% endcomment %}
+
+{%- liquid
+    # Make sure to change these input variables
+    assign bank_account_number = ''
+    assign bank_code = ''
+    assign due_days = 0
+    assign qr_code_size = 150
+  
+    # Do not change these
+    assign compatible_order = order
+    if first_time_accessed
+      assign compatible_order = checkout.order
+    endif
+    assign bank_variable_symbol = compatible_order.order_number
+    assign bank_amount = compatible_order.total_price | divided_by: 100.0 | round: 2
+    assign seconds = due_days | times: 24 | times: 60 | times: 60
+    assign due_date = order.created_at | date: "%s" | plus: seconds | date: "%Y-%m-%d"
+    assign is_bank = false
+    assign is_cancelled = order.cancelled
+    assign is_paid = order.financial_status
+    capture payment_methods
+      for t in compatible_order.transactions
+        echo t.gateway | downcase
+      endfor
+    endcapture
+    # Change the lookup keyword 'bank' if necessary
+    if payment_methods contains 'bank'
+      assign is_bank = true
+    endif
+  -%}
+
+  {%- if is_bank and is_cancelled == false and is_paid == “pending” -%}
+    <script>
+      Checkout.$(function() {
+        Shopify.Checkout.OrderStatus.addContentBox(
+          `<div class="text-container"><h2>Údaje pro platbu bankovním převodem</h2><p>Platbu prosím uhraďte na náš bankovní účet dle následujících parametrů nebo využijte QR kód níže.<ul style="list-style-type: disc; margin-left: 16px;"><li>Číslo účtu: <span class="emphasis">{{ bank_account_number }}/{{ bank_code }}</span></li><li>Částka: <span class="emphasis">{{ total_price | money_with_currency }}</span></li><li>Variabilní symbol: <span class="emphasis">{{ bank_variable_symbol }}</span></li></ul></p><p>Na kompletaci objednávky začneme pracovat ihned, jakmile platbu zaregistrujeme.</p></div>`,`<img src="https://api.paylibo.com/paylibo/generator/czech/image?accountNumber={{ bank_account_number }}&bankCode={{ bank_code }}&amount={{ bank_amount }}&currency=CZK&vs={{ bank_variable_symbol }}&message=Shopify+obj.+{{ bank_variable_symbol }}&date={{ due_date }}" width="{{ qr_code_size }}">`
+        )
+      });
+    </script>
+  {%- endif -%}
+  
+  {% comment %}
+  	END: QR code content box for bank transfers by Digismoothie
+  {% endcomment %}
