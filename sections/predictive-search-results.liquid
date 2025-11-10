@@ -1,0 +1,129 @@
+
+<div class="predictive-search__results-wrapper">
+  {% if predictive_search.performed %}
+
+    {%- liquid
+      assign results_count = 0
+
+      for resource in predictive_search.resources
+        assign results_count = results_count | plus: resource.last.size
+      endfor
+
+      assign has_main_results = false
+      if predictive_search.resources.products.size > 0 or predictive_search.resources.collections.size > 0 or predictive_search.resources.pages.size > 0 or predictive_search.resources.articles.size > 0
+        assign has_main_results = true
+      endif
+
+      assign pages_and_articles = predictive_search.resources.pages | concat: predictive_search.resources.articles
+    -%}
+
+    <div class="predictive-search__results wrapper-spacing--h{% if predictive_search.resources.queries.size > 0 and has_main_results %} predictive-search__results--is-grid{% endif %}">
+      {% if results_count > 0 %}
+        {% if predictive_search.resources.queries.size > 0 %}
+          <div class="predictive-search__list">
+            <p class="predictive-search__title h5">{{ 'general.search.suggestions' | t }}</p>
+            <div class="predictive-search__list-items nav-link-animated">
+              {% for query in predictive_search.resources.queries %}
+                <div>
+                  <a href="{{ query.url }}" class="predictive-search__list-item"><span class="animated-underline">{{ query.styled_text }}</span></a>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="predictive-search__view-all-desktop text-link-animated">
+              <a href="{{ routes.search_url }}?q={{ predictive_search.terms }}" class="predictive-search__list-item">{{ 'general.search.view_all' | t }}</a>
+            </div>
+          </div>
+        {% endif %}
+        {% if has_main_results %}
+          <div class="predictive-search__main-results" data-predictive-search-main-results>
+            <div class="predictive-search__nav">
+              <div class="predictive-search__nav-buttons" data-predictive-search-nav-buttons>
+                {% assign is_default_nav_button = true %}
+
+                {% for i in (1..3) %}
+                  {% capture category %}{% cycle 'products', 'collections', 'other' %}{% endcapture %}
+
+                  {% if category == 'other' %}
+                    {% assign results_array = pages_and_articles %}
+                  {% else %}
+                    {% assign results_array = predictive_search.resources[category] %}
+                  {% endif %}
+
+                  {% if results_array.size > 0 %}
+                    <button role="tab" id="{{ section.id }}-{{ category }}" aria-controls="{{ section.id }}-{{ category }}" aria-selected="{{ is_default_nav_button }}" class="predictive-search__nav-button h5{% if is_default_nav_button %} active{% endif %}" data-nav-id="{{ category }}">{{ 'general.search.' | append: category | t }}</button>
+                    {% assign is_default_nav_button = false %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <div class="predictive-search__view-all-desktop text-link-animated">
+                <a href="{{ routes.search_url }}?q={{ predictive_search.terms }}" class="predictive-search__list-item">{{ 'general.search.view_all' | t }}</a>
+              </div>
+            </div>
+            {% assign is_default_grid = true %}
+            {% if predictive_search.resources.products.size > 0 %}
+              <div role="tabpanel" id="{{ section.id }}-products" aria-labelledby="{{ section.id }}-products" class="predictive-search__grid predictive-search__grid--products" data-grid-id="products"{% unless is_default_grid %} hidden{% endunless %}>
+                {% for product_result in predictive_search.resources.products limit: 4 %}
+                  <div class="predictive-search__grid-item" data-animate data-animate-order="{{ forloop.index }}">
+                    {% render 'grid-view-item', product: product_result, is_search_result: true, enable_badges: settings.show_badges, grid_count_desktop: 4, grid_count_mobile: 2 %}
+                  </div>
+                {% endfor %}
+              </div>
+              {% assign is_default_grid = false %}
+            {% endif %}
+            {% if predictive_search.resources.collections.size > 0 %}
+              <div role="tabpanel" id="{{ section.id }}-collections" aria-labelledby="{{ section.id }}-collections" class="predictive-search__grid" data-grid-id="collections"{% unless is_default_grid %} hidden{% endunless %}>
+                {% for collection_result in predictive_search.resources.collections limit: 4 %}
+                  {% assign collection_image = collection_result.image %}
+                  {% if settings.predictive_search_collections_image_type == 'first_product' %}
+                    {% assign collection_image = collection_result.products.first.featured_image %}
+                  {% endif %}
+                  <div class="predictive-search__grid-item" data-animate data-animate-order="{{ forloop.index }}">
+                    <a href="{{ collection_result.url }}" class="predictive-search__collection-link{% unless collection_image %} predictive-search__collection-link--no-image block-radius{% endunless %}{% unless settings.predictive_search_collections_aspect == 'natural' %} predictive-search__collection-aspect predictive-search__collection-aspect--{{ settings.predictive_search_collections_aspect }}{% endunless %}">
+                      {% if collection_image %}
+                        <div class="predictive-search__collection-image block-radius-clip" data-animate-hover-zoom>
+                          {% render 'responsive-image' with collection_image, allow_stretch: true %}
+                        </div>
+                      {% endif %}
+                      <h5 class="predictive-search__collection-title">{{ collection_result.title }}</h5>
+                    </a>
+                  </div>
+                {% endfor %}
+              </div>
+              {% assign is_default_grid = false %}
+            {% endif %}
+            {% if pages_and_articles.size > 0 %}
+              <div role="tabpanel" id="{{ section.id }}-other" aria-labelledby="{{ section.id }}-other" class="predictive-search__grid" data-grid-id="other"{% unless is_default_grid %} hidden{% endunless %}>
+                {% for page_or_article in pages_and_articles limit: 4 %}
+                  <div class="predictive-search__grid-item predictive-search__grid-item--page-or-article block-radius" data-animate data-animate-order="{{ forloop.index }}">
+                    <h5 class="predictive-search__page-or-article-title">{{ page_or_article.title }}</h5>
+                    {% if page_or_article.content != blank %}
+                      <p class="predictive-search__page-or-article-content">{{ page_or_article.content | strip_html | truncate: 100 }}</p>
+                    {% endif %}
+                    <div class="text-link-animated">
+                      <a href="{{ page_or_article.url }}">{{ 'general.search.read_more' | t }}</a>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="predictive-search__no-results">
+          <p>{{ 'general.search.no_results' | t }}</p>
+        </div>
+      {% endif %}
+    </div>
+    {% if results_count > 0 %}
+      <div class="predictive-search__view-all-mobile text-link-animated">
+        <a href="{{ routes.search_url }}?q={{ predictive_search.terms }}" class="predictive-search__list-item" tabindex="-1">{{ 'general.search.view_all' | t }}</a>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% schema %}
+  {
+    "name": "Predictive search results"
+  }
+{% endschema %}
