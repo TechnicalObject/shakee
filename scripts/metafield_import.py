@@ -10,7 +10,7 @@ load_dotenv(env_path)
 # Shopify credentials
 API_VERSION = "2025-01"
 
-CSV_FILE = "variant_images.csv"  # handle, sku, image_url
+CSV_FILE = "variant_images.csv"  # handle, sku, variant_image_2, variant_image_3, variant_image_4, variant_image_5, variant_image_6
 
 GRAPHQL_URL = f"https://{os.getenv('SHOP_URL')}/admin/api/{API_VERSION}/graphql.json"
 
@@ -184,7 +184,7 @@ def find_variant_id_by_sku(handle, sku):
     return None
 
 
-def add_image_metafield(variant_id, file_id):
+def add_image_metafield(variant_id, file_id, metafield_key):
     """Attach uploaded image file as a metafield to the variant"""
     query = """
     mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
@@ -207,7 +207,7 @@ def add_image_metafield(variant_id, file_id):
             {
                 "ownerId": variant_id,
                 "namespace": "custom",
-                "key": "variant_image_2",
+                "key": metafield_key,
                 "type": "file_reference",
                 "value": file_id,
             }
@@ -216,9 +216,25 @@ def add_image_metafield(variant_id, file_id):
     result = graphql_query(query, variables)
     errors = result["data"]["metafieldsSet"]["userErrors"]
     if errors:
-        print("Error:", errors)
+        print(f"Error for {metafield_key}:", errors)
     else:
-        print("✓ Metafield added successfully")
+        print(f"✓ Metafield {metafield_key} added successfully")
+
+
+def process_image(image_url, variant_id, metafield_key):
+    """Process a single image: download, upload, and create metafield"""
+    try:
+        # Download and upload image
+        image_content = requests.get(image_url).content
+        staged = get_staged_upload(Path(image_url).name)
+        resource_url = upload_to_staged_target(staged, image_content)
+        file_id = create_file_reference(resource_url)
+        
+        # Add metafield
+        add_image_metafield(variant_id, file_id, metafield_key)
+        
+    except Exception as e:
+        print(f"Error processing {metafield_key} ({image_url}): {e}")
 
 
 def process_csv():
@@ -227,21 +243,29 @@ def process_csv():
         for row in reader:
             handle = row["handle"]
             sku = row["sku"]
-            image_url = row["image_url"]
 
             print(f"Processing {handle} - {sku} ...")
             variant_id = find_variant_id_by_sku(handle, sku)
             if not variant_id:
                 continue
 
-            # Download and upload image
-            image_content = requests.get(image_url).content
-            staged = get_staged_upload(Path(image_url).name)
-            resource_url = upload_to_staged_target(staged, image_content)
-            file_id = create_file_reference(resource_url)
-
-            # Add metafield
-            add_image_metafield(variant_id, file_id)
+            # Process each variant image (2-6) if URL is provided
+            image_fields = [
+                ("variant_image_2", "variant_image_2"),
+                ("variant_image_3", "variant_image_3"),
+                ("variant_image_4", "variant_image_4"),
+                ("variant_image_5", "variant_image_5"),
+                ("variant_image_6", "variant_image_6")
+            ]
+            
+            for csv_column, metafield_key in image_fields:
+                image_url = row.get(csv_column, "").strip()
+                if image_url:  # Only process if URL is not empty
+                    print(f"  Processing {metafield_key}...")
+                    process_image(image_url, variant_id, metafield_key)
+                else:
+                    print(f"  Skipping {metafield_key} (empty URL)")
+            
             print("-" * 40)
 
 
