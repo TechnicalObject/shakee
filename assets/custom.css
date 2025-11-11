@@ -104,3 +104,7 @@ ul.site-nav li.first-level-dropdown:hover > a {
     color: white;
   }
 }
+
+.mobile-nav.locale--mobile:after {
+  border: 0 !important;
+}

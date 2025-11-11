@@ -673,6 +673,14 @@ Testing Cypress integration
             }
           {% endif %}
         {% endstyle %}
+
+
+        
+          {% if section.settings.enable_custom_button %}
+        <a href="{{ section.settings.custom_button_link }}" class="custom-button btn standalone-icon--wrapper" aria-label="{{ 'layout.header.search' | t }}" style="font-size: 0.875rem; padding: 8px 12px; text-transform: none;">
+          {{ section.settings.custom_button_label }}
+        </a>
+    {% endif %}
         <ul class="mobile-nav nav--meta{% unless shop.customer_accounts_enabled or social_icons %} hidden{% endunless %}">
           {% if shop.customer_accounts_enabled %}
             {% if customer %}
