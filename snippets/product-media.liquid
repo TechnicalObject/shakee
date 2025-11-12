@@ -649,3 +649,20 @@
   {% endif %}
 </product-media>
 
+<script>
+function listenForVariantChange() {
+  if (!window.eventBus) {
+    // Wait a bit and try again
+    setTimeout(listenForVariantChange, 50);
+    return;
+  }
+
+  // Safe to subscribe
+  window.eventBus.on('variant:change', (data) => {
+    console.log('Variant changed:', data);
+  });
+}
+
+// Start the check
+listenForVariantChange();
+</script>
