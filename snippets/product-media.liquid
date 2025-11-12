@@ -205,14 +205,9 @@
           {% comment %} Check if selected variant has any metafield images {% endcomment %}
           {% assign selected_variant = product.selected_or_first_available_variant %}
           {% assign has_variant_images = false %}
-          {% for i in (2..6) %}
-            {% assign metafield_key = 'variant_image_' | append: i %}
-            {% assign variant_image = selected_variant.metafields.custom[metafield_key] %}
-            {% if variant_image != blank %}
-              {% assign has_variant_images = true %}
-              {% break %}
-            {% endif %}
-          {% endfor %}
+          {% if selected_variant.metafields.custom.variant_images %}
+            {% assign has_variant_images = true %}
+          {% endif %}
 
           {% comment %} Show product media only if NO variant metafields exist {% endcomment %}
           {% unless has_variant_images %}
@@ -373,9 +368,9 @@
             {% endif %}
 
             {% comment %} Then show variant_image_2 through variant_image_6 {% endcomment %}
-            {% for i in (2..6) %}
-              {% assign metafield_key = 'variant_image_' | append: i %}
-              {% assign variant_image = selected_variant.metafields.custom[metafield_key] %}
+                  {% assign variant_image_num = forloop.index | plus: 1 %}
+            {% for variant_image in selected_variant.metafields.custom.variant_images.value %}
+              {% assign variant_image_num = forloop.index | plus: 1 %}
               
               {% if variant_image != blank %}
                 <div 
@@ -384,9 +379,9 @@
                     style="visibility:hidden;"
                   {%- endif -%}
                   data-media-type="image"
-                  data-media-id="variant-{{ selected_variant.id }}-{{ i }}"
+                  data-media-id="variant-{{ selected_variant.id }}-{{ variant_image_num }}"
                   data-variant-id="{{ selected_variant.id }}"
-                  data-variant-image="{{ i }}"
+                  data-variant-image="{{ variant_image_num }}"
                 >
                   <a 
                     data-main-media-link
@@ -401,7 +396,7 @@
                   <img
                     class="theme-img media-ratio--{{ image_crop }}"
                     src="{{ variant_image | image_url: width: 1445 }}"
-                    alt="{% if variant_image.alt != blank %}{{ variant_image.alt }}{% else %}{{ product.title }} - {{ selected_variant.title }} - Image {{ i }}{% endif %}"
+                    alt="{% if variant_image.alt != blank %}{{ variant_image.alt }}{% else %}{{ product.title }} - {{ selected_variant.title }} - Image {{ variant_image_num }}{% endif %}"
                     width="{{ variant_image.width | default: 1445 }}"
                     height="{{ variant_image.height | default: 1445 }}"
                     sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
@@ -454,20 +449,17 @@
     {% comment %} ==== THUMBNAILS ==== {% endcomment %}
     {% if type == 'thumbnails' %}
       {% if product.media.size > 1 or onboarding %}
-        <div data-media-thumbnails class="thumbnail-media--thumbnails swiper">
+        <div 
+                      data-updates-on-change
+                      data-update-id="item-title" data-media-thumbnails class="thumbnail-media--thumbnails swiper">
           <div class="swiper-wrapper">
             {% if product.media.size > 0 %}
               {% comment %} Check if selected variant has any metafield images {% endcomment %}
               {% assign selected_variant = product.selected_or_first_available_variant %}
               {% assign has_variant_images = false %}
-              {% for i in (2..6) %}
-                {% assign metafield_key = 'variant_image_' | append: i %}
-                {% assign variant_image = selected_variant.metafields.custom[metafield_key] %}
-                {% if variant_image != blank %}
-                  {% assign has_variant_images = true %}
-                  {% break %}
-                {% endif %}
-              {% endfor %}
+              {% if selected_variant.metafields.custom.variant_images %}
+                {% assign has_variant_images = true %}
+              {% endif %}
 
               {% comment %} Show product media only if NO variant metafields exist {% endcomment %}
               {% unless has_variant_images %}
@@ -586,9 +578,8 @@
                 {% endif %}
 
                 {% comment %} Then show variant_image_2 through variant_image_6 {% endcomment %}
-                {% for i in (2..6) %}
-                  {% assign metafield_key = 'variant_image_' | append: i %}
-                  {% assign variant_image = selected_variant.metafields.custom[metafield_key] %}
+                {% for variant_image in selected_variant.metafields.custom.variant_images.value %}
+                  {% assign variant_image_num = forloop.index | plus: 1 %}
                   
                   {% if variant_image != blank %}
                     <div class="swiper-slide variant-thumbnail"
@@ -596,10 +587,10 @@
                         style="visibility:hidden;"
                       {%- endif -%}
                       data-variant-id="{{ selected_variant.id }}"
-                      data-variant-image="{{ i }}"
+                      data-variant-image="{{ variant_image_num }}"
                     >
                       {% capture props %}
-                        data-image-id="variant-{{ selected_variant.id }}-{{ i }}"
+                        data-image-id="variant-{{ selected_variant.id }}-{{ variant_image_num }}"
                         data-max-width="{{ variant_image.width | default: 300 }}"
                         data-variant-metafield="true"
                       {% endcapture %}
@@ -613,7 +604,7 @@
                         {% if variant_image.alt != blank %}
                           {{ variant_image.alt }}
                         {% else %}
-                          {{ product.title }} - {{ selected_variant.title }} - Image {{ i }}
+                          {{ product.title }} - {{ selected_variant.title }} - Image {{ variant_image_num }}
                         {% endif %}
                       {% endcapture %}
 
