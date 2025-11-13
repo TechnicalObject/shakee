@@ -3,6 +3,7 @@ import requests
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import json
 
 env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env.local')
 load_dotenv(env_path)
@@ -101,8 +102,8 @@ def upload_to_staged_target(staged_target, file_content):
     url = staged_target["url"]
     params = {p["name"]: p["value"] for p in staged_target["parameters"]}
     
-    print(f"Upload URL: {url}")
-    print(f"Parameters: {params}")
+    # print(f"Upload URL: {url}")
+    # print(f"Parameters: {params}")
     
     # For Google Cloud Storage, we need to send the file as binary data
     # with the content-type header, not as multipart form data
@@ -184,8 +185,22 @@ def find_variant_id_by_sku(handle, sku):
     return None
 
 
-def add_image_metafield(variant_id, file_id, metafield_key):
-    """Attach uploaded image file as a metafield to the variant"""
+def upload_image(image_url):
+    """Upload a single image and return its file ID"""
+    try:
+        # Download and upload image
+        image_content = requests.get(image_url).content
+        staged = get_staged_upload(Path(image_url).name)
+        resource_url = upload_to_staged_target(staged, image_content)
+        file_id = create_file_reference(resource_url)
+        return file_id
+    except Exception as e:
+        print(f"Error uploading image ({image_url}): {e}")
+        return None
+
+
+def add_images_list_metafield(variant_id, file_ids):
+    """Attach list of uploaded image files as a metafield to the variant"""
     query = """
     mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
       metafieldsSet(metafields: $metafields) {
@@ -202,39 +217,27 @@ def add_image_metafield(variant_id, file_id, metafield_key):
       }
     }
     """
+    
+    # Format as proper JSON array string
+    value = json.dumps(file_ids)  # Converts to: ["gid://shopify/MediaImage/123", "gid://shopify/MediaImage/456"]
+    
     variables = {
         "metafields": [
             {
                 "ownerId": variant_id,
                 "namespace": "custom",
-                "key": metafield_key,
-                "type": "file_reference",
-                "value": file_id,
+                "key": "variant_images",
+                "type": "list.file_reference",
+                "value": value,
             }
         ]
     }
     result = graphql_query(query, variables)
     errors = result["data"]["metafieldsSet"]["userErrors"]
     if errors:
-        print(f"Error for {metafield_key}:", errors)
+        print(f"Error setting variant_images metafield:", errors)
     else:
-        print(f"✓ Metafield {metafield_key} added successfully")
-
-
-def process_image(image_url, variant_id, metafield_key):
-    """Process a single image: download, upload, and create metafield"""
-    try:
-        # Download and upload image
-        image_content = requests.get(image_url).content
-        staged = get_staged_upload(Path(image_url).name)
-        resource_url = upload_to_staged_target(staged, image_content)
-        file_id = create_file_reference(resource_url)
-        
-        # Add metafield
-        add_image_metafield(variant_id, file_id, metafield_key)
-        
-    except Exception as e:
-        print(f"Error processing {metafield_key} ({image_url}): {e}")
+        print(f"✓ Metafield variant_images added successfully with {len(file_ids)} images")
 
 
 def process_csv():
@@ -249,22 +252,32 @@ def process_csv():
             if not variant_id:
                 continue
 
-            # Process each variant image (2-6) if URL is provided
-            image_fields = [
-                ("variant_image_2", "variant_image_2"),
-                ("variant_image_3", "variant_image_3"),
-                ("variant_image_4", "variant_image_4"),
-                ("variant_image_5", "variant_image_5"),
-                ("variant_image_6", "variant_image_6")
+            # Collect all image URLs in order (2-6)
+            image_columns = [
+                "variant_image_2",
+                "variant_image_3",
+                "variant_image_4",
+                "variant_image_5",
+                "variant_image_6"
             ]
             
-            for csv_column, metafield_key in image_fields:
-                image_url = row.get(csv_column, "").strip()
+            file_ids = []
+            for column in image_columns:
+                image_url = row.get(column, "").strip()
                 if image_url:  # Only process if URL is not empty
-                    print(f"  Processing {metafield_key}...")
-                    process_image(image_url, variant_id, metafield_key)
+                    print(f"  Uploading {column}...")
+                    file_id = upload_image(image_url)
+                    if file_id:
+                        file_ids.append(file_id)
                 else:
-                    print(f"  Skipping {metafield_key} (empty URL)")
+                    print(f"  Skipping {column} (empty URL)")
+            
+            # Add all images as a list metafield
+            if file_ids:
+                print(f"  Setting metafield with {len(file_ids)} images...")
+                add_images_list_metafield(variant_id, file_ids)
+            else:
+                print("  No images to upload for this variant")
             
             print("-" * 40)
 
