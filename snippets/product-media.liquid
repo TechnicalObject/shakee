@@ -75,6 +75,144 @@
   .badge {
     flex-shrink: 0;
   }
+
+  /* Variant image styling */
+  .variant-main-item img {
+    border-radius: var(--block-border-radius, 8px) !important;
+    width: 100%;
+    height: auto;
+    background-color: var(--product-card-background-color) !important;
+  }
+
+  .variant-thumb-item img {
+    border-radius: var(--thumbnail-border-radius, 4px) !important;
+    width: 100px !important;
+    height: 100px !important;
+    object-fit: cover !important;
+    background-color: var(--product-card-background-color) !important;
+  }
+
+  /* Active thumbnail styling */
+  .variant-thumb-item img.active {
+    border: 2px solid #000 !important;
+  }
+
+  /* Main image container with navigation */
+  .variant-main-image {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  /* Navigation arrows for main image */
+  .main-image-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .main-image-nav:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .main-image-nav.prev {
+    left: 10px;
+  }
+
+  .main-image-nav.next {
+    right: 10px;
+  }
+
+  .main-image-nav svg {
+    width: 20px;
+    height: 20px;
+    stroke: #333;
+    stroke-width: 2;
+  }
+
+  /* Hide arrows when there's only one image */
+  .variant-thumbnail-group[data-single-image="true"] ~ .variant-main-image .main-image-nav {
+    display: none;
+  }
+
+  /* Scrollable thumbnail container */
+  .variant-thumbnails {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+  }
+
+  .variant-thumbnails::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .variant-thumbnails::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .variant-thumbnails::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+
+  .variant-thumbnails::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+
+  .variant-thumbnail-group {
+    flex-wrap: nowrap !important;
+  }
+
+  .variant-thumb-item {
+    flex-shrink: 0;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .variant-main-item img {
+      max-width: 100%;
+    }
+
+    .variant-thumb-item img {
+      width: 80px !important;
+      height: 80px !important;
+    }
+
+    .main-image-nav {
+      width: 36px;
+      height: 36px;
+    }
+
+    .main-image-nav svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .main-image-nav.prev {
+      left: 5px;
+    }
+
+    .main-image-nav.next {
+      right: 5px;
+    }
+  }
 {% endstyle %}
 
 {% liquid 
@@ -199,250 +337,273 @@
         {{ product_badge }}
       </div>
 
-      {% comment %} ==== SLIDES ==== {% endcomment %}
-      <div class="swiper-wrapper">
-        {% if product.media.size > 0 %}
-          {% comment %} Check if selected variant has any metafield images {% endcomment %}
-          {% assign selected_variant = product.selected_or_first_available_variant %}
-          {% assign has_variant_images = false %}
-          {% if selected_variant.metafields.custom.variant_images %}
-            {% assign has_variant_images = true %}
-          {% endif %}
 
-          {% comment %} Show product media only if NO variant metafields exist {% endcomment %}
-          {% unless has_variant_images %}
-            {% for media in product.media %}
-              {% comment %}
-                If this media is assigned to any variant that is available, keep showing the thumbnail.
-                EVERY variant with this media needs to be unavailable for it to be hidden.
-              {% endcomment %}
-              {% liquid 
-                assign hideThumb = false
-                assign mediaHasVariant = false
+      {% comment %} Check if selected variant has any metafield images {% endcomment %}
+      {% assign selected_variant = product.selected_or_first_available_variant %}
+      {% assign has_variant_images = false %}
+      {% if selected_variant.metafields.custom.variant_images %}
+        {% assign has_variant_images = true %}
+      {% endif %}
 
-                if hide_out_of_stock_variants
-                  assign hideThumb = true
-                  for option in product.options_with_values
-                    for option_value in option.values
-                      if option_value.variant.featured_media.id == media.id
-                        assign mediaHasVariant = true
+      {% if has_variant_images %}
 
-                        if option_value.variant.available
-                          assign hideThumb = false
-                        endif
-                      endif
-                    endfor
-                  endfor
-                endif
-              %}
-
-              {% unless hideThumb and mediaHasVariant %}
-                <div 
-                  class="swiper-slide{% if product.media.size == 1 %} animated fadeIn{% endif %}{% if enable_peep %} block-radius-clip{% endif %}"
-                  {%- if product.media.size > 1 -%}
-                    style="visibility:hidden;"
-                  {%- endif -%}
-                  data-media-type="{{ media.media_type }}"
-                  data-media-id="{{ media.id }}"
-                  {%- assign found = false -%}
-                  {%- for option in product.options_with_values -%}
-                    {%- for value in option.values -%}
-                      {%- liquid 
-                        assign is_combined_listing = false
-                        if value.product_url != blank
-                          assign is_combined_listing = true
-                          assign item_url = value.product_url | append: '?variant=' | append: value.variant.id
-                          assign product_url = value.product_url
-                        else
-                          assign item_url = value.variant.url
-                          assign product_url = value.variant.product.url
-                        endif
-                      -%}
-                      {%- if found == false and value.variant.featured_media.id == media.id -%}
-                        data-variant="{{ value.variant | json | escape }}"
-                        data-is-combined-listing="{{ is_combined_listing }}"
-                        data-product-fetch-url="{{ item_url }}"
-                        data-product-url="{{ product_url }}"
-                        {%- assign found = true -%}
-                      {%- endif -%}
-                    {%- endfor -%}
-                  {%- endfor -%}
-                >
-                  {% if media.media_type == 'image' %}
-                    <a 
-                      data-main-media-link
-                      href="{{ media.preview_image | image_url: width: 1445 }}"
-                      data-pswp-width="{{ media.width }}"
-                      data-pswp-height="{{ media.height }}"
-                      target="_blank"
-                      {% if adapt_ratio %}style="padding-bottom: {{ adapt_ratio }}%;"{% endif %}
-                      {% if settings.animations_enabled %}class="kb-enabled"{% endif %}
-                    >
-
-                    <img
+        {% comment %} ==== MAIN VARIANT IMAGE DISPLAY ==== {% endcomment %}
+        <div class="variant-media-container">
+          <!-- Main large image display -->
+          <div class="variant-main-image">
+            {% for variant in product.variants %}
+              {% comment %} Main featured image for each variant {% endcomment %}
+              {% if variant.featured_media %}
+                <div class="variant-main-item" data-variant-id="{{ variant.id }}" style="{%  unless product.selected_or_first_available_variant.id == variant.id %}display:none;{% endunless %}">
+                  <img src="{{ variant.featured_media | image_url: width: 1445 }}"
+                    alt="{% if variant.featured_media.alt != blank %}{{ variant.featured_media.alt }}{% else %}{{ product.title }} - {{ variant.title }}{% endif %}"
+                    class="theme-img media-ratio--{{ image_crop }}"
+                    width="{{ variant.featured_media.width }}"
+                    height="{{ variant.featured_media.height }}"
+                    sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                    loading="eager"
+                    style="pointer-events: auto;"
+                  >
+                </div>
+              {% else %}
+                {% comment %} If no featured image, show first metafield image as main {% endcomment %}
+                {% assign first_variant_image = variant.metafields.custom.variant_images.value.first %}
+                {% if first_variant_image %}
+                  <div class="variant-main-item" data-variant-id="{{ variant.id }}" style="{%  unless product.selected_or_first_available_variant.id == variant.id %}display:none;{% endunless %}">
+                    <img src="{{ first_variant_image | image_url: width: 1445 }}"
+                      alt="{% if first_variant_image.alt != blank %}{{ first_variant_image.alt }}{% else %}{{ product.title }} - {{ variant.title }}{% endif %}"
                       class="theme-img media-ratio--{{ image_crop }}"
-                      src="{{ media.preview_image | image_url: width: 1445 }}"
-                      alt="{% if media.alt != product.title %}{{ media.alt }}{% endif %}"
-                      width="{{ media.width }}"
-                      height="{{ media.height }}"
+                      width="{{ first_variant_image.width }}"
+                      height="{{ first_variant_image.height }}"
                       sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
                       loading="eager"
-                    />
-                  
-                    </a>
-                  {% else %}
-                    {% render 'deferred-media' with delayed_media: media, section_id: section_id, enable_video_loop: enable_video_loop, enable_autoplay: enable_autoplay, media_wrapper_classes: 'product-single__media__wrapper', aspect_ratio: image_crop, media_product: product, media_type: 'slider', show_controls: show_video_controls %}
-                  {% endif %}
+                      style="pointer-events: auto;"
+                    >
+                  </div>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
 
-                  
-                  {%- if media.media_type == 'model' -%}
-                    <div class="button-wrap view-in-space--wrapper">
-                      <button
-                        type="button"
-                        aria-label="{{ 'products.product.view_in_space_label' | t }}"
-                        class="btn product-medias__view-in-space"
-                        data-shopify-xr
-                        data-shopify-model3d-id="{{ media.id }}"
-                        data-shopify-title="{{ product.title | escape }}"
-                        data-shopify-xr-hidden
+            <!-- Navigation arrows -->
+            <button class="main-image-nav prev" onclick="navigateMainImage(-1)" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            
+            <button class="main-image-nav next" onclick="navigateMainImage(1)" aria-label="Next image">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Thumbnail images display -->
+          <div class="variant-thumbnails" style="display: flex; overflow-x: auto; gap: 10px; padding-bottom: 5px;">
+            {% for variant in product.variants %}
+              {% comment %} Show thumbnails for each variant {% endcomment %}
+              <div class="variant-thumbnail-group" data-variant-id="{{ variant.id }}" style="display: flex; flex-wrap: nowrap; gap: 10px; {%  unless product.selected_or_first_available_variant.id == variant.id %}display:none;{% endunless %}">
+
+                {% comment %} Always show the first image (featured or first metafield) as thumbnail {% endcomment %}
+                {% if variant.featured_media %}
+                  <div class="variant-thumb-item" onclick="updateMainImage('{{ variant.featured_media | image_url: width: 1445 }}', '{{ variant.featured_media.alt | escape }}')">
+                    <img src="{{ variant.featured_media | image_url: width: 150 }}"
+                      alt="{{ variant.featured_media.alt | default: product.title }}"
+                      style="cursor: pointer; border: 2px solid transparent;"
+                      class="{% if forloop.first and product.selected_or_first_available_variant.id == variant.id %}active{% endif %}"
+                      onmouseover="this.style.borderColor='#000'"
+                      onmouseout="if(!this.classList.contains('active')) this.style.borderColor='transparent'"
+                    >
+                  </div>
+                {% else %}
+                  {% comment %} If no featured image, show first metafield image as thumbnail {% endcomment %}
+                  {% assign first_variant_image = variant.metafields.custom.variant_images.value.first %}
+                  {% if first_variant_image %}
+                    <div class="variant-thumb-item" onclick="updateMainImage('{{ first_variant_image | image_url: width: 1445 }}', '{{ first_variant_image.alt | escape }}')">
+                      <img src="{{ first_variant_image | image_url: width: 150 }}"
+                        alt="{% if first_variant_image.alt != blank %}{{ first_variant_image.alt }}{% else %}{{ product.title }} - {{ variant.title }}{% endif %}"
+                        style="cursor: pointer; border: 2px solid transparent;"
+                        class="{% if product.selected_or_first_available_variant.id == variant.id %}active{% endif %}"
+                        onmouseover="this.style.borderColor='#000'"
+                        onmouseout="if(!this.classList.contains('active')) this.style.borderColor='transparent'"
                       >
-                        {{ 'products.product.view_in_space' | t }}
-                      </button>
                     </div>
-                  {%- endif -%}
+                  {% endif %}
+                {% endif %}
 
-                  {%- if first_3d_model -%}
+                {% comment %} Show remaining metafield images as thumbnails {% endcomment %}
+                {% for image in variant.metafields.custom.variant_images.value %}
+                  {% comment %} Skip first image if no featured image exists (already shown above) {% endcomment %}
+                  {% unless variant.featured_media == blank and forloop.first %}
+                    <div class="variant-thumb-item" onclick="updateMainImage('{{ image | image_url: width: 1445 }}', '{{ image.alt | escape }}')">
+                      <img src="{{ image | image_url: width: 150 }}"
+                        alt="{% if image.alt != blank %}{{ image.alt }}{% else %}{{ product.title }} - {{ variant.title }}{% endif %}"
+                        style="cursor: pointer; border: 2px solid transparent;"
+                        onmouseover="this.style.borderColor='#000'"
+                        onmouseout="if(!this.classList.contains('active')) this.style.borderColor='transparent'"
+                      >
+                    </div>
+                  {% endunless %}
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        {% comment %} ==== SLIDES ==== {% endcomment %}
+        <div class="swiper-wrapper">
+          {% if product.media.size > 0 %}
+            {% comment %} Show product media only if NO variant metafields exist {% endcomment %}
+            {% unless has_variant_images %}
+              {% for media in product.media %}
+                {% comment %}
+                  If this media is assigned to any variant that is available, keep showing the thumbnail.
+                  EVERY variant with this media needs to be unavailable for it to be hidden.
+                {% endcomment %}
+                {% liquid 
+                  assign hideThumb = false
+                  assign mediaHasVariant = false
+
+                  if hide_out_of_stock_variants
+                    assign hideThumb = true
+                    for option in product.options_with_values
+                      for option_value in option.values
+                        if option_value.variant.featured_media.id == media.id
+                          assign mediaHasVariant = true
+
+                          if option_value.variant.available
+                            assign hideThumb = false
+                          endif
+                        endif
+                      endfor
+                    endfor
+                  endif
+                %}
+
+                {% unless hideThumb and mediaHasVariant %}
+                  <div 
+                    class="swiper-slide{% if product.media.size == 1 %} animated fadeIn{% endif %}{% if enable_peep %} block-radius-clip{% endif %}"
+                    {%- if product.media.size > 1 -%}
+                      style="visibility:hidden;"
+                    {%- endif -%}
+                    data-media-type="{{ media.media_type }}"
+                    data-media-id="{{ media.id }}"
+                    {%- assign found = false -%}
+                    {%- for option in product.options_with_values -%}
+                      {%- for value in option.values -%}
+                        {%- liquid 
+                          assign is_combined_listing = false
+                          if value.product_url != blank
+                            assign is_combined_listing = true
+                            assign item_url = value.product_url | append: '?variant=' | append: value.variant.id
+                            assign product_url = value.product_url
+                          else
+                            assign item_url = value.variant.url
+                            assign product_url = value.variant.product.url
+                          endif
+                        -%}
+                        {%- if found == false and value.variant.featured_media.id == media.id -%}
+                          data-variant="{{ value.variant | json | escape }}"
+                          data-is-combined-listing="{{ is_combined_listing }}"
+                          data-product-fetch-url="{{ item_url }}"
+                          data-product-url="{{ product_url }}"
+                          {%- assign found = true -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                    {%- endfor -%}
+                  >
+                    {% if media.media_type == 'image' %}
+                      <a 
+                        data-main-media-link
+                        href="{{ media.preview_image | image_url: width: 1445 }}"
+                        data-pswp-width="{{ media.width }}"
+                        data-pswp-height="{{ media.height }}"
+                        target="_blank"
+                        {% if adapt_ratio %}style="padding-bottom: {{ adapt_ratio }}%;"{% endif %}
+                        {% if settings.animations_enabled %}class="kb-enabled"{% endif %}
+                      >
+
+                      <img
+                        class="theme-img media-ratio--{{ image_crop }}"
+                        src="{{ media.preview_image | image_url: width: 1445 }}"
+                        alt="{% if media.alt != product.title %}{{ media.alt }}{% endif %}"
+                        width="{{ media.width }}"
+                        height="{{ media.height }}"
+                        sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                        loading="eager"
+                      />
+                    
+                      </a>
+                    {% else %}
+                      {% render 'deferred-media' with delayed_media: media, section_id: section_id, enable_video_loop: enable_video_loop, enable_autoplay: enable_autoplay, media_wrapper_classes: 'product-single__media__wrapper', aspect_ratio: image_crop, media_product: product, media_type: 'slider', show_controls: show_video_controls %}
+                    {% endif %}
+
+                    
+                    {%- if media.media_type == 'model' -%}
+                      <div class="button-wrap view-in-space--wrapper">
+                        <button
+                          type="button"
+                          aria-label="{{ 'products.product.view_in_space_label' | t }}"
+                          class="btn product-medias__view-in-space"
+                          data-shopify-xr
+                          data-shopify-model3d-id="{{ media.id }}"
+                          data-shopify-title="{{ product.title | escape }}"
+                          data-shopify-xr-hidden
+                        >
+                          {{ 'products.product.view_in_space' | t }}
+                        </button>
+                      </div>
+                    {%- endif -%}
+
+                    {%- if first_3d_model -%}
+                      <script type="application/json" id="ProductJSON-{{ product.id }}">
+                        {{ product.media | where: 'media_type', 'model' | json }}
+                      </script>
+                    {%- endif -%}
+
                     <script type="application/json" id="ProductJSON-{{ product.id }}">
                       {{ product.media | where: 'media_type', 'model' | json }}
                     </script>
-                  {%- endif -%}
-
-                  <script type="application/json" id="ProductJSON-{{ product.id }}">
-                    {{ product.media | where: 'media_type', 'model' | json }}
-                  </script>
-                </div>
-              {% endunless %}
-            {% endfor %}
-          {% endunless %}
-
-          {% comment %} Show variant metafield images in main slider if they exist {% endcomment %}
-          {% if has_variant_images %}
-            {% comment %} First show variant's featured image if it exists {% endcomment %}
-            {% if selected_variant.featured_media %}
-              <div 
-                class="swiper-slide{% if enable_peep %} block-radius-clip{% endif %}"
-                {%- if product.media.size > 1 -%}
-                  style="visibility:hidden;"
-                {%- endif -%}
-                data-media-type="{{ selected_variant.featured_media.media_type }}"
-                data-media-id="variant-featured-{{ selected_variant.id }}"
-                data-variant-id="{{ selected_variant.id }}"
-                data-variant-image="featured"
-              >
-                {% if selected_variant.featured_media.media_type == 'image' %}
-                  <a 
-                    data-main-media-link
-                    href="{{ selected_variant.featured_media.preview_image | image_url: width: 1445 }}"
-                    data-pswp-width="{{ selected_variant.featured_media.width }}"
-                    data-pswp-height="{{ selected_variant.featured_media.height }}"
-                    target="_blank"
-                    {% if adapt_ratio %}style="padding-bottom: {{ adapt_ratio }}%;"{% endif %}
-                    {% if settings.animations_enabled %}class="kb-enabled"{% endif %}
-                  >
-
-                  <img
-                    class="theme-img media-ratio--{{ image_crop }}"
-                    src="{{ selected_variant.featured_media.preview_image | image_url: width: 1445 }}"
-                    alt="{% if selected_variant.featured_media.alt != blank %}{{ selected_variant.featured_media.alt }}{% else %}{{ product.title }} - {{ selected_variant.title }}{% endif %}"
-                    width="{{ selected_variant.featured_media.width }}"
-                    height="{{ selected_variant.featured_media.height }}"
-                    sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
-                    loading="eager"
-                  />
-                
-                  </a>
-                {% else %}
-                  {% render 'deferred-media' with delayed_media: selected_variant.featured_media, section_id: section_id, enable_video_loop: enable_video_loop, enable_autoplay: enable_autoplay, media_wrapper_classes: 'product-single__media__wrapper', aspect_ratio: image_crop, media_product: product, media_type: 'slider', show_controls: show_video_controls %}
-                {% endif %}
+                  </div>
+                {% endunless %}
+              {% endfor %}
+            {% endunless %}
+          {% else %}
+            {% comment %} Onboarding placeholder slides {% endcomment %}
+            {% assign svg_classes = 'icon icon--placeholder block-radius media-ratio--' | append: image_crop %}
+            {% for i in (1..3) %}
+              <div class="swiper-slide" style="visibility:hidden;">
+                {% assign svg_name = 'product-' | append: i %}
+                {{ svg_name | placeholder_svg_tag: svg_classes }}
               </div>
-            {% endif %}
-
-            {% comment %} Then show variant_image_2 through variant_image_6 {% endcomment %}
-                  {% assign variant_image_num = forloop.index | plus: 1 %}
-            {% for variant_image in selected_variant.metafields.custom.variant_images.value %}
-              {% assign variant_image_num = forloop.index | plus: 1 %}
-              
-              {% if variant_image != blank %}
-                <div 
-                  class="swiper-slide{% if enable_peep %} block-radius-clip{% endif %}"
-                  {%- if product.media.size > 1 -%}
-                    style="visibility:hidden;"
-                  {%- endif -%}
-                  data-media-type="image"
-                  data-media-id="variant-{{ selected_variant.id }}-{{ variant_image_num }}"
-                  data-variant-id="{{ selected_variant.id }}"
-                  data-variant-image="{{ variant_image_num }}"
-                >
-                  <a 
-                    data-main-media-link
-                    href="{{ variant_image | image_url: width: 1445 }}"
-                    data-pswp-width="{{ variant_image.width | default: 1445 }}"
-                    data-pswp-height="{{ variant_image.height | default: 1445 }}"
-                    target="_blank"
-                    {% if adapt_ratio %}style="padding-bottom: {{ adapt_ratio }}%;"{% endif %}
-                    {% if settings.animations_enabled %}class="kb-enabled"{% endif %}
-                  >
-
-                  <img
-                    class="theme-img media-ratio--{{ image_crop }}"
-                    src="{{ variant_image | image_url: width: 1445 }}"
-                    alt="{% if variant_image.alt != blank %}{{ variant_image.alt }}{% else %}{{ product.title }} - {{ selected_variant.title }} - Image {{ variant_image_num }}{% endif %}"
-                    width="{{ variant_image.width | default: 1445 }}"
-                    height="{{ variant_image.height | default: 1445 }}"
-                    sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
-                    loading="eager"
-                  />
-                
-                  </a>
-                </div>
-              {% endif %}
             {% endfor %}
           {% endif %}
-        {% else %}
-          {% comment %} Onboarding placeholder slides {% endcomment %}
-          {% assign svg_classes = 'icon icon--placeholder block-radius media-ratio--' | append: image_crop %}
-          {% for i in (1..3) %}
-            <div class="swiper-slide" style="visibility:hidden;">
-              {% assign svg_name = 'product-' | append: i %}
-              {{ svg_name | placeholder_svg_tag: svg_classes }}
-            </div>
-          {% endfor %}
-        {% endif %}
-      </div>
+        </div>
 
-      {% comment %} ==== PAGINATION ==== {% endcomment %}
-      {% if has_pagination %}
-        <div class="media-slider-navigation arrows input-radius-clip">
-          <a href="#" class="flex-prev arrow-prev-{{ id }}-{{ section_id }} standalone-icon--wrapper">
+        {% comment %} ==== PAGINATION ==== {% endcomment %}
+        {% if has_pagination %}
+          <div class="media-slider-navigation arrows input-radius-clip">
+            <a href="#" class="flex-prev arrow-prev-{{ id }}-{{ section_id }} standalone-icon--wrapper">
+              {% render 'theme-icon' with icon: 'chevron_left', iconWidth: 24, iconHeight: 24, iconColor: 'currentColor' %}
+            </a>
+
+            <div class="swiper-pagination-{{ id }}-{{ section_id }}"></div>
+
+            <a href="#" class="flex-next arrow-next-{{ id }}-{{ section_id }} standalone-icon--wrapper">
+              {% render 'theme-icon' with icon: 'chevron_right', iconWidth: 24, iconHeight: 24, iconColor: 'currentColor' %}
+            </a>
+          </div>
+        {% endif %}
+
+        {% if type == 'thumbnails' %}
+          <a href="#" class="thumb-prev arrow-prev-{{ id }}-{{ section_id }}">
             {% render 'theme-icon' with icon: 'chevron_left', iconWidth: 24, iconHeight: 24, iconColor: 'currentColor' %}
           </a>
 
-          <div class="swiper-pagination-{{ id }}-{{ section_id }}"></div>
-
-          <a href="#" class="flex-next arrow-next-{{ id }}-{{ section_id }} standalone-icon--wrapper">
+          <a href="#" class="thumb-next arrow-next-{{ id }}-{{ section_id }}">
             {% render 'theme-icon' with icon: 'chevron_right', iconWidth: 24, iconHeight: 24, iconColor: 'currentColor' %}
           </a>
-        </div>
-      {% endif %}
-
-      {% if type == 'thumbnails' %}
-        <a href="#" class="thumb-prev arrow-prev-{{ id }}-{{ section_id }}">
-          {% render 'theme-icon' with icon: 'chevron_left', iconWidth: 24, iconHeight: 24, iconColor: 'currentColor' %}
-        </a>
-
-        <a href="#" class="thumb-next arrow-next-{{ id }}-{{ section_id }}">
-          {% render 'theme-icon' with icon: 'chevron_right', iconWidth: 24, iconHeight: 24, iconColor: 'currentColor' %}
-        </a>
+        {% endif %}
       {% endif %}
     </div>
 
@@ -454,12 +615,6 @@
                       data-update-id="item-title" data-media-thumbnails class="thumbnail-media--thumbnails swiper">
           <div class="swiper-wrapper">
             {% if product.media.size > 0 %}
-              {% comment %} Check if selected variant has any metafield images {% endcomment %}
-              {% assign selected_variant = product.selected_or_first_available_variant %}
-              {% assign has_variant_images = false %}
-              {% if selected_variant.metafields.custom.variant_images %}
-                {% assign has_variant_images = true %}
-              {% endif %}
 
               {% comment %} Show product media only if NO variant metafields exist {% endcomment %}
               {% unless has_variant_images %}
@@ -532,97 +687,6 @@
                   {% endunless %}
                 {% endfor %}
               {% endunless %}
-
-              {% comment %} Show variant metafield images if they exist {% endcomment %}
-              {% if has_variant_images %}
-                {% comment %} First show variant's featured image if it exists {% endcomment %}
-                {% if selected_variant.featured_media %}
-                  <div class="swiper-slide variant-thumbnail"
-                    {%- if product.media.size > 1 -%}
-                      style="visibility:hidden;"
-                    {%- endif -%}
-                    data-variant-id="{{ selected_variant.id }}"
-                    data-variant-image="featured"
-                  >
-                    {% if selected_variant.featured_media.media_type == 'model' %}
-                      <div class="product-medias__emblem">
-                        {% render 'theme-icon' with icon: 'cube', iconSize: 20 %}
-                      </div>
-                    {% elsif selected_variant.featured_media.media_type == 'video' or selected_variant.featured_media.media_type == 'external_video' %}
-                      <div class="product-medias__emblem">
-                        {% render 'theme-icon' with icon: 'play', iconSize: 20 %}
-                      </div>
-                    {% endif %}
-
-                    {% capture props %}
-                      data-image-id="variant-featured-{{ selected_variant.id }}"
-                      data-max-width="{{ selected_variant.featured_media.preview_image.width | default: 300 }}"
-                      data-variant-metafield="false"
-                    {% endcapture %}
-
-                    {% capture styles %}max-width: {{ selected_variant.featured_media.preview_image.width | default: 300 }}px;{% endcapture %}
-                    {% capture class %}
-                      product-medias__thumbnail__image product-medias__thumbnail--{{ selected_variant.featured_media.media_type }} media-ratio--{{ image_crop }} thumbnail-radius
-                    {% endcapture %}
-
-                    {% capture thumbalt %}
-                      {% if selected_variant.featured_media.alt != blank %}
-                        {{ selected_variant.featured_media.alt }}
-                      {% else %}
-                        {{ product.title }} - {{ selected_variant.title }}
-                      {% endif %}
-                    {% endcapture %}
-
-                    {% render 'responsive-image' with selected_variant.featured_media.preview_image, wrapper_class: 'thumbnail-radius', class: class, alt: thumbalt | escape, default_size: '300x', props: props, blur: false, styles: styles, adaptive_ratio: adapt_ratio %}
-                  </div>
-                {% endif %}
-
-                {% comment %} Then show variant_image_2 through variant_image_6 {% endcomment %}
-                {% for variant_image in selected_variant.metafields.custom.variant_images.value %}
-                  {% assign variant_image_num = forloop.index | plus: 1 %}
-                  
-                  {% if variant_image != blank %}
-                    <div class="swiper-slide variant-thumbnail"
-                      {%- if product.media.size > 1 -%}
-                        style="visibility:hidden;"
-                      {%- endif -%}
-                      data-variant-id="{{ selected_variant.id }}"
-                      data-variant-image="{{ variant_image_num }}"
-                    >
-                      {% capture props %}
-                        data-image-id="variant-{{ selected_variant.id }}-{{ variant_image_num }}"
-                        data-max-width="{{ variant_image.width | default: 300 }}"
-                        data-variant-metafield="true"
-                      {% endcapture %}
-
-                      {% capture styles %}max-width: {{ variant_image.width | default: 300 }}px;{% endcapture %}
-                      {% capture class %}
-                        product-medias__thumbnail__image product-medias__thumbnail--variant-metafield media-ratio--{{ image_crop }} thumbnail-radius
-                      {% endcapture %}
-
-                      {% capture thumbalt %}
-                        {% if variant_image.alt != blank %}
-                          {{ variant_image.alt }}
-                        {% else %}
-                          {{ product.title }} - {{ selected_variant.title }} - Image {{ variant_image_num }}
-                        {% endif %}
-                      {% endcapture %}
-
-                      {% comment %} Use direct image tag instead of responsive-image to avoid srcset issues {% endcomment %}
-                      <div class="thumbnail-radius {{ class }}" {{ props }} style="{{ styles }}">
-                        <img 
-                          src="{{ variant_image | image_url: width: 300 }}"
-                          alt="{{ thumbalt | escape }}"
-                          width="{{ variant_image.width | default: 300 }}"
-                          height="{{ variant_image.height | default: 300 }}"
-                          loading="lazy"
-                          class="theme-img"
-                        />
-                      </div>
-                    </div>
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
             {% else %}
               {% comment %} Onboarding placeholder thumbnails {% endcomment %}
               {% assign svg_classes = 'icon icon--placeholder thumbnail-radius product-medias__thumbnail__image product-medias__thumbnail--image media-ratio--' | append: image_crop %}
@@ -650,6 +714,264 @@
 </product-media>
 
 <script>
+let currentImageIndex = 0;
+let currentVariantImages = [];
+
+// Function to get all images for current variant
+function getCurrentVariantImages(variantId) {
+  const thumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
+  if (!thumbnailGroup) return [];
+  
+  const images = [];
+  const thumbnails = thumbnailGroup.querySelectorAll('.variant-thumb-item img');
+  
+  thumbnails.forEach(thumb => {
+    const largeSrc = thumb.src.replace('width=150', 'width=1445');
+    images.push({
+      src: largeSrc,
+      alt: thumb.alt
+    });
+  });
+  
+  return images;
+}
+
+// Function to navigate main image
+function navigateMainImage(direction) {
+  const selectedVariantId = getSelectedVariantId();
+  if (!selectedVariantId) return;
+  
+  currentVariantImages = getCurrentVariantImages(selectedVariantId);
+  if (currentVariantImages.length <= 1) return;
+  
+  currentImageIndex += direction;
+  
+  if (currentImageIndex >= currentVariantImages.length) {
+    currentImageIndex = 0;
+  } else if (currentImageIndex < 0) {
+    currentImageIndex = currentVariantImages.length - 1;
+  }
+  
+  const newImage = currentVariantImages[currentImageIndex];
+  updateMainImage(newImage.src, newImage.alt);
+  updateActiveThumbnail(selectedVariantId, currentImageIndex);
+}
+
+// Function to get selected variant ID
+function getSelectedVariantId() {
+  const variantSelector = document.querySelector('input[name="id"]:checked') || 
+                         document.querySelector('select[name="id"]') || 
+                         document.querySelector('.variant-selector:checked') ||
+                         document.querySelector('.variant-selector');
+  
+  if (variantSelector) {
+    return variantSelector.value;
+  }
+  
+  const visibleMainImage = document.querySelector('.variant-main-item[style*="display: block"], .variant-main-item:not([style*="display: none"])');
+  if (visibleMainImage) {
+    return visibleMainImage.getAttribute('data-variant-id');
+  }
+  
+  return null;
+}
+
+// Function to update active thumbnail
+function updateActiveThumbnail(variantId, index) {
+  const thumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
+  if (!thumbnailGroup) return;
+  
+  const thumbnails = thumbnailGroup.querySelectorAll('.variant-thumb-item img');
+  
+  thumbnails.forEach((thumb, i) => {
+    thumb.classList.remove('active');
+    thumb.style.borderColor = 'transparent';
+    
+    if (i === index) {
+      thumb.classList.add('active');
+      thumb.style.borderColor = '#000';
+    }
+  });
+}
+
+// Function to update the main image when thumbnail is clicked
+function updateMainImage(imageSrc, imageAlt) {
+  const selectedVariantId = getSelectedVariantId();
+  
+  if (selectedVariantId) {
+    const mainImageContainer = document.querySelector(`.variant-main-item[data-variant-id="${selectedVariantId}"]`);
+    
+    if (mainImageContainer) {
+      const mainImage = mainImageContainer.querySelector('img');
+      if (mainImage) {
+        // Add loading state
+        mainImageContainer.style.opacity = '0.7';
+        mainImageContainer.style.transition = 'opacity 0.2s ease';
+        
+        // Create new image to preload
+        const newImage = new Image();
+        newImage.onload = function() {
+          // Once loaded, update the source and remove loading state
+          mainImage.src = imageSrc;
+          mainImage.alt = imageAlt || '';
+          mainImageContainer.style.opacity = '1';
+          
+          // Update current image index
+          currentVariantImages = getCurrentVariantImages(selectedVariantId);
+          currentImageIndex = currentVariantImages.findIndex(img => img.src === imageSrc);
+          if (currentImageIndex === -1) currentImageIndex = 0;
+        };
+        newImage.onerror = function() {
+          // If error, still remove loading state
+          mainImageContainer.style.opacity = '1';
+        };
+        // Start preloading
+        newImage.src = imageSrc;
+      }
+    }
+  }
+}
+
+// Function to preload variant images
+function preloadVariantImages(variantId) {
+  const thumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
+  if (thumbnailGroup) {
+    const thumbnails = thumbnailGroup.querySelectorAll('.variant-thumb-item img');
+    thumbnails.forEach(thumb => {
+      const largeSrc = thumb.src.replace('width=150', 'width=1445');
+      const img = new Image();
+      img.src = largeSrc; // This triggers preloading
+    });
+  }
+}
+
+// Function to scroll thumbnails to the beginning
+function scrollThumbnailsToStart() {
+  const thumbnailContainer = document.querySelector('.variant-thumbnails');
+  if (thumbnailContainer) {
+    thumbnailContainer.scrollTo({
+      left: 0,
+      behavior: 'smooth'
+    });
+  }
+}
+
+// Function to update variant images visibility
+function updateVariantImages(selectedVariantId) {
+  // Update main images
+  const mainImages = document.querySelectorAll('.variant-main-item');
+  mainImages.forEach(item => {
+    const itemVariantId = item.getAttribute('data-variant-id');
+    if (itemVariantId === selectedVariantId.toString()) {
+      item.style.display = 'block';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+
+  // Update thumbnail groups
+  const thumbnailGroups = document.querySelectorAll('.variant-thumbnail-group');
+  thumbnailGroups.forEach(group => {
+    const groupVariantId = group.getAttribute('data-variant-id');
+    if (groupVariantId === selectedVariantId.toString()) {
+      group.style.display = 'flex';
+    } else {
+      group.style.display = 'none';
+    }
+  });
+
+  // Reset main image to show the first/main image for the selected variant
+  const selectedVariantContainer = document.querySelector(`.variant-main-item[data-variant-id="${selectedVariantId}"]`);
+  if (selectedVariantContainer) {
+    const mainImage = selectedVariantContainer.querySelector('img');
+    const thumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${selectedVariantId}"]`);
+    
+    if (mainImage && thumbnailGroup) {
+      // Find the first thumbnail to get the main image source
+      const firstThumbnail = thumbnailGroup.querySelector('.variant-thumb-item img');
+      if (firstThumbnail) {
+        // Update main image to show the first image (main image) of the variant
+        const mainImageSrc = firstThumbnail.src.replace('width=150', 'width=1445');
+        const mainImageAlt = firstThumbnail.alt;
+        
+        mainImage.src = mainImageSrc;
+        mainImage.alt = mainImageAlt;
+        
+        // Reset image index
+        currentImageIndex = 0;
+        currentVariantImages = getCurrentVariantImages(selectedVariantId);
+      }
+    }
+  }
+
+  // Set the first thumbnail as active for the selected variant
+  setActiveFirstThumbnail(selectedVariantId);
+
+  // Scroll thumbnails to the beginning
+  scrollThumbnailsToStart();
+
+  // Preload images for the selected variant
+  preloadVariantImages(selectedVariantId);
+
+  // Update legacy variant images (if they exist)
+  const variantImages = document.querySelectorAll('.variant-image-item');
+  variantImages.forEach(item => {
+    const itemVariantId = item.getAttribute('data-variant-id');
+    const img = item.querySelector('img');
+    
+    if (itemVariantId === selectedVariantId.toString()) {
+      item.style.display = 'block';
+      if (img) img.style.display = 'block';
+    } else {
+      item.style.display = 'none';
+      if (img) img.style.display = 'none';
+    }
+  });
+}
+
+// Function to set the first thumbnail as active
+function setActiveFirstThumbnail(variantId) {
+  // Remove active class from all thumbnails
+  document.querySelectorAll('.variant-thumb-item img').forEach(thumb => {
+    thumb.classList.remove('active');
+    thumb.style.borderColor = 'transparent';
+  });
+  
+  // Add active class to the first thumbnail of the selected variant
+  const selectedThumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
+  if (selectedThumbnailGroup) {
+    const firstThumbnail = selectedThumbnailGroup.querySelector('.variant-thumb-item img');
+    if (firstThumbnail) {
+      firstThumbnail.classList.add('active');
+      firstThumbnail.style.borderColor = '#000';
+    }
+  }
+}
+
+// Add visual feedback to thumbnails
+function addThumbnailFeedback() {
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.variant-thumb-item')) {
+      // Remove active state from all thumbnails in current variant
+      const currentVariantGroup = e.target.closest('.variant-thumbnail-group');
+      if (currentVariantGroup) {
+        const allThumbs = currentVariantGroup.querySelectorAll('.variant-thumb-item img');
+        allThumbs.forEach(thumb => {
+          thumb.classList.remove('active');
+          thumb.style.borderColor = 'transparent';
+        });
+        
+        // Add active state to clicked thumbnail
+        const clickedThumb = e.target.closest('.variant-thumb-item').querySelector('img');
+        if (clickedThumb) {
+          clickedThumb.classList.add('active');
+          clickedThumb.style.borderColor = '#000';
+        }
+      }
+    }
+  });
+}
+
 function listenForVariantChange() {
   if (!window.eventBus) {
     // Wait a bit and try again
@@ -657,12 +979,39 @@ function listenForVariantChange() {
     return;
   }
 
-  // Safe to subscribe
+  // Subscribe to variant change events
   window.eventBus.on('variant:change', (data) => {
     console.log('Variant changed:', data);
+    if (data && data.variant && data.variant.id) {
+      updateVariantImages(data.variant.id);
+    }
   });
 }
 
-// Start the check
-listenForVariantChange();
+// Also listen for direct variant selector changes (fallback)
+document.addEventListener('change', function(e) {
+  if (e.target.name === 'id' || e.target.classList.contains('variant-selector')) {
+    const selectedVariantId = e.target.value;
+    if (selectedVariantId) {
+      updateVariantImages(selectedVariantId);
+    }
+  }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  listenForVariantChange();
+  addThumbnailFeedback();
+  
+  // Set initial state
+  const selectedVariant = {{ product.selected_or_first_available_variant.id | json }};
+  if (selectedVariant) {
+    updateVariantImages(selectedVariant);
+  }
+  
+  // Preload initial variant images
+  if (selectedVariant) {
+    preloadVariantImages(selectedVariant);
+  }
+});
 </script>
