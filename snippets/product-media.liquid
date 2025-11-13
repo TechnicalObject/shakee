@@ -105,6 +105,44 @@
     margin-bottom: 20px;
   }
 
+  /* Loader overlay for main image */
+  .variant-main-image {
+    position: relative;
+  }
+
+  .variant-main-image .main-image-loader {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 4;
+    pointer-events: all;
+  }
+
+  .variant-main-image.is-loading .main-image-loader {
+    display: flex;
+  }
+
+  .main-image-loader .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #111;
+    border-radius: 50%;
+    animation: pm-spin 0.8s linear infinite;
+  }
+
+  @keyframes pm-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Optional: subtle blur on the image while loading */
+  .variant-main-image.is-loading .variant-main-item img {
+    filter: blur(2px);
+  }
+
   /* Navigation arrows for main image */
   .main-image-nav {
     position: absolute;
@@ -350,7 +388,7 @@
         {% comment %} ==== MAIN VARIANT IMAGE DISPLAY ==== {% endcomment %}
         <div class="variant-media-container">
           <!-- Main large image display -->
-          <div class="variant-main-image">
+          <div class="variant-main-image" aria-busy="false">
             {% for variant in product.variants %}
               {% comment %} Main featured image for each variant {% endcomment %}
               {% if variant.featured_media %}
@@ -383,6 +421,11 @@
                 {% endif %}
               {% endif %}
             {% endfor %}
+
+            <!-- Loader overlay -->
+            <div class="main-image-loader" role="status" aria-live="polite" aria-label="Loading image">
+              <div class="spinner"></div>
+            </div>
 
             <!-- Navigation arrows -->
             <button class="main-image-nav prev" onclick="navigateMainImage(-1)" aria-label="Previous image">
@@ -762,7 +805,7 @@ function getCurrentVariantImages(variantId) {
   return images;
 }
 
-// Function to navigate main image (device-aware)
+// Function to navigate main image (direction: -1 for prev, 1 for next)
 function navigateMainImage(direction) {
   const activeContainer = getActiveMediaContainer();
   if (!activeContainer) return;
@@ -851,32 +894,40 @@ function updateMainImage(imageSrc, imageAlt) {
   
   if (selectedVariantId) {
     const mainImageContainer = activeContainer.querySelector(`.variant-main-item[data-variant-id="${selectedVariantId}"]`);
+    const wrapper = activeContainer.querySelector('.variant-main-image');
     
     if (mainImageContainer) {
       const mainImage = mainImageContainer.querySelector('img');
       if (mainImage) {
-        // Add loading state
+        // Skip if already showing this image
+        if (mainImage.src === imageSrc) return;
+
+        // Show loader
+        toggleMainImageLoader(activeContainer, true);
+
+        // Keep the slight visual dim
         mainImageContainer.style.opacity = '0.7';
         mainImageContainer.style.transition = 'opacity 0.2s ease';
         
-        // Create new image to preload
+        // Preload new image
         const newImage = new Image();
         newImage.onload = function() {
-          // Once loaded, update the source and remove loading state
           mainImage.src = imageSrc;
           mainImage.alt = imageAlt || '';
           mainImageContainer.style.opacity = '1';
-          
-          // Update current image index
+
+          // Update state
           currentVariantImages = getCurrentVariantImages(selectedVariantId);
           currentImageIndex = currentVariantImages.findIndex(img => img.src === imageSrc);
           if (currentImageIndex === -1) currentImageIndex = 0;
+
+          // Hide loader
+          toggleMainImageLoader(activeContainer, false);
         };
         newImage.onerror = function() {
-          // If error, still remove loading state
           mainImageContainer.style.opacity = '1';
+          toggleMainImageLoader(activeContainer, false);
         };
-        // Start preloading
         newImage.src = imageSrc;
       }
     }
@@ -917,7 +968,7 @@ function scrollThumbnailsToStart() {
 function updateVariantImages(selectedVariantId) {
   const activeContainer = getActiveMediaContainer();
   if (!activeContainer) return;
-  
+
   // Store the selected variant ID globally
   lastSelectedVariantId = selectedVariantId;
   
@@ -925,55 +976,37 @@ function updateVariantImages(selectedVariantId) {
   const mainImages = activeContainer.querySelectorAll('.variant-main-item');
   mainImages.forEach(item => {
     const itemVariantId = item.getAttribute('data-variant-id');
-    if (itemVariantId === selectedVariantId.toString()) {
-      item.style.display = 'block';
-    } else {
-      item.style.display = 'none';
-    }
+    item.style.display = (itemVariantId === selectedVariantId.toString()) ? 'block' : 'none';
   });
 
   // Update thumbnail groups
   const thumbnailGroups = activeContainer.querySelectorAll('.variant-thumbnail-group');
   thumbnailGroups.forEach(group => {
     const groupVariantId = group.getAttribute('data-variant-id');
-    if (groupVariantId === selectedVariantId.toString()) {
-      group.style.display = 'flex';
-    } else {
-      group.style.display = 'none';
-    }
+    group.style.display = (groupVariantId === selectedVariantId.toString()) ? 'flex' : 'none';
   });
 
-  // Reset main image to show the first/main image for the selected variant
+  // Reset main image to the first thumbnail for the selected variant (use loader-aware path)
   const selectedVariantContainer = activeContainer.querySelector(`.variant-main-item[data-variant-id="${selectedVariantId}"]`);
   if (selectedVariantContainer) {
-    const mainImage = selectedVariantContainer.querySelector('img');
     const thumbnailGroup = activeContainer.querySelector(`.variant-thumbnail-group[data-variant-id="${selectedVariantId}"]`);
-    
-    if (mainImage && thumbnailGroup) {
-      // Find the first thumbnail to get the main image source
+    if (thumbnailGroup) {
       const firstThumbnail = thumbnailGroup.querySelector('.variant-thumb-item img');
       if (firstThumbnail) {
-        // Update main image to show the first image (main image) of the variant
         const mainImageSrc = firstThumbnail.src.replace('width=150', 'width=1445');
         const mainImageAlt = firstThumbnail.alt;
-        
-        mainImage.src = mainImageSrc;
-        mainImage.alt = mainImageAlt;
-        
-        // Reset image index
-        currentImageIndex = 0;
-        currentVariantImages = getCurrentVariantImages(selectedVariantId);
+
+        // Use the same loader/preload logic as thumbnail clicks
+        updateMainImage(mainImageSrc, mainImageAlt);
       }
     }
   }
 
-  // Set the first thumbnail as active for the selected variant
+  // Set the first thumbnail as active
   setActiveFirstThumbnail(selectedVariantId);
 
-  // Scroll thumbnails to the beginning
+  // Scroll and preload
   scrollThumbnailsToStart();
-
-  // Preload images for the selected variant
   preloadVariantImages(selectedVariantId);
 
   // Update legacy variant images (if they exist)
@@ -1104,4 +1137,11 @@ document.addEventListener('DOMContentLoaded', function() {
     preloadVariantImages(selectedVariant);
   }
 });
+
+function toggleMainImageLoader(activeContainer, isLoading) {
+  const wrapper = activeContainer ? activeContainer.querySelector('.variant-main-image') : null;
+  if (!wrapper) return;
+  wrapper.classList.toggle('is-loading', !!isLoading);
+  wrapper.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+}
 </script>
