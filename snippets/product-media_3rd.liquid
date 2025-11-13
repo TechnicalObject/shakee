@@ -1,0 +1,688 @@
+{% comment %}
+  Renders product media in various different layouts, depending on the settings in the section.
+
+  Accepts:
+    - id: {String} The instance id (required)
+    - section_id: The section ID (optional)
+    - type: {String} The type of media layout eg. slider, thumbnails (required)
+    - product: {Object} The product object (required)
+    - section: {Object} The section object (required)
+    - device: {String} The device type eg. desktop, mobile (required)
+    - has_pagination: {Boolean} Whether to show pagination (optional)
+    - enable_peep: {Boolean} Whether to enable peep (optional)
+    - is_quick_view: {Boolean} Whether the media is being rendered in quick view (optional)
+    - hide_out_of_stock_variants: {Boolean} Whether to hide out of stock variants (optional)
+    - change_variant_based_on_thumbnail: {Boolean} Whether to change the variant based on the thumbnail (optional)
+    - onboarding: {Boolean} Whether to render an onboarding product media when product media size is 0 (eg. Featured Product) (optional)
+  
+  Usage:
+    {% render product_media with id: 'product-media', product: product, section: section, device: 'mobile', has_pagination: true, enable_peep: true %}
+{% endcomment %}
+
+{{ 'component-product-media.min.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  {% if device == 'mobile' %}
+    @media (max-width: 767px) {
+      #{{ id }} {
+        visibility: visible;
+        height: unset;
+      }
+    }
+
+    @media (min-width: 768px) {
+      #{{ id }} {
+        visibility: hidden;
+        height: 0;
+      }
+
+      #{{ id }} deferred-media {
+        display: none;
+      }
+    }
+  {% elsif device == 'desktop' %}
+    @media (max-width: 767px) {
+      #{{ id }} {
+        visibility: hidden;
+        height: 0;
+      }
+
+      #{{ id }} deferred-media {
+        display: none;
+      }
+    }
+
+    @media (min-width: 768px) {
+      #{{ id }} {
+        visibility: visible;
+        height: unset;
+      }
+    }
+  {% endif %}
+  [data-product-badge] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 2;
+    scale: 1.3;
+    margin-left: 30px;
+    margin-top: 5px;
+  }
+
+  .badge {
+    flex-shrink: 0;
+  }
+
+  /* Custom Variant Slider Styles */
+  .variant-slider-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .variant-slider-main {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .variant-slider-track {
+    display: flex;
+    transition: transform 0.3s ease;
+  }
+
+  .variant-slide-custom {
+    min-width: 100%;
+    flex-shrink: 0;
+  }
+
+  .variant-slide-custom img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .variant-slide-custom[data-hidden="true"] {
+    display: none !important;
+  }
+
+  .variant-thumbnail-custom {
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .variant-thumbnail-custom:hover {
+    border-color: #333;
+  }
+
+  .variant-thumbnail-custom.active {
+    border-color: #000;
+  }
+
+  .variant-thumbnail-custom[data-hidden="true"] {
+    display: none !important;
+  }
+
+  .slider-nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .slider-nav-button:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  .slider-nav-button.prev {
+    left: 10px;
+  }
+
+  .slider-nav-button.next {
+    right: 10px;
+  }
+{% endstyle %}
+
+{% liquid 
+  assign image_crop = section.settings.image_shape
+
+  unless section_id
+    assign section_id = section.id
+  endunless
+
+  assign thumbnail_position = section.settings.thumbnail_position
+  if device == 'mobile'
+    assign thumbnail_position = 'below'
+  endif
+
+  assign custom_aspect_ratio = false
+  if image_crop != 'original'
+    assign custom_aspect_ratio = true
+  endif
+
+  if image_crop == 'adapt_to_first_image'
+    assign first_image_ratio = product.media.first.preview_image.aspect_ratio
+    assign adapt_ratio = 1 | divided_by: first_image_ratio | times: 100
+  endif
+
+  assign change_variant_based_on_thumbnail = false
+  for block in section.blocks
+    case block.type
+      when "options"
+        if block.settings.thumbnail_changes_variant == true
+          assign change_variant_based_on_thumbnail = true
+        endif
+    endcase
+  endfor
+
+  assign enable_video_loop = section.settings.enable_video_loop
+  assign enable_autoplay = section.settings.enable_autoplay
+  assign show_video_controls = section.settings.show_video_controls
+
+  comment
+    Product badges
+  endcomment
+  assign preorder_string = 'products.product.preorder' | t | downcase
+  assign preorder_product = false
+
+  for tag in product.tags
+    assign lowercase_tag = tag | downcase
+    if lowercase_tag contains preorder_string
+      assign preorder_product = true
+    endif
+    if preorder_product == false and tag contains '_badge:'
+      assign custom_badge = tag | remove: '_badge:'
+    endif
+  endfor
+
+  assign selected_variant = product.selected_or_first_available_variant
+
+  comment
+    Check if any variant has custom images
+  endcomment
+  assign has_any_variant_images = false
+  for variant in product.variants
+    if variant.metafields.custom.variant_images
+      assign has_any_variant_images = true
+      break
+    endif
+  endfor
+%}
+
+<safe-load-scripts class="hidden">
+  <script src="{{ 'component-deferred-media.js' | asset_url }}" defer="defer" type="module" data-flow-load-key="deferred-media"></script>
+</safe-load-scripts>
+
+<safe-load-scripts class="hidden">
+  <script src="{{ 'custom-component-variant-slider.js' | asset_url }}" defer="defer"></script>
+</safe-load-scripts>
+
+{% if settings.show_badges %}
+  {% capture product_badge %}
+    {% if product != blank %}
+      {% if product.available %}
+        {% comment %} Always show sale/discount badge if applicable {% endcomment %}
+        {% render 'badge' with badge: 'sale', badge_product: product, use_variant: true %}
+        
+        {% comment %} Show preorder badge {% endcomment %}
+        {% if preorder_product %}
+          {% render 'badge' with badge: 'preorder', preorder_badge: preorder_string %}
+        {% endif %}
+        
+        {% comment %} Show up to 2 custom badges from tags {% endcomment %}
+        {% assign custom_badge_count = 0 %}
+        {% for tag in product.tags %}
+          {% if tag contains '_badge:' and custom_badge_count < 2 %}
+            {% assign custom_badge_text = tag | remove: '_badge:' %}
+            {% render 'badge' with badge: 'custom', custom_badge: custom_badge_text %}
+            {% assign custom_badge_count = custom_badge_count | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% render 'badge' with badge: 'sold-out', badge_product: product %}
+      {% endif %}
+    {% else %}
+      {% render 'badge' with badge: 'sold-out' %}
+    {% endif %}
+  {% endcapture %}
+{% endif %}
+
+<product-media 
+  id="{{ id }}"
+  data-device="{{ device }}"
+  data-image-size="{{ section.settings.image_size }}"
+  data-image-cropped="{{ custom_aspect_ratio }}"
+  data-section-id="{{ section_id }}"
+  data-peep-enabled="{% if device == 'mobile' and enable_peep == true %}true{% else %}false{% endif %}"
+  data-pagination-enabled="{% if has_pagination %}true{% else %}false{% endif %}"
+  data-thumbnail-position="{{ thumbnail_position }}"
+  data-media-type="{{ type }}"
+  data-media-count="{% if onboarding and product.media.size == 0 %}3{% else %}{{ product.media.size }}{% endif %}"
+  data-autoplay-enabled="{% if enable_autoplay %}true{% else %}false{% endif %}"
+  data-selected-variant="{{ product.selected_or_first_available_variant | json | escape }}"
+  class="product-media-slider product-media-slider-{{ device }} thumbnails-{{ thumbnail_position }} media-type-{{ type }}{% if product.media.size == 1 or product.media.size == 0 and onboarding == false %} single-media{% endif %}"
+  {% if change_variant_based_on_thumbnail %}
+    data-change-variant-based-on-thumbnail="true"
+  {% endif %}
+  data-quick-view="{% if is_quick_view %}true{% else %}false{% endif %}"
+>
+  {% if product.media.size > 0 or onboarding %}
+    {% if has_any_variant_images %}
+      {% comment %} ==== CUSTOM VARIANT SLIDER ==== {% endcomment %}
+      <div 
+        class="variant-slider-container {% if type == 'thumbnails' %}thumbnail-media--main-media{% else %}product-media-slider-main{% endif %}{% if custom_aspect_ratio %} custom-aspect-ratio{% endif %}{% unless enable_peep %} block-radius-clip{% endunless %}" 
+        data-variant-slider
+        data-selected-variant-id="{{ selected_variant.id }}"
+        data-product-id="{{ product.id }}"
+      >
+        {% comment %} ==== BADGES ==== {% endcomment %}
+        <div data-product-badge{% if settings.border_radius == 'round' %} class="product-media-badge--extra-spacing"{% endif %}>
+          {{ product_badge }}
+        </div>
+
+        {% comment %} Main Slider {% endcomment %}
+        <div class="variant-slider-main" data-slider-main>
+          {% if type == 'thumbnails' %}
+            <button class="slider-nav-button prev" data-slider-prev aria-label="Previous slide">
+              {% render 'theme-icon' with icon: 'chevron_left', iconWidth: 24, iconHeight: 24, iconColor: 'currentColor' %}
+            </button>
+          {% endif %}
+          
+          <div class="variant-slider-track" data-slider-track>
+            {% for variant in product.variants %}
+              {% comment %} Add variant's featured image {% endcomment %}
+              {% if variant.featured_media %}
+                <div 
+                  class="variant-slide-custom{% if enable_peep %} block-radius-clip{% endif %}"
+                  data-variant-id="{{ variant.id }}"
+                  data-slide-id="variant-featured-{{ variant.id }}"
+                  data-hidden="{% if variant.id != selected_variant.id %}true{% else %}false{% endif %}"
+                >
+                  {% if variant.featured_media.media_type == 'image' %}
+                    <a 
+                      data-main-media-link
+                      href="{{ variant.featured_media.preview_image | image_url: width: 1445 }}"
+                      data-pswp-width="{{ variant.featured_media.width }}"
+                      data-pswp-height="{{ variant.featured_media.height }}"
+                      target="_blank"
+                      {% if adapt_ratio %}style="padding-bottom: {{ adapt_ratio }}%;"{% endif %}
+                      {% if settings.animations_enabled %}class="kb-enabled"{% endif %}
+                    >
+                      <img
+                        class="theme-img media-ratio--{{ image_crop }}"
+                        src="{{ variant.featured_media.preview_image | image_url: width: 1445 }}"
+                        alt="{% if variant.featured_media.alt != blank %}{{ variant.featured_media.alt }}{% else %}{{ product.title }} - {{ variant.title }}{% endif %}"
+                        width="{{ variant.featured_media.width }}"
+                        height="{{ variant.featured_media.height }}"
+                        sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                        loading="eager"
+                      />
+                    </a>
+                  {% else %}
+                    {% render 'deferred-media' with delayed_media: variant.featured_media, section_id: section_id, enable_video_loop: enable_video_loop, enable_autoplay: enable_autoplay, media_wrapper_classes: 'product-single__media__wrapper', aspect_ratio: image_crop, media_product: product, media_type: 'slider', show_controls: show_video_controls %}
+                  {% endif %}
+                </div>
+              {% endif %}
+
+              {% comment %} Add variant metafield images {% endcomment %}
+              {% assign variant_images = variant.metafields.custom.variant_images.value %}
+              
+              {% comment %} DEBUG: Check what we got {% endcomment %}
+              {% if variant_images %}
+                <!-- DEBUG: Variant {{ variant.id }} has variant_images metafield -->
+                <!-- DEBUG: variant_images type: {{ variant_images | json }} -->
+                <!-- DEBUG: variant_images size: {{ variant_images.size }} -->
+              {% else %}
+                <!-- DEBUG: Variant {{ variant.id }} has NO variant_images metafield -->
+              {% endif %}
+              
+              {% if variant_images and variant_images.size > 0 %}
+                {% for variant_image in variant_images %}
+                  <!-- DEBUG: Rendering image {{ forloop.index }} for variant {{ variant.id }} -->
+                  <div 
+                    class="variant-slide-custom{% if enable_peep %} block-radius-clip{% endif %}"
+                    data-variant-id="{{ variant.id }}"
+                    data-slide-id="variant-{{ variant.id }}-img-{{ forloop.index }}"
+                    data-hidden="{% if variant.id != selected_variant.id %}true{% else %}false{% endif %}"
+                  >
+                    <a 
+                      data-main-media-link
+                      href="{{ variant_image | image_url: width: 1445 }}"
+                      data-pswp-width="{{ variant_image.width | default: 1445 }}"
+                      data-pswp-height="{{ variant_image.height | default: 1445 }}"
+                      target="_blank"
+                      {% if adapt_ratio %}style="padding-bottom: {{ adapt_ratio }}%;"{% endif %}
+                      {% if settings.animations_enabled %}class="kb-enabled"{% endif %}
+                    >
+                      <img
+                        class="theme-img media-ratio--{{ image_crop }}"
+                        src="{{ variant_image | image_url: width: 1445 }}"
+                        alt="{% if variant_image.alt != blank %}{{ variant_image.alt }}{% else %}{{ product.title }} - {{ variant.title }} - Image {{ forloop.index }}{% endif %}"
+                        width="{{ variant_image.width | default: 1445 }}"
+                        height="{{ variant_image.height | default: 1445 }}"
+                        sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                        loading="lazy"
+                      />
+                    </a>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          {% if type == 'thumbnails' %}
+            <button class="slider-nav-button next" data-slider-next aria-label="Next slide">
+              {% render 'theme-icon' with icon: 'chevron_right', iconWidth: 24, iconHeight: 24, iconColor: 'currentColor' %}
+            </button>
+          {% endif %}
+        </div>
+
+        {% comment %} Thumbnails {% endcomment %}
+        {% if type == 'thumbnails' %}
+          <div 
+            data-updates-on-change
+            data-update-id="item-title" 
+            data-slider-thumbnails 
+            class="thumbnail-media--thumbnails swiper"
+          >
+            <div class="swiper-wrapper">
+              {% for variant in product.variants %}
+                {% comment %} Featured image thumbnail {% endcomment %}
+                {% if variant.featured_media %}
+                  <div 
+                    class="swiper-slide variant-thumbnail-custom"
+                    data-variant-id="{{ variant.id }}"
+                    data-thumbnail-id="variant-featured-{{ variant.id }}"
+                    data-target-slide="variant-featured-{{ variant.id }}"
+                    data-hidden="{% if variant.id != selected_variant.id %}true{% else %}false{% endif %}"
+                  >
+                    {% capture props %}
+                      data-image-id="variant-featured-{{ variant.id }}"
+                      data-max-width="{{ variant.featured_media.preview_image.width | default: 300 }}"
+                      data-variant-metafield="false"
+                    {% endcapture %}
+
+                    {% capture class %}
+                      product-medias__thumbnail__image product-medias__thumbnail--{{ variant.featured_media.media_type }} media-ratio--{{ image_crop }} thumbnail-radius
+                    {% endcapture %}
+
+                    {% render 'responsive-image' with variant.featured_media.preview_image, wrapper_class: 'thumbnail-radius', class: class, alt: variant.title, default_size: '300x', props: props, blur: false %}
+                  </div>
+                {% endif %}
+
+                {% comment %} Metafield image thumbnails {% endcomment %}
+                {% assign variant_images = variant.metafields.custom.variant_images.value %}
+                
+                {% comment %} DEBUG: Check thumbnails {% endcomment %}
+                {% if variant_images %}
+                  <!-- DEBUG THUMBS: Variant {{ variant.id }} has {{ variant_images.size }} images -->
+                {% else %}
+                  <!-- DEBUG THUMBS: Variant {{ variant.id }} has NO images -->
+                {% endif %}
+                
+                {% if variant_images and variant_images.size > 0 %}
+                  {% for variant_image in variant_images %}
+                    <!-- DEBUG THUMBS: Rendering thumbnail {{ forloop.index }} for variant {{ variant.id }} -->
+                    <div 
+                      class="swiper-slide variant-thumbnail-custom"
+                      data-variant-id="{{ variant.id }}"
+                      data-thumbnail-id="variant-{{ variant.id }}-img-{{ forloop.index }}"
+                      data-target-slide="variant-{{ variant.id }}-img-{{ forloop.index }}"
+                      data-hidden="{% if variant.id != selected_variant.id %}true{% else %}false{% endif %}"
+                    >
+                      {% capture props %}
+                        data-image-id="variant-{{ variant.id }}-img-{{ forloop.index }}"
+                        data-max-width="{{ variant_image.width | default: 300 }}"
+                        data-variant-metafield="true"
+                      {% endcapture %}
+
+                      <div class="thumbnail-radius product-medias__thumbnail__image media-ratio--{{ image_crop }}" {{ props }}>
+                        <img 
+                          src="{{ variant_image | image_url: width: 300 }}"
+                          alt="{{ variant.title }} - Image {{ forloop.index }}"
+                          width="{{ variant_image.width | default: 300 }}"
+                          height="{{ variant_image.height | default: 300 }}"
+                          loading="lazy"
+                          class="theme-img"
+                        />
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      {% comment %} ==== FALLBACK: DEFAULT PRODUCT MEDIA (NO VARIANT IMAGES) ==== {% endcomment %}
+      <div data-media-main data-slider-main class="{% if type == 'thumbnails' %}thumbnail-media--main-media{% else %}product-media-slider-main{% endif %} swiper{% if custom_aspect_ratio %} custom-aspect-ratio{% endif %}{% if product.media.size == 1 %} media--single{% endif %}{% unless enable_peep %} block-radius-clip{% endunless %}">
+        {% comment %} ==== BADGES ==== {% endcomment %}
+        <div data-product-badge{% if settings.border_radius == 'round' %} class="product-media-badge--extra-spacing"{% endif %}>
+          {{ product_badge }}
+        </div>
+
+        {% comment %} ==== SLIDES ==== {% endcomment %}
+        <div class="swiper-wrapper">
+          {% for media in product.media %}
+            {% liquid 
+              assign hideThumb = false
+              assign mediaHasVariant = false
+
+              if hide_out_of_stock_variants
+                assign hideThumb = true
+                for option in product.options_with_values
+                  for option_value in option.values
+                    if option_value.variant.featured_media.id == media.id
+                      assign mediaHasVariant = true
+
+                      if option_value.variant.available
+                        assign hideThumb = false
+                      endif
+                    endif
+                  endfor
+                endfor
+              endif
+            %}
+
+            {% unless hideThumb and mediaHasVariant %}
+              <div 
+                class="swiper-slide{% if product.media.size == 1 %} animated fadeIn{% endif %}{% if enable_peep %} block-radius-clip{% endif %}"
+                {%- if product.media.size > 1 -%}
+                  style="visibility:hidden;"
+                {%- endif -%}
+                data-media-type="{{ media.media_type }}"
+                data-media-id="{{ media.id }}"
+              >
+                {% if media.media_type == 'image' %}
+                  <a 
+                    data-main-media-link
+                    href="{{ media.preview_image | image_url: width: 1445 }}"
+                    data-pswp-width="{{ media.width }}"
+                    data-pswp-height="{{ media.height }}"
+                    target="_blank"
+                    {% if adapt_ratio %}style="padding-bottom: {{ adapt_ratio }}%;"{% endif %}
+                    {% if settings.animations_enabled %}class="kb-enabled"{% endif %}
+                  >
+                    <img
+                      class="theme-img media-ratio--{{ image_crop }}"
+                      src="{{ media.preview_image | image_url: width: 1445 }}"
+                      alt="{% if media.alt != product.title %}{{ media.alt }}{% endif %}"
+                      width="{{ media.width }}"
+                      height="{{ media.height }}"
+                      sizes="(min-width: 1200px) calc((1200px - 10rem) / 2), (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                      loading="eager"
+                    />
+                  </a>
+                {% else %}
+                  {% render 'deferred-media' with delayed_media: media, section_id: section_id, enable_video_loop: enable_video_loop, enable_autoplay: enable_autoplay, media_wrapper_classes: 'product-single__media__wrapper', aspect_ratio: image_crop, media_product: product, media_type: 'slider', show_controls: show_video_controls %}
+                {% endif %}
+              </div>
+            {% endunless %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% else %}
+    {% comment %} ==== BADGES ==== {% endcomment %}
+    <div data-product-badge>
+      {{ product_badge }}
+    </div>
+    
+    {% comment %} ==== PLACEHOLDER ==== {% endcomment %}
+    {% assign svg_classes = 'icon icon--placeholder block-radius media-ratio--' | append: image_crop %}
+    {{ 'product-1' | placeholder_svg_tag: svg_classes }}
+  {% endif %}
+</product-media>
+
+<script>
+window.selectedVariantId = {{ product.selected_or_first_available_variant.id }};
+
+function listenForVariantChange() {
+  if (!window.eventBus) {
+    console.log('DEBUG: Waiting for eventBus...');
+    setTimeout(listenForVariantChange, 100);
+    return;
+  }
+
+  console.log('DEBUG: EventBus found, setting up listeners');
+
+  window.eventBus.on('variant:change', (data) => {
+    const selectedVariantId = data.variant?.id;
+    if (!selectedVariantId) {
+      console.log('DEBUG: No variant ID in change event');
+      return;
+    }
+    
+    console.log('DEBUG: Variant changed to:', selectedVariantId);
+    window.selectedVariantId = selectedVariantId;
+    
+    updateVariantDisplay(selectedVariantId);
+  });
+
+  updateVariantDisplay(window.selectedVariantId);
+}
+
+function updateVariantDisplay(selectedVariantId) {
+  try {
+    console.log('DEBUG: Updating display for variant:', selectedVariantId);
+    
+    // FIXED: Use correct class names
+    const allSlides = document.querySelectorAll('.variant-slide-custom');
+    const allThumbnails = document.querySelectorAll('.variant-thumbnail-custom');
+    
+    console.log('DEBUG: Found slides:', allSlides.length, 'thumbnails:', allThumbnails.length);
+    
+    if (allSlides.length === 0 && allThumbnails.length === 0) {
+      console.log('DEBUG: No variant elements found, retrying...');
+      setTimeout(() => updateVariantDisplay(selectedVariantId), 100);
+      return;
+    }
+    
+    // Show/hide slides based on variant
+    allSlides.forEach((slide, index) => {
+      const slideVariantId = parseInt(slide.dataset.variantId);
+      const isMatch = slideVariantId === selectedVariantId;
+      
+      slide.dataset.hidden = isMatch ? 'false' : 'true';
+      console.log(`DEBUG: Slide ${index}: variant-id=${slideVariantId}, selected=${selectedVariantId}, visible=${isMatch}`);
+    });
+    
+    // Show/hide thumbnails based on variant
+    allThumbnails.forEach((thumb, index) => {
+      const thumbVariantId = parseInt(thumb.dataset.variantId);
+      const isMatch = thumbVariantId === selectedVariantId;
+      
+      thumb.dataset.hidden = isMatch ? 'false' : 'true';
+      console.log(`DEBUG: Thumbnail ${index}: variant-id=${thumbVariantId}, selected=${selectedVariantId}, visible=${isMatch}`);
+    });
+
+    // Setup handlers
+    requestAnimationFrame(() => {
+      setupThumbnailHandlers();
+    });
+    
+  } catch (error) {
+    console.error('DEBUG: Error in updateVariantDisplay:', error);
+  }
+}
+
+function setupThumbnailHandlers() {
+  try {
+    console.log('DEBUG: Setting up thumbnail handlers');
+    
+    // FIXED: Use correct class name
+    const allThumbnails = Array.from(document.querySelectorAll('.variant-thumbnail-custom'));
+    
+    console.log('DEBUG: Found total thumbnails:', allThumbnails.length);
+    
+    // Remove all existing handlers by cloning
+    allThumbnails.forEach(thumb => {
+      const clone = thumb.cloneNode(true);
+      thumb.parentNode?.replaceChild(clone, thumb);
+    });
+    
+    // Get fresh list after cloning
+    const freshThumbnails = Array.from(document.querySelectorAll('.variant-thumbnail-custom'));
+    
+    // Add click handlers to visible thumbnails only
+    freshThumbnails.forEach((thumb, index) => {
+      if (thumb.dataset.hidden !== 'true') {
+        thumb.addEventListener('click', handleThumbnailClick);
+        thumb.style.cursor = 'pointer';
+        console.log(`DEBUG: Added handler to thumbnail ${index}, target:`, thumb.dataset.targetSlide);
+      }
+    });
+  } catch (error) {
+    console.error('DEBUG: Error setting up thumbnail handlers:', error);
+  }
+}
+
+function handleThumbnailClick(event) {
+  try {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const thumbnail = event.currentTarget;
+    const targetSlideId = thumbnail.dataset.targetSlide;
+    
+    console.log('DEBUG: Thumbnail clicked, target:', targetSlideId);
+    
+    if (!targetSlideId) {
+      console.log('DEBUG: No target slide ID found');
+      return;
+    }
+    
+    // Find the matching slide by data-slide-id
+    const targetSlide = document.querySelector(`.variant-slide-custom[data-slide-id="${targetSlideId}"]`);
+    
+    if (!targetSlide) {
+      console.log('DEBUG: Target slide not found');
+      return;
+    }
+    
+    // Trigger click on the corresponding slide
+    targetSlide.click();
+  } catch (error) {
+    console.error('DEBUG: Error in handleThumbnailClick:', error);
+  }
+}
+
+// Initialize variant display on page load
+document.addEventListener('DOMContentLoaded', () => {
+  listenForVariantChange();
+});
+</script>
