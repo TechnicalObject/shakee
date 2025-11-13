@@ -716,10 +716,36 @@
 <script>
 let currentImageIndex = 0;
 let currentVariantImages = [];
+let lastSelectedVariantId = null; // Track the last selected variant
 
-// Function to get all images for current variant
+// Function to get the current device type based on screen width
+function getCurrentDevice() {
+  return window.innerWidth >= 768 ? 'desktop' : 'mobile';
+}
+
+// Function to get the active media container based on current device
+function getActiveMediaContainer() {
+  const currentDevice = getCurrentDevice();
+  const containers = document.querySelectorAll('[data-device]');
+  
+  for (let container of containers) {
+    const containerDevice = container.getAttribute('data-device');
+    const computedStyle = window.getComputedStyle(container);
+    
+    if (containerDevice === currentDevice && computedStyle.visibility === 'visible') {
+      return container;
+    }
+  }
+  
+  return null;
+}
+
+// Function to get all images for current variant (device-aware)
 function getCurrentVariantImages(variantId) {
-  const thumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
+  const activeContainer = getActiveMediaContainer();
+  if (!activeContainer) return [];
+  
+  const thumbnailGroup = activeContainer.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
   if (!thumbnailGroup) return [];
   
   const images = [];
@@ -736,8 +762,11 @@ function getCurrentVariantImages(variantId) {
   return images;
 }
 
-// Function to navigate main image
+// Function to navigate main image (device-aware)
 function navigateMainImage(direction) {
+  const activeContainer = getActiveMediaContainer();
+  if (!activeContainer) return;
+  
   const selectedVariantId = getSelectedVariantId();
   if (!selectedVariantId) return;
   
@@ -757,28 +786,47 @@ function navigateMainImage(direction) {
   updateActiveThumbnail(selectedVariantId, currentImageIndex);
 }
 
-// Function to get selected variant ID
+// Function to get selected variant ID with fallback to global state
 function getSelectedVariantId() {
+  // First, try to get from form selectors
   const variantSelector = document.querySelector('input[name="id"]:checked') || 
                          document.querySelector('select[name="id"]') || 
                          document.querySelector('.variant-selector:checked') ||
                          document.querySelector('.variant-selector');
   
-  if (variantSelector) {
+  if (variantSelector && variantSelector.value) {
+    lastSelectedVariantId = variantSelector.value;
     return variantSelector.value;
   }
   
-  const visibleMainImage = document.querySelector('.variant-main-item[style*="display: block"], .variant-main-item:not([style*="display: none"])');
-  if (visibleMainImage) {
-    return visibleMainImage.getAttribute('data-variant-id');
+  // If no form selector found, use the last known selected variant
+  if (lastSelectedVariantId) {
+    return lastSelectedVariantId;
   }
   
-  return null;
+  // Fallback to checking visible main image in active container
+  const activeContainer = getActiveMediaContainer();
+  if (activeContainer) {
+    const visibleMainImage = activeContainer.querySelector('.variant-main-item[style*="display: block"], .variant-main-item:not([style*="display: none"])');
+    if (visibleMainImage) {
+      const variantId = visibleMainImage.getAttribute('data-variant-id');
+      lastSelectedVariantId = variantId;
+      return variantId;
+    }
+  }
+  
+  // Final fallback to default variant
+  const defaultVariantId = {{ product.selected_or_first_available_variant.id | json }};
+  lastSelectedVariantId = defaultVariantId;
+  return defaultVariantId;
 }
 
-// Function to update active thumbnail
+// Function to update active thumbnail (device-aware)
 function updateActiveThumbnail(variantId, index) {
-  const thumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
+  const activeContainer = getActiveMediaContainer();
+  if (!activeContainer) return;
+  
+  const thumbnailGroup = activeContainer.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
   if (!thumbnailGroup) return;
   
   const thumbnails = thumbnailGroup.querySelectorAll('.variant-thumb-item img');
@@ -794,12 +842,15 @@ function updateActiveThumbnail(variantId, index) {
   });
 }
 
-// Function to update the main image when thumbnail is clicked
+// Function to update the main image when thumbnail is clicked (device-aware)
 function updateMainImage(imageSrc, imageAlt) {
+  const activeContainer = getActiveMediaContainer();
+  if (!activeContainer) return;
+  
   const selectedVariantId = getSelectedVariantId();
   
   if (selectedVariantId) {
-    const mainImageContainer = document.querySelector(`.variant-main-item[data-variant-id="${selectedVariantId}"]`);
+    const mainImageContainer = activeContainer.querySelector(`.variant-main-item[data-variant-id="${selectedVariantId}"]`);
     
     if (mainImageContainer) {
       const mainImage = mainImageContainer.querySelector('img');
@@ -832,9 +883,12 @@ function updateMainImage(imageSrc, imageAlt) {
   }
 }
 
-// Function to preload variant images
+// Function to preload variant images (device-aware)
 function preloadVariantImages(variantId) {
-  const thumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
+  const activeContainer = getActiveMediaContainer();
+  if (!activeContainer) return;
+  
+  const thumbnailGroup = activeContainer.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
   if (thumbnailGroup) {
     const thumbnails = thumbnailGroup.querySelectorAll('.variant-thumb-item img');
     thumbnails.forEach(thumb => {
@@ -845,9 +899,12 @@ function preloadVariantImages(variantId) {
   }
 }
 
-// Function to scroll thumbnails to the beginning
+// Function to scroll thumbnails to the beginning (device-aware)
 function scrollThumbnailsToStart() {
-  const thumbnailContainer = document.querySelector('.variant-thumbnails');
+  const activeContainer = getActiveMediaContainer();
+  if (!activeContainer) return;
+  
+  const thumbnailContainer = activeContainer.querySelector('.variant-thumbnails');
   if (thumbnailContainer) {
     thumbnailContainer.scrollTo({
       left: 0,
@@ -856,10 +913,16 @@ function scrollThumbnailsToStart() {
   }
 }
 
-// Function to update variant images visibility
+// Function to update variant images visibility (device-aware)
 function updateVariantImages(selectedVariantId) {
+  const activeContainer = getActiveMediaContainer();
+  if (!activeContainer) return;
+  
+  // Store the selected variant ID globally
+  lastSelectedVariantId = selectedVariantId;
+  
   // Update main images
-  const mainImages = document.querySelectorAll('.variant-main-item');
+  const mainImages = activeContainer.querySelectorAll('.variant-main-item');
   mainImages.forEach(item => {
     const itemVariantId = item.getAttribute('data-variant-id');
     if (itemVariantId === selectedVariantId.toString()) {
@@ -870,7 +933,7 @@ function updateVariantImages(selectedVariantId) {
   });
 
   // Update thumbnail groups
-  const thumbnailGroups = document.querySelectorAll('.variant-thumbnail-group');
+  const thumbnailGroups = activeContainer.querySelectorAll('.variant-thumbnail-group');
   thumbnailGroups.forEach(group => {
     const groupVariantId = group.getAttribute('data-variant-id');
     if (groupVariantId === selectedVariantId.toString()) {
@@ -881,10 +944,10 @@ function updateVariantImages(selectedVariantId) {
   });
 
   // Reset main image to show the first/main image for the selected variant
-  const selectedVariantContainer = document.querySelector(`.variant-main-item[data-variant-id="${selectedVariantId}"]`);
+  const selectedVariantContainer = activeContainer.querySelector(`.variant-main-item[data-variant-id="${selectedVariantId}"]`);
   if (selectedVariantContainer) {
     const mainImage = selectedVariantContainer.querySelector('img');
-    const thumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${selectedVariantId}"]`);
+    const thumbnailGroup = activeContainer.querySelector(`.variant-thumbnail-group[data-variant-id="${selectedVariantId}"]`);
     
     if (mainImage && thumbnailGroup) {
       // Find the first thumbnail to get the main image source
@@ -914,7 +977,7 @@ function updateVariantImages(selectedVariantId) {
   preloadVariantImages(selectedVariantId);
 
   // Update legacy variant images (if they exist)
-  const variantImages = document.querySelectorAll('.variant-image-item');
+  const variantImages = activeContainer.querySelectorAll('.variant-image-item');
   variantImages.forEach(item => {
     const itemVariantId = item.getAttribute('data-variant-id');
     const img = item.querySelector('img');
@@ -929,16 +992,19 @@ function updateVariantImages(selectedVariantId) {
   });
 }
 
-// Function to set the first thumbnail as active
+// Function to set the first thumbnail as active (device-aware)
 function setActiveFirstThumbnail(variantId) {
-  // Remove active class from all thumbnails
-  document.querySelectorAll('.variant-thumb-item img').forEach(thumb => {
+  const activeContainer = getActiveMediaContainer();
+  if (!activeContainer) return;
+  
+  // Remove active class from all thumbnails in active container
+  activeContainer.querySelectorAll('.variant-thumb-item img').forEach(thumb => {
     thumb.classList.remove('active');
     thumb.style.borderColor = 'transparent';
   });
   
   // Add active class to the first thumbnail of the selected variant
-  const selectedThumbnailGroup = document.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
+  const selectedThumbnailGroup = activeContainer.querySelector(`.variant-thumbnail-group[data-variant-id="${variantId}"]`);
   if (selectedThumbnailGroup) {
     const firstThumbnail = selectedThumbnailGroup.querySelector('.variant-thumb-item img');
     if (firstThumbnail) {
@@ -948,10 +1014,16 @@ function setActiveFirstThumbnail(variantId) {
   }
 }
 
-// Add visual feedback to thumbnails
+// Add visual feedback to thumbnails (device-aware)
 function addThumbnailFeedback() {
   document.addEventListener('click', function(e) {
     if (e.target.closest('.variant-thumb-item')) {
+      const activeContainer = getActiveMediaContainer();
+      if (!activeContainer) return;
+      
+      // Only process if the clicked thumbnail is in the active container
+      if (!activeContainer.contains(e.target)) return;
+      
       // Remove active state from all thumbnails in current variant
       const currentVariantGroup = e.target.closest('.variant-thumbnail-group');
       if (currentVariantGroup) {
@@ -971,6 +1043,23 @@ function addThumbnailFeedback() {
     }
   });
 }
+
+// Handle resize events to update when switching between mobile/desktop
+function handleResize() {
+  // Use the last selected variant or get current selection
+  const selectedVariant = getSelectedVariantId();
+  if (selectedVariant) {
+    // Update the new active container with the current variant selection
+    updateVariantImages(selectedVariant);
+  }
+}
+
+// Debounce resize handler
+let resizeTimeout;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(handleResize, 100);
+});
 
 function listenForVariantChange() {
   if (!window.eventBus) {
@@ -1006,6 +1095,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set initial state
   const selectedVariant = {{ product.selected_or_first_available_variant.id | json }};
   if (selectedVariant) {
+    lastSelectedVariantId = selectedVariant; // Initialize the global state
     updateVariantImages(selectedVariant);
   }
   
