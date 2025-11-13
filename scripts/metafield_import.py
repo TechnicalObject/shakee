@@ -78,7 +78,7 @@ def get_staged_upload(filename, mime_type=None):
     result = graphql_query(query, variables)
     
     # Debug: Print the full response
-    print("Staged upload response:", result)
+    # print("Staged upload response:", result)
     
     # Check for errors
     if "errors" in result:
