@@ -281,13 +281,22 @@
             {% endif %}
 
             {% if settings.hover-effect and product.media.size > 1 %}
-              {% comment %} Use variant metafield image if available, otherwise use second product image {% endcomment %}
+              {% comment %} Use first image from variant_images list if available, otherwise use second product image {% endcomment %}
               {% liquid
-                assign secondary_image = null
-                if current_variant.metafields.custom.variant_image_2
-                  assign secondary_image = current_variant.metafields.custom.variant_image_2
-                else
-                  assign secondary_image = product.media[1]
+                assign secondary_image = product.media[1]
+                assign variant_images = current_variant.metafields.custom.variant_images
+                
+                comment
+                  The metafield contains GIDs that need to be matched to actual media objects
+                endcomment
+                if variant_images and variant_images.size > 0
+                  assign first_variant_image_gid = variant_images[0]
+                  for media_item in product.media
+                    if media_item.id == first_variant_image_gid or media_item contains first_variant_image_gid
+                      assign secondary_image = media_item
+                      break
+                    endif
+                  endfor
                 endif
               %}
               
