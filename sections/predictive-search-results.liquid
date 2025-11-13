@@ -1,4 +1,3 @@
-
 <div class="predictive-search__results-wrapper">
   {% if predictive_search.performed %}
 
@@ -62,10 +61,45 @@
             {% assign is_default_grid = true %}
             {% if predictive_search.resources.products.size > 0 %}
               <div role="tabpanel" id="{{ section.id }}-products" aria-labelledby="{{ section.id }}-products" class="predictive-search__grid predictive-search__grid--products" data-grid-id="products"{% unless is_default_grid %} hidden{% endunless %}>
-                {% for product_result in predictive_search.resources.products limit: 4 %}
-                  <div class="predictive-search__grid-item" data-animate data-animate-order="{{ forloop.index }}">
-                    {% render 'grid-view-item', product: product_result, is_search_result: true, enable_badges: settings.show_badges, grid_count_desktop: 4, grid_count_mobile: 2 %}
-                  </div>
+                {% assign variant_count = 0 %}
+                {% for product_result in predictive_search.resources.products %}
+                  {% if variant_count >= 4 %}
+                    {% break %}
+                  {% endif %}
+                  
+                  {% assign has_prichut_or_velikost = false %}
+                  {% for option in product_result.options %}
+                    {% assign option_handle = option | handle %}
+                    {% if option_handle == 'prichut' or option_handle == 'velikost-baleni' %}
+                      {% assign has_prichut_or_velikost = true %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% if has_prichut_or_velikost %}
+                    {% comment %} Display all variants for products with 'prichut' or 'velikost-baleni' options {% endcomment %}
+                    {% for variant in product_result.variants %}
+                      {% if variant_count >= 4 %}
+                        {% break %}
+                      {% endif %}
+                      {% assign variant_count = variant_count | plus: 1 %}
+                      {% liquid
+                        assign variant_title = product_result.title
+                        if variant.title != 'Default Title'
+                          assign variant_title = product_result.title | append: ' - ' | append: variant.title
+                        endif
+                      %}
+                      <div class="predictive-search__grid-item" data-animate data-animate-order="{{ variant_count }}">
+                        {% render 'grid-view-item', product: product_result, variant: variant, variant_title: variant_title, is_search_result: true, enable_badges: settings.show_badges, grid_count_desktop: 4, grid_count_mobile: 2 %}
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    {% comment %} Display only the main product for products without 'prichut' or 'velikost-baleni' options {% endcomment %}
+                    {% assign variant_count = variant_count | plus: 1 %}
+                    <div class="predictive-search__grid-item" data-animate data-animate-order="{{ variant_count }}">
+                      {% render 'grid-view-item', product: product_result, variant: product_result.selected_or_first_available_variant, variant_title: product_result.title, is_search_result: true, enable_badges: settings.show_badges, grid_count_desktop: 4, grid_count_mobile: 2 %}
+                    </div>
+                  {% endif %}
                 {% endfor %}
               </div>
               {% assign is_default_grid = false %}

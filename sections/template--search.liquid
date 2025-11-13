@@ -1620,6 +1620,30 @@
     Avoid accessing search.results before the opening paginate tag.
     If you do, the pagination of results will be broken.
   {% endcomment %}
+  
+  {% comment %} Calculate total items including expanded variants {% endcomment %}
+  {% assign total_display_items = 0 %}
+  {% for item in search.results %}
+    {% if item.object_type == 'product' %}
+      {% assign has_prichut_or_velikost = false %}
+      {% for option in item.options %}
+        {% assign option_handle = option | handle %}
+        {% if option_handle == 'prichut' or option_handle == 'velikost-baleni' %}
+          {% assign has_prichut_or_velikost = true %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+      
+      {% if has_prichut_or_velikost %}
+        {% assign total_display_items = total_display_items | plus: item.variants.size %}
+      {% else %}
+        {% assign total_display_items = total_display_items | plus: 1 %}
+      {% endif %}
+    {% else %}
+      {% assign total_display_items = total_display_items | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+  
   {% paginate search.results by search.results_count %}
 
     <div
@@ -1635,7 +1659,7 @@
               {% if search.results_count == 0 %}
                 <h1 class="page--title template-title">{{ 'general.search.no_results_html' | t: terms: search.terms }}</h1>
               {% else %}
-                <h1 class="page--title template-title">{{ 'general.search.results_for_html' | t: terms: search.terms }}</h1>
+                <h1 class="page--title template-title">{{ 'general.search.results_for_html' | t: terms: search.terms }} ({{ total_display_items }} items)</h1>
               {% endif %}
             {% else %}
               <h1 class="page--title template-title">{{ 'general.search.title' | t }}</h1>
@@ -1962,35 +1986,113 @@
                       data-grid-id="{{ section.id }}"
                       id="template--collection"
                     >
+                      {% assign display_index = 0 %}
                       {% for item in search.results %}
-                        <div class="grid__item {{ grid_item_width }} show-on-scroll">
-                          {%- liquid
-                            assign loading = 'lazy'
-                            if forloop.index <= desktop_results_per_row
-                              assign loading = 'eager'
-                            endif
+                        {% if item.object_type == 'product' %}
+                          {% assign has_prichut_or_velikost = false %}
+                          {% for option in item.options %}
+                            {% assign option_handle = option | handle %}
+                            {% if option_handle == 'prichut' or option_handle == 'velikost-baleni' %}
+                              {% assign has_prichut_or_velikost = true %}
+                              {% break %}
+                            {% endif %}
+                          {% endfor %}
+                          
+                          {% if has_prichut_or_velikost %}
+                            {% comment %} Display all variants for products with 'prichut' or 'velikost-baleni' options {% endcomment %}
+                            {% for variant in item.variants %}
+                              {% assign display_index = display_index | plus: 1 %}
+                              <div class="grid__item {{ grid_item_width }} show-on-scroll">
+                                {%- liquid
+                                  assign loading = 'lazy'
+                                  if display_index <= desktop_results_per_row
+                                    assign loading = 'eager'
+                                  endif
 
-                            assign animate_order = forloop.index | modulo: desktop_results_per_row
-                            if animate_order == 0
-                              assign animate_order = desktop_results_per_row
-                            endif
-                            assign badge_anim_order = animate_order | plus: 2
+                                  assign animate_order = display_index | modulo: desktop_results_per_row
+                                  if animate_order == 0
+                                    assign animate_order = desktop_results_per_row
+                                  endif
+                                  assign badge_anim_order = animate_order | plus: 2
 
-                            assign animate_order_ipad = forloop.index | modulo: 2
-                            if animate_order_ipad == 0
-                              assign animate_order_ipad = 2
-                            endif
-                            assign badge_anim_order_ipad = animate_order_ipad | plus: 2
+                                  assign animate_order_ipad = display_index | modulo: 2
+                                  if animate_order_ipad == 0
+                                    assign animate_order_ipad = 2
+                                  endif
+                                  assign badge_anim_order_ipad = animate_order_ipad | plus: 2
 
-                            assign animate_order_mobile = forloop.index | modulo: mobile_results_per_row
-                            if animate_order_mobile == 0
-                              assign animate_order_mobile = mobile_results_per_row
-                            endif
-                            assign badge_anim_order_mobile = animate_order_mobile | plus: 2
-                          -%}
-                          {% if item.object_type == 'product' %}
-                            {% render 'grid-view-item', product: item, collection: null, enable_badges: settings.show_badges, grid_count_desktop: desktop_results_per_row, grid_count_mobile: mobile_results_per_row, loading: loading, badge_anim_order: badge_anim_order, badge_anim_order_ipad: badge_anim_order_ipad, badge_anim_order_mobile: badge_anim_order_mobile, animate: true, animate_order: animate_order, animate_order_ipad: animate_order_ipad, animate_order_mobile: animate_order_mobile %}
+                                  assign animate_order_mobile = display_index | modulo: mobile_results_per_row
+                                  if animate_order_mobile == 0
+                                    assign animate_order_mobile = mobile_results_per_row
+                                  endif
+                                  assign badge_anim_order_mobile = animate_order_mobile | plus: 2
+                                  
+                                  assign variant_title = item.title
+                                  if variant.title != 'Default Title'
+                                    assign variant_title = item.title | append: ' - ' | append: variant.title
+                                  endif
+                                -%}
+                                {% render 'grid-view-item', product: item, variant: variant, variant_title: variant_title, collection: null, enable_badges: settings.show_badges, grid_count_desktop: desktop_results_per_row, grid_count_mobile: mobile_results_per_row, loading: loading, badge_anim_order: badge_anim_order, badge_anim_order_ipad: badge_anim_order_ipad, badge_anim_order_mobile: badge_anim_order_mobile, animate: true, animate_order: animate_order, animate_order_ipad: animate_order_ipad, animate_order_mobile: animate_order_mobile %}
+                              </div>
+                            {% endfor %}
                           {% else %}
+                            {% comment %} Display only the main product for products without 'prichut' or 'velikost-baleni' options {% endcomment %}
+                            {% assign display_index = display_index | plus: 1 %}
+                            <div class="grid__item {{ grid_item_width }} show-on-scroll">
+                              {%- liquid
+                                assign loading = 'lazy'
+                                if display_index <= desktop_results_per_row
+                                  assign loading = 'eager'
+                                endif
+
+                                assign animate_order = display_index | modulo: desktop_results_per_row
+                                if animate_order == 0
+                                  assign animate_order = desktop_results_per_row
+                                endif
+                                assign badge_anim_order = animate_order | plus: 2
+
+                                assign animate_order_ipad = display_index | modulo: 2
+                                if animate_order_ipad == 0
+                                  assign animate_order_ipad = 2
+                                endif
+                                assign badge_anim_order_ipad = animate_order_ipad | plus: 2
+
+                                assign animate_order_mobile = display_index | modulo: mobile_results_per_row
+                                if animate_order_mobile == 0
+                                  assign animate_order_mobile = mobile_results_per_row
+                                endif
+                                assign badge_anim_order_mobile = animate_order_mobile | plus: 2
+                              -%}
+                              {% render 'grid-view-item', product: item, variant: item.selected_or_first_available_variant, variant_title: item.title, collection: null, enable_badges: settings.show_badges, grid_count_desktop: desktop_results_per_row, grid_count_mobile: mobile_results_per_row, loading: loading, badge_anim_order: badge_anim_order, badge_anim_order_ipad: badge_anim_order_ipad, badge_anim_order_mobile: badge_anim_order_mobile, animate: true, animate_order: animate_order, animate_order_ipad: animate_order_ipad, animate_order_mobile: animate_order_mobile %}
+                            </div>
+                          {% endif %}
+                        {% else %}
+                          {% assign display_index = display_index | plus: 1 %}
+                          <div class="grid__item {{ grid_item_width }} show-on-scroll">
+                            {%- liquid
+                              assign loading = 'lazy'
+                              if display_index <= desktop_results_per_row
+                                assign loading = 'eager'
+                              endif
+
+                              assign animate_order = display_index | modulo: desktop_results_per_row
+                              if animate_order == 0
+                                assign animate_order = desktop_results_per_row
+                              endif
+                              assign badge_anim_order = animate_order | plus: 2
+
+                              assign animate_order_ipad = display_index | modulo: 2
+                              if animate_order_ipad == 0
+                                assign animate_order_ipad = 2
+                              endif
+                              assign badge_anim_order_ipad = animate_order_ipad | plus: 2
+
+                              assign animate_order_mobile = display_index | modulo: mobile_results_per_row
+                              if animate_order_mobile == 0
+                                assign animate_order_mobile = mobile_results_per_row
+                              endif
+                              assign badge_anim_order_mobile = animate_order_mobile | plus: 2
+                            -%}
                             <a href="{{ item.url }}" class="grid-item--align-{{ settings.product_card_text_alignment }}">
                               {% if item.image %}
                                 {%- liquid 
@@ -2020,8 +2122,8 @@
                               <p class="grid-item__title grid-item--font-{{ settings.type_card_title_font }} text-truncate--line">{{ item.title }}</p>
                               <p class="grid-item__excerpt">{{ item.content | strip_html | truncate: 80 }}</p>
                             </a>
-                          {% endif %}
-                        </div>
+                          </div>
+                        {% endif %}
                       {% endfor %}
                     </div>
                   </div>
