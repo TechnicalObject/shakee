@@ -77,8 +77,17 @@
         >
           {% assign variant_index = 0 %}
           {% for product in collection.products %}
-            {% if product.tags contains 'display-all' %}
-              {% comment %} Display all variants for products with 'display-all' tag {% endcomment %}
+            {% assign has_prichut_or_velikost = false %}
+            {% for option in product.options %}
+              {% assign option_handle = option | handle %}
+              {% if option_handle == 'prichut' or option_handle == 'velikost-baleni' %}
+                {% assign has_prichut_or_velikost = true %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            
+            {% if has_prichut_or_velikost %}
+              {% comment %} Display all variants for products with 'prichut' or 'velikost-baleni' options {% endcomment %}
               {% for variant in product.variants %}
                 {% assign variant_index = variant_index | plus: 1 %}
                 <div class="grid__item {{ grid_item_width }} show-on-scroll">
@@ -118,7 +127,7 @@
                 </div>
               {% endfor %}
             {% else %}
-              {% comment %} Display only the main product for products without 'display-all' tag {% endcomment %}
+              {% comment %} Display only the main product for products without 'prichut' or 'velikost-baleni' options {% endcomment %}
               {% assign variant_index = variant_index | plus: 1 %}
               <div class="grid__item {{ grid_item_width }} show-on-scroll">
                 {%- liquid
