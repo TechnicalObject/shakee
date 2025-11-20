@@ -166,11 +166,13 @@
           {{ section.settings.guarantee_text }}
         </p>
       </div>
-      <div class="sale-section">
-        <p class="sale-notice">
-          {{ section.settings.sale_text_prefix }} {% render 'end-of-month' %}
-        </p>
-      </div>
+      {% if section.settings.show_sale_section %}
+        <div class="sale-section">
+          <p class="sale-notice">
+            {{ section.settings.sale_text_prefix }} {% render 'end-of-month' %}
+          </p>
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -188,6 +190,12 @@
       "id": "guarantee_text",
       "label": "Guarantee text",
       "default": "Označení nezávislý člen Herbalife Nutrition pro český trh garantuje 100% originalitu a čerstvost produktů."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sale_section",
+      "label": "Show sale section",
+      "default": true
     },
     {
       "type": "text",

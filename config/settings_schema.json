@@ -1762,6 +1762,31 @@
         "id": "show_currency_code",
         "label": "t:settings_schema.price.settings.show_currency_codes.label",
         "default": false
+      },
+      {
+        "type": "header",
+        "content": "Price History"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_price_history",
+        "label": "Show price history",
+        "default": false,
+        "info": "Display lowest price in last 30 days and discount validity"
+      },
+      {
+        "type": "text",
+        "id": "lowest_price_text",
+        "label": "Lowest price text",
+        "default": "Nejnižší cena za posledních 30 dní:",
+        "info": "Text displayed before the lowest price"
+      },
+      {
+        "type": "text",
+        "id": "discount_validity_text",
+        "label": "Discount validity text",
+        "default": "Sleva je platná do",
+        "info": "Text displayed before the validity date"
       }
     ]
   },
