@@ -1,0 +1,325 @@
+<!doctype html>
+<html class="js" lang="{{ request.locale.iso_code }}">
+<head>
+  <!-- Basic page needs ================================================== -->
+  <meta charset="utf-8">
+  {%- comment -%}DemoStoreRequirements{%- endcomment -%}
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  {%- unless settings.type_header_font.system? -%}
+    <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+  {%- endunless -%}
+
+  {{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'photoswipe.min.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'theme.min.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'custom.css' | asset_url | stylesheet_tag: preload: true }}
+
+  {% if settings.favicon != blank %}
+    <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 180, height: 180, crop: 'center' }}" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.favicon | image_url: width: 180, height: 180, crop: 'center' }}">
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="{{ settings.favicon | image_url: width: 180, height: 180, crop: 'center' }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ settings.favicon | image_url: width: 32, height: 32, crop: 'center' }}">
+    <link rel="icon" type="image/png" sizes="194x194" href="{{ settings.favicon | image_url: width: 194, height: 194, crop: 'center' }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ settings.favicon | image_url: width: 192, height: 192, crop: 'center' }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ settings.favicon | image_url: width: 16, height: 16, crop: 'center' }}">
+  {% endif %}
+
+  {%- unless settings.type_header_font.system? -%}
+    {% # theme-check-disable AssetPreload %}
+    <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
+    {% # theme-check-enable AssetPreload %}
+  {%- endunless -%}
+  {%- unless settings.type_base_font.system? -%}
+    {% # theme-check-disable AssetPreload %}
+    <link rel="preload" as="font" href="{{ settings.type_base_font | font_url }}" type="font/woff2" crossorigin>
+    {% # theme-check-enable AssetPreload %}
+  {%- endunless -%}
+
+  <!-- Title and description ================================================== -->
+  <title>
+    {{ page_title }}{% if current_tags %}{% assign meta_tags = current_tags | join: ', ' %} &ndash; {{ 'general.meta.tags' | t: tags: meta_tags }}{% endif %}{% if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}
+  </title>
+
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+
+  <!-- Helpers ================================================== -->
+  {% render 'social-meta-tags' %}
+  <link rel="canonical" href="{{ canonical_url }}"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="theme-color" content="rgba({{ settings.color_primary.rgba }})">
+
+  <!-- CSS ================================================== -->
+  {% render 'css-variables' %}
+  {% style %}
+    *,
+    *::before,
+    *::after {
+      box-sizing: inherit;
+    }
+
+    html {
+      box-sizing: border-box;
+      background-color: var(--body-color);
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background-color: var(--body-color);
+      min-height: 100%;
+      margin: 0;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      grid-template-columns: 100%;
+      overflow-x: hidden;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .sr-only-focusable:active, .sr-only-focusable:focus {
+      position: static;
+      width: auto;
+      height: auto;
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+    }
+  {% endstyle %}
+
+  <!-- Header hook for plugins ================================================== -->
+  {{ content_for_header }}
+
+  <script defer src="{{ 'eventBus.js' | asset_url }}"></script>
+
+  <script type="text/javascript">
+		window.wetheme = {
+			name: 'Flow',
+			webcomponentRegistry: {
+        registry: {},
+				checkScriptLoaded: function(key) {
+					return window.wetheme.webcomponentRegistry.registry[key] ? true : false
+				},
+        register: function(registration) {
+            if(!window.wetheme.webcomponentRegistry.checkScriptLoaded(registration.key)) {
+              window.wetheme.webcomponentRegistry.registry[registration.key] = registration
+            }
+        }
+      }
+    };
+	</script>
+
+  {% if template contains 'customers' %}
+    {% # theme-check-disable ParserBlockingScriptTag %}
+    {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+    {% # theme-check-enable ParserBlockingScriptTag %}
+  {% endif %}
+
+  {% if template.name == 'article' %}
+    <script src="{{ 'textSlideshow.js' | asset_url }}" defer="defer"></script>
+  {% endif %}
+</head>
+
+{% comment %}
+  Add the page template as a class for easy page or template specific styling.
+{% endcomment %}
+<body id="{{ page_title | handle }}" class="{% if template == 'page.contact' %}contact-page {% endif %}{% if customer %}customer-logged-in {% endif %}template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% unless settings.animations_enabled %} animations-disabled{% endunless %}{% if settings.page_fade_enabled %} page-fade{% endif %}{% if settings.ken_burns_enabled %} hover-zoom-enabled{% endif %}{% if settings.product-grid != 'natural' %} images-aspect-ratio{% endif %} border-radius-{{ settings.border_radius }}">
+  <a class="btn skip-to-content-link sr-only" href="#MainContent">
+    {{ 'general.accessibility.skip_to_content' | t }}
+  </a>
+
+  {% comment %} Cart {% endcomment %}
+  <safe-load-scripts class="hidden">
+    <script src="{{ 'component-cart-quantity.js' | asset_url }}" type="module" defer="defer" data-flow-load-key="component-cart-quantity"></script>
+  </safe-load-scripts>
+  <safe-load-scripts class="hidden">
+    <script src="{{ 'component-cart-update.js' | asset_url }}" type="module" defer="defer" data-flow-load-key="component-cart-update"></script>
+  </safe-load-scripts>
+  {% if settings.drawer--override_button_colors %}
+    {% render 'button-color-overrides' with
+      id: 'drawer-filled',
+      style: 'filled',
+      text_color: settings.drawer--button_text_color,
+      background_color: settings.drawer--button_background_color
+    %}
+    {% render 'button-color-overrides' with
+      id: 'drawer-outlined',
+      style: 'outlined',
+      text_color: settings.drawer--button_text_color,
+      background_color: settings.drawer--button_background_color
+    %}
+    {% render 'button-color-overrides' with
+      id: 'drawer-underlined',
+      style: 'underlined',
+      text_color: settings.drawer--button_text_color,
+      background_color: settings.drawer--button_background_color
+    %}
+  {% endif %}
+
+  {% comment %} Cart drawer {% endcomment %}
+  {% if settings.cart_type == 'drawer' %}
+    <safe-load-scripts class="hidden">
+      <script src="{{ 'component-cart-drawer.js' | asset_url }}" type="module" defer="defer" data-flow-load-key="component-cart-drawer"></script>
+    </safe-load-scripts>
+    <safe-load-scripts class="hidden">
+      <script src="{{ 'component-cart-update-modal.js' | asset_url }}" type="module" defer="defer" data-flow-load-key="component-cart-update-modal"></script>
+    </safe-load-scripts>
+    {% if settings.show_cart_recommendations %}
+      <safe-load-scripts class="hidden">
+        <script src="{{ 'component-cart-recommendations.js' | asset_url }}" type="module" defer="defer" data-flow-load-key="component-cart-recommendations"></script>
+      </safe-load-scripts>
+      {% endif %}
+    {% render 'cart-drawer' %}
+  {% endif %}
+
+  {% comment %} Size guide drawer - replaces right-drawer for size guides {% endcomment %}
+  {% render 'size-guide-drawer' %}
+
+  <div id="DrawerOverlay" class="drawer-overlay"></div>
+  <div id="ThemeModal" class="theme-modal width--modal"></div>
+
+  <div 
+    id="PageContainer" 
+    data-editor-open="{{ request.design_mode }}" 
+    data-cart-action="{{ settings.add_to_cart_action }}" 
+    data-cart-type="{{ settings.cart_type }}" 
+    data-language-url="{{ localization.language.root_url }}" 
+    data-show-currency-code="{{ settings.show_currency_code }}"
+    data-currency-code="{{ 1299 | money_with_currency | split: ' ' | last }}"
+  >
+    {% sections 'header-group' %}
+    {% sections 'overlay-group' %}
+
+    {% if settings.enable_breadcrumbs %}
+      {% unless template == 'index' or template == 'cart' or template == 'search' or template == 'blog' %}
+        {% unless template.name == 'collection' or template == 'list-collections' or template.name == 'product' %}
+          {{ 'component-breadcrumbs.min.css' | asset_url | stylesheet_tag }}
+          <div id="breadcrumbs" class="wrapper-padded wrapper-spacing--h">
+            {% render 'breadcrumb' %}
+          </div>
+        {% endunless %}
+      {% endunless %}
+    {% endif %}
+
+    {% if template == 'index' %}
+      <div id="MainContent" class="homepage-wrapper">
+    {% elsif template == 'cart' or template contains 'customers/' %}
+      <div id="MainContent" class="main-content page-main--wrapper">
+    {% else %}
+      <div id="MainContent" class="wrapper main-content page-main--wrapper">
+    {% endif %}
+
+        {{ content_for_layout }}
+      </div>
+  </div>
+
+  <div class="footer-wrapper">
+    {% sections 'footer-group' %}
+  </div>
+
+  <script defer type="module" src="{{ 'theme.min.js' | asset_url }}"></script>
+  <script defer src="{{ 'SafeLoadScripts.js' | asset_url }}"></script>
+
+  {% if settings.popup--enable or settings.popup--test-mode %}
+    {% render 'popup' %}
+    {% if settings.desktop-popup-style == 'fullscreen' %}
+      <div id="PopupOverlay" class="popup-overlay"></div>
+    {% endif %}
+  {% endif %}
+
+  {% if settings.enable_verification_popup or settings.verification-pop-up__test-mode %}
+    {% render 'verification-popup' %}
+  {% endif %}
+
+  {% render 'back-to-top-button' %}
+
+  <script>
+    window.routes = {
+      cart_add_url: '{{ routes.cart_add_url }}',
+      cart_change_url: '{{ routes.cart_change_url }}',
+      cart_update_url: '{{ routes.cart_update_url }}',
+      cart_url: '{{ routes.cart_url }}',
+      predictive_search_url: '{{ routes.predictive_search_url }}',
+    }
+  </script>
+
+  <script type="application/json" id="wetheme-global">
+    {
+      {% comment %}Translations that will be used in javascript section handling{% endcomment %}
+      "translations": {
+        "addToCart": {{ 'products.product.add_to_cart' | t | json }},
+        "preorder": {{ 'products.product.preorder' | t | json }},
+        "added": {{ 'products.product.added' | t | json }},
+        "soldOut": {{ 'products.product.sold_out' | t | json }},
+        "unavailable": {{ 'products.product.unavailable' | t | json }},
+        "no_results_html": {{ 'general.search.no_results_html' | t | json }},
+        "results_for_html": {{ 'general.search.results_for_html' | t | json }},
+        "products": {{ 'general.search.products' | t | json }},
+        "pages": {{ 'general.search.pages' | t | json }},
+        "collections": {{ 'general.search.collections' | t | json }},
+        "articles": {{ 'general.search.articles' | t | json }},
+        "suggestions": {{ 'general.search.suggestions' | t | json }},
+        "quick_shop": {{ 'products.product.quick_shop' | t | json }},
+        "view_options": {{ 'products.product.view_options' | t | json }},
+        "read_more_html": {{ 'products.product.read_more_html' | t | json }},
+        "read_less_html": {{ 'products.product.read_less_html' | t | json }},
+        "youve_viewed": {{ 'collections.paginate.youve_viewed' | t | json }},
+        "load_more": {{ 'collections.paginate.load_more' | t | json }},
+        "productAdded": {{ 'products.product.added' | t | json }},
+        "loading": {{ 'collections.paginate.loading' | t | json }},
+        "giftwrap_label": {{ 'products.general.giftwrap_label' | t | json }},
+        "yes": {{ 'products.general.yes' | t | json }},
+        "days": {{ 'general.time.days' | t | json }},
+        "hours": {{ 'general.time.hours' | t | json }},
+        "minutes": {{ 'general.time.minutes' | t | json }},
+        "seconds": {{ 'general.time.seconds' | t | json }},
+        "required_input_error": {{ 'general.forms.required_input_error' | t | json }},
+        "required_upload_error": {{ 'general.forms.required_upload_error' | t | json }},
+        "required_checkbox_error": {{ 'general.forms.required_checkbox_error' | t | json }},
+        "required_dropdown_error": {{ 'general.forms.required_dropdown_error' | t | json }},
+        "max_filesize_error": {{ 'general.forms.max_filesize_error' | t | json }},
+        "qr_image_alt": {{ 'gift_cards.issued.qr_image_alt' | t | json }}
+      },
+      "moneyFormat": {{ shop.money_format | json }},
+      "giftwrapProduct": {{ settings.giftwrap_product_selector | json }}
+    }
+  </script>
+  {% if request.design_mode %}<script src="{{ 'theme-editor.js' | asset_url }}" defer="defer"></script>{% endif %}
+
+  {% if settings.animations_enabled %}
+    {{ 'animate.min.css' | asset_url | stylesheet_tag }}
+  {% endif %}
+
+  {% if settings.popup--enable or settings.popup--test-mode %}
+    {{ 'component-popup.min.css' | asset_url | stylesheet_tag }}
+  {% endif %}
+
+  {% if settings.enable_verification_popup or settings.verification-pop-up__test-mode %}
+    {{ 'component-verification-popup.min.css' | asset_url | stylesheet_tag }}
+  {% endif %}
+
+  {% if request.design_mode %}
+    <script type="application/json" id="theme-analytics">
+      {
+        "shop_email": {{ shop.email | json }},
+        "shop_name": {{ shop.name | json }},
+        "shop_url": {{ shop.url | json }}
+      }
+    </script>
+    {% # theme-check-disable RemoteAsset %}
+    <script src="https://themes.weareeight.workers.dev/analytics.js" type="module"></script>
+    {% # theme-check-enable RemoteAsset %}
+  {% endif %}
+</body>
+</html>
