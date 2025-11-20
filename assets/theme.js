@@ -6853,6 +6853,7 @@ class QuickAdd extends Component {
     this.theme = theme;
     this.element = element;
     this.onSubmit = this.onSubmit.bind(this);
+    this.isProcessing = false;
     this.cartAction = document.getElementById('PageContainer').dataset.cartAction;
     this.cartType = document.getElementById('PageContainer').dataset.cartType;
     this.languageUrl = document.getElementById('PageContainer').dataset.languageUrl;
@@ -6864,17 +6865,24 @@ class QuickAdd extends Component {
     }
     this.formWrappers.forEach(wrapper => {
       const form = wrapper.querySelector('.shopify-product-form');
-      if (form) {
-        form.addEventListener('submit', this.onSubmit);
-      }
+      if (form && !form.hasAttribute('data-quick-add-initialized')) { 
+        form.addEventListener('submit', this.onSubmit); 
+        form.setAttribute('data-quick-add-initialized', 'true'); 
+    }
     });
   }
   async onSubmit(e) {
+    // Prevent duplicate submissions
+    if (this.isProcessing) { 
+        e.preventDefault(); 
+        return; 
+    }
     // Go straight to cart page, use html form submit event.
     if (this.cartType == 'page' && this.cartAction != 'show_added_message') {
       return;
     }
     e.preventDefault();
+    this.isProcessing = true;
     const currentForm = e.currentTarget;
     const currentButton = currentForm.querySelector('.quick-add-button');
     const productWrapper = currentForm.closest('.quick-add-wrapper.is-singular');
@@ -6944,10 +6952,12 @@ class QuickAdd extends Component {
           currentButton.innerHTML = this.translationsObject.translations[translationKey];
         }, 2000);
       }
-    } catch (e) {
-      console.error('Unable to add to cart: ', e);
-      // FIXME error handling
-    }
+    } catch (e) { 
+        console.error('Unable to add to cart: ', e); 
+        // FIXME error handling 
+        } finally { 
+            this.isProcessing = false; 
+        }
     return false;
   }
 }

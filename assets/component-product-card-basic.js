@@ -2,7 +2,8 @@
 class ProductCardBasic extends HTMLElement {
   constructor() {
     super();
-    this.form = this.querySelector('#ProductCardBasicAtcForm');
+    this.formId = this.getAttribute('data-form-id');
+    this.form = this.querySelector(`#${this.formId}`);
     this.quickViewLink = this.querySelector('[data-quick-view-link]');
     this.errorElement = this.querySelector('[data-add-to-cart-error]');
     this.quickAddEnabled = this.getAttribute('data-enable-quick-add') === 'true';
@@ -10,6 +11,7 @@ class ProductCardBasic extends HTMLElement {
     this.cartAction = this.getAttribute('data-cart-action') || 'show_added_message';
     this.buttonInitialContent = '';
     this.cartCountIndicator = document.querySelector('[data-cart-count-indicator]');
+    this.isProcessing = false;
     this.attachEvents = this.attachEvents.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.updateCartCountIndicator = this.updateCartCountIndicator.bind(this);
@@ -39,7 +41,11 @@ class ProductCardBasic extends HTMLElement {
 
   async handleSubmit(e) {
     e.preventDefault();
-
+    // Prevent duplicate submissions 
+    if (this.isProcessing) { 
+        return; 
+    } 
+    this.isProcessing = true;
     const addButton = e.currentTarget.querySelector('button');
     this.setButtonLoadingState(addButton);
     
@@ -64,8 +70,10 @@ class ProductCardBasic extends HTMLElement {
       if (this.quickAddEnabled) {
         this.handleCartAction(addButton);
       }
-    } catch (e) {
-      console.error('Unable to add to cart: ', e);
+    } catch (e) { 
+        console.error('Unable to add to cart: ', e); 
+    } finally { 
+        this.isProcessing = false; 
     }
   }
 

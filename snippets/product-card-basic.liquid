@@ -1,3 +1,4 @@
+{% assign form_id = 'ProductCardBasicAtcForm-' | append: card_product.id | append: '-' | append: section.id %}
 <div class="product-card-basic">
   {% # Product image %}
   {% if card_product.featured_media %}
@@ -37,6 +38,7 @@
         data-enable-quick-add="{{ enable_quick_add }}"
         data-cart-type="{{ settings.cart_type }}"
         data-cart-action="{{ settings.add_to_cart_action }}"
+        data-form-id="{{ form_id }}"
       >
         {% if card_product.variants.size > 1 %}
           <div class="text-link-animated">
@@ -57,7 +59,7 @@
               endif
             endfor
           -%}
-          {% form 'product', card_product, id: "ProductCardBasicAtcForm" %}
+          {% form 'product', card_product, id: form_id %}
             <input type="hidden" name="id" value="{{ card_product.variants.first.id }}" />
             <input type="hidden" name="sections" value="cart-drawer" />
             <div class="product-card-basic__add-button text-link-animated">

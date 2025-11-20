@@ -4,6 +4,7 @@ class ProductForm extends HTMLElement {
   constructor() {
     super();
 
+    this.isProcessing = false;
     this.cacheDOMElements();
     /* ===== Bind the event handlers in order to maintain the correct context of 'this' ===== */
     this.onSubmitBound = this.onSubmit.bind(this);
@@ -38,6 +39,10 @@ class ProductForm extends HTMLElement {
   onSubmit(event) {
     /* ===== Handle the form submission ===== */
     event.preventDefault();
+    // Prevent duplicate submissions 
+    if (this.isProcessing) { 
+        return; 
+    }
     this.prepareForSubmission();
   }
 
@@ -142,6 +147,7 @@ class ProductForm extends HTMLElement {
 
   async addItemsToCart() {
     /* ===== Add the item(s) to the cart ===== */
+    this.isProcessing = true;
     try {
       // Add the main product to the cart
       const mainProductAdded = await this.addProductToCart(routes.cart_add_url, this.fetchConfigWithBody());
@@ -151,8 +157,10 @@ class ProductForm extends HTMLElement {
       }
       // Process the response
       this.processResponse(mainProductAdded);
-    } catch (error) {
-      console.error(`Error adding item(s) to cart: ${error.description || error.message}`);
+    } catch (error) { 
+        console.error(`Error adding item(s) to cart: ${error.description || error.message}`); 
+    } finally { 
+        this.isProcessing = false; 
     }
   }
 
