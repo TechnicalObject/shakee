@@ -1,0 +1,85 @@
+<div class="product-card-basic">
+  {% # Product image %}
+  {% if card_product.featured_media %}
+    <div class="product-card-basic__image">
+      <a href="{{ card_product.url }}" tabindex="-1" aria-hidden="true">
+        <div class="{% unless settings.product-grid == 'natural' %}aspect-ratio aspect-ratio--{{ settings.product-grid }}{% endunless %}">
+          {{ card_product.featured_media | image_url: width: 200 | image_tag: class: 'theme-img thumbnail-radius' }}
+        </div>
+      </a>
+    </div>
+  {% endif %}
+
+  <div class="product-card-basic--info">
+    <div class="product-card-basic--info--body">
+      <div>
+        {% # Vendor %}
+        {% if show_vendor %}
+          {% assign vendor_font = 'product-grid--vendor-font-' | append: settings.type_card_vendor_font %}
+          <div class="product-card-basic__vendor {{ vendor_font }}">{{ card_product.vendor }}</div>
+        {% endif %}
+
+        {% # Product title %}
+        {% assign title_font = 'product-grid--title-font-' | append: settings.type_card_title_font %}
+        <div class="product-card-basic__title {{ title_font }}">
+          <a href="{{ card_product.url }}">{{ card_product.title }}</a>
+        </div>
+      </div>
+
+      {% # Price %}
+      <div class="product-card-basic__price">
+        {% render 'product-grid-item-price', price_product: card_product %}
+      </div>
+    </div>
+
+    <div class="product-card-basic--info--footer">
+      <product-card-basic
+        data-enable-quick-add="{{ enable_quick_add }}"
+        data-cart-type="{{ settings.cart_type }}"
+        data-cart-action="{{ settings.add_to_cart_action }}"
+      >
+        {% if card_product.variants.size > 1 %}
+          <div class="text-link-animated">
+            <a class="btn--underlined-with-icon" href="{{ card_product.url }}" data-quick-view-link>
+              {% render 'theme-icon' with icon: 'shopping-bag', iconSize: 14 %}
+              <span>{{ 'products.product.view_options' | t }}</span>
+            </a>
+          </div>
+        {% elsif card_product.available %}
+          {%- liquid
+            assign preorder_product = false
+            assign preorder_string = 'products.product.preorder' | t | downcase
+
+            for tag in card_product.tags
+              assign lowercase_tag = tag | downcase
+              if lowercase_tag contains preorder_string
+                assign preorder_product = true
+              endif
+            endfor
+          -%}
+          {% form 'product', card_product, id: "ProductCardBasicAtcForm" %}
+            <input type="hidden" name="id" value="{{ card_product.variants.first.id }}" />
+            <input type="hidden" name="sections" value="cart-drawer" />
+            <div class="product-card-basic__add-button text-link-animated">
+              <button class="btn--underlined btn--underlined-with-icon" type="submit">
+                {% render 'theme-icon' with icon: 'shopping-bag', iconSize: 14, iconClasses: 'btn--underlined-with-icon__icon' %}
+                <span>
+                  {% if preorder_product %}{{ 'products.product.preorder' | t }}{% else %}{{ 'products.product.add_to_cart' | t }}{% endif %}
+                </span>
+              </button>
+            </div>
+          {% endform %}
+          <div
+            data-add-to-cart-error
+            class="product-card-basic__errors errors"
+            aria-hidden="true"
+            role="alert"
+          ></div>
+        {% endif %}
+      </product-card-basic>
+      <safe-load-scripts class="hidden">
+        <script src="{{ 'component-product-card-basic.js' | asset_url }}" type="module" defer="defer" data-flow-load-key="component-product-card-basic"></script>
+      </safe-load-scripts>
+    </div>
+  </div>
+</div>
