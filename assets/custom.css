@@ -108,3 +108,7 @@ ul.site-nav li.first-level-dropdown:hover > a {
 .mobile-nav.locale--mobile:after {
   border: 0 !important;
 }
+
+.money:not(.sale-price):not(.price-line-through), .price {
+  color: var(--on-sale-color) !important;
+}
