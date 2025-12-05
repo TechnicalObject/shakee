@@ -1,16 +1,19 @@
 <body>
-
-
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>Konzultace zdarma | Shakee</title>
-	<meta name="description" content="Rezervujte si bezplatnou vstupní konzultaci výživy a životního stylu Shakee. Získejte mini analýzu a Fit plán na míru.">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Cabin:wght@500;600;700&amp;display=swap" rel="stylesheet">
-	<style>
-/* Global Styles */
-:root {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Konzultace zdarma | Shakee</title>
+    <meta name="description" content="Rezervujte si bezplatnou vstupní konzultaci výživy a životního stylu Shakee. Získejte mini analýzu a Fit plán na míru.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Cabin:wght@500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+/* Global rule - applies to entire website */
+.template-title--wrapper {
+  display: none !important;
+}
+/* Scoped styles for konzultace-zdarma page */
+.konzultace-zdarma-page {
+  /* Global Styles */
   --bg-gradient: radial-gradient(circle at 20% 20%, #e8f9ff 0%, #f3f7ff 40%, #f8f9fb 100%);
   --color-primary: #2563eb;
   --color-primary-glow: #3b82f6;
@@ -28,24 +31,21 @@
   --glass-bg: rgba(255,255,255,0.7);
   --glass-border: rgba(255,255,255,0.5);
   --gradient-text: linear-gradient(90deg,#14b8a6,#6366f1,#2563eb);
-}
-* { box-sizing: border-box; }
-body {
-  margin:0;
+  
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--color-text);
-
-
-
 }
-img { max-width:100%; display:block; }
 
-h1,h2,h3 { font-family: 'Cabin', sans-serif; letter-spacing:.5px; }
-h1 { font-size: clamp(2rem,6vw,3rem); line-height:1.15; margin:0 0 1rem; }
-h2 { font-size: clamp(1.6rem,4vw,2.2rem); margin:0 0 1.6rem; text-align:center; }
-h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
-.lead { font-size:1.05rem; line-height:1.6; max-width:62ch; margin:0 auto 1.8rem; }
-.gradient-text { 
+.konzultace-zdarma-page * { box-sizing: border-box; }
+
+.konzultace-zdarma-page img { max-width:100%; display:block; }
+
+.konzultace-zdarma-page h1,.konzultace-zdarma-page h2,.konzultace-zdarma-page h3 { font-family: 'Cabin', sans-serif; letter-spacing:.5px; }
+.konzultace-zdarma-page h1 { font-size: clamp(2rem,6vw,3rem); line-height:1.15; margin:0 0 1rem; }
+.konzultace-zdarma-page h2 { font-size: clamp(1.6rem,4vw,2.2rem); margin:0 0 1.6rem; text-align:center; }
+.konzultace-zdarma-page h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
+.konzultace-zdarma-page .lead { font-size:1.05rem; line-height:1.6; max-width:62ch; margin:0 auto 1.8rem; }
+.konzultace-zdarma-page .gradient-text { 
   background: var(--gradient-text); 
   -webkit-background-clip:text; 
   background-clip:text;
@@ -53,10 +53,10 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
 }
 
 /* Container */
-.container { max-width:100%; margin:0 auto; padding:2.5rem 1.4rem; flex:1; }
+.konzultace-zdarma-page .container { max-width:100%; margin:0 auto; padding:2.5rem 1.4rem; flex:1; }
 
 /* Hero Compact */
-.hero-compact { 
+.konzultace-zdarma-page .hero-compact { 
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
   border:1px solid var(--glass-border);
@@ -67,7 +67,7 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
   max-width:1400px;
 }
 
-.logo { 
+.konzultace-zdarma-page .logo { 
   font-weight:700; 
   font-size:1.5rem; 
   letter-spacing:1px; 
@@ -76,21 +76,21 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
   gap:.3rem;
   margin-bottom:1.8rem;
 }
-.logo .accent { color: var(--color-accent); font-size:1.8rem; }
+.konzultace-zdarma-page .logo .accent { color: var(--color-accent); font-size:1.8rem; }
 
 /* Info Section */
-.info-section {
+.konzultace-zdarma-page .info-section {
   margin-top:2.5rem;
 }
 
-.info-grid {
+.konzultace-zdarma-page .info-grid {
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap:2rem;
   margin-bottom:2rem;
 }
 
-.info-box {
+.konzultace-zdarma-page .info-box {
   background:#fff;
   border:1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -98,14 +98,14 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
   box-shadow: var(--shadow-soft);
 }
 
-.info-box .description {
+.konzultace-zdarma-page .info-box .description {
   text-align:left;
   margin-left:0;
   margin-right:0;
 }
 
 /* Hero Grid */
-.hero-grid {
+.konzultace-zdarma-page .hero-grid {
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap:3rem;
@@ -113,14 +113,14 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
 }
 
 /* Hero Image */
-.hero-image {
+.konzultace-zdarma-page .hero-image {
   border-radius: var(--radius-lg);
   overflow:hidden;
   box-shadow: var(--shadow-hover);
   position:sticky;
   top:2rem;
 }
-.hero-image img {
+.konzultace-zdarma-page .hero-image img {
   width:100%;
   height:auto;
   display:block;
@@ -128,25 +128,25 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
 }
 
 /* Hero Content */
-.hero-content {
+.konzultace-zdarma-page .hero-content {
   text-align:left;
 }
-.hero-content h1 {
+.konzultace-zdarma-page .hero-content h1 {
   margin-top:0;
 }
-.hero-content .subtitle {
+.konzultace-zdarma-page .hero-content .subtitle {
   text-align:left;
 }
-.hero-content .lead,
-.hero-content .intro-text,
-.hero-content .description {
+.konzultace-zdarma-page .hero-content .lead,
+.konzultace-zdarma-page .hero-content .intro-text,
+.konzultace-zdarma-page .hero-content .description {
   text-align:left;
   margin-left:0;
   margin-right:0;
 }
 
 /* Typography */
-.subtitle {
+.konzultace-zdarma-page .subtitle {
   font-size:.95rem;
   font-weight:600;
   color: var(--color-muted);
@@ -154,7 +154,7 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
   text-transform:uppercase;
   letter-spacing:1px;
 }
-.intro-text {
+.konzultace-zdarma-page .intro-text {
   font-size:.95rem;
   line-height:1.6;
   margin:1rem auto 1.6rem;
@@ -162,19 +162,19 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
 }
 
 /* Highlight Box */
-.highlight-box {
+.konzultace-zdarma-page .highlight-box {
   background: linear-gradient(135deg, #fff8e1 0%, #ffe8e8 100%);
   border-left:4px solid var(--color-accent);
   border-radius: var(--radius-md);
   padding:1.2rem 1.4rem;
   margin:1.8rem 0 2rem;
 }
-.highlight-text {
+.konzultace-zdarma-page .highlight-text {
   margin:0 0 .6rem;
   font-size:.95rem;
   line-height:1.5;
 }
-.tagline {
+.konzultace-zdarma-page .tagline {
   margin:0;
   font-size:.9rem;
   font-style:italic;
@@ -182,20 +182,20 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
 }
 
 /* Section Titles */
-.section-title {
+.konzultace-zdarma-page .section-title {
   font-size:1.8rem;
   margin:0 0 .6rem;
   text-align:left;
   color: var(--color-primary);
 }
-.section-subtitle {
+.konzultace-zdarma-page .section-subtitle {
   font-size:1.25rem;
   margin:.5rem 0 1.5rem;
   text-align:left;
   font-weight:600;
   color: var(--color-text);
 }
-.description {
+.konzultace-zdarma-page .description {
   font-size:.95rem;
   line-height:1.65;
   margin:.8rem 0;
@@ -203,7 +203,7 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
 }
 
 /* Value Note */
-.value-note {
+.konzultace-zdarma-page .value-note {
   margin:0;
   padding:1.2rem 1.4rem;
   background: linear-gradient(135deg, #e8fdf0 0%, #d4f4ff 100%);
@@ -211,27 +211,27 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
   border:2px solid var(--color-accent);
   max-width:100%;
 }
-.value-note p {
+.konzultace-zdarma-page .value-note p {
   margin:0 0 .5rem;
   font-size:.9rem;
   line-height:1.5;
 }
-.value-note p:last-child {
+.konzultace-zdarma-page .value-note p:last-child {
   margin-bottom:0;
 }
-.urgency {
+.konzultace-zdarma-page .urgency {
   font-weight:700;
   color: var(--color-primary);
 }
 
-.benefits-mini {
+.konzultace-zdarma-page .benefits-mini {
   display:flex;
   gap:1rem;
   justify-content:center;
   flex-wrap:wrap;
   margin:1.6rem 0 2rem;
 }
-.benefit-item {
+.konzultace-zdarma-page .benefit-item {
   display:flex;
   align-items:center;
   gap:.5rem;
@@ -245,7 +245,7 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
 }
 
 /* CTA Button */
-.cta-primary {
+.konzultace-zdarma-page .cta-primary {
   cursor:pointer;
   font-family:inherit;
   font-weight:700;
@@ -262,13 +262,13 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
   transition:.35s cubic-bezier(.4,0,.2,1);
   margin:1.5rem 0 1rem;
 }
-.cta-primary:hover {
+.konzultace-zdarma-page .cta-primary:hover {
   box-shadow: var(--shadow-hover);
   transform: translateY(-3px);
 }
 
 /* How it works */
-.how-it-works {
+.konzultace-zdarma-page .how-it-works {
   text-align:left;
   background:#fff;
   border:1px solid var(--color-border);
@@ -276,38 +276,38 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
   padding:1.5rem;
   box-shadow: var(--shadow-soft);
 }
-.how-it-works h3 {
+.konzultace-zdarma-page .how-it-works h3 {
   margin-top:0;
   margin-bottom:1rem;
   color: var(--color-primary);
   font-size:1.1rem;
 }
-.how-it-works ol {
+.konzultace-zdarma-page .how-it-works ol {
   margin:0;
   padding-left:1.6rem;
 }
-.how-it-works li {
+.konzultace-zdarma-page .how-it-works li {
   margin-bottom:1rem;
   line-height:1.6;
   font-size:.95rem;
 }
-.how-it-works li:last-child {
+.konzultace-zdarma-page .how-it-works li:last-child {
   margin-bottom:0;
 }
 
 /* Testimonials Compact */
-.testimonials-compact {
+.konzultace-zdarma-page .testimonials-compact {
   margin-top:3rem;
   max-width:1200px;
   margin-left:auto;
   margin-right:auto;
 }
-.testimonial-grid {
+.konzultace-zdarma-page .testimonial-grid {
   display:grid;
   gap:1.4rem;
   grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
 }
-.testimonial-card {
+.konzultace-zdarma-page .testimonial-card {
   background:#fff;
   border:1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -315,256 +315,172 @@ h3 { font-size:1.2rem; margin:1.4rem 0 .6rem; }
   box-shadow: var(--shadow-soft);
   transition:.3s;
 }
-.testimonial-card:hover {
+.konzultace-zdarma-page .testimonial-card:hover {
   transform:translateY(-3px);
   box-shadow: var(--shadow-hover);
 }
-.quote {
+.konzultace-zdarma-page .quote {
   font-style:italic;
   line-height:1.55;
   margin:0 0 1rem;
   color: var(--color-text);
 }
-.author {
+.konzultace-zdarma-page .author {
   display:flex;
   justify-content:space-between;
   align-items:center;
   font-size:.9rem;
 }
-.author strong {
+.konzultace-zdarma-page .author strong {
   color: var(--color-primary);
 }
-.stars {
+.konzultace-zdarma-page .stars {
   font-size:.75rem;
 }
 
-
-
 /* Responsive */
 @media (max-width: 900px) {
-  .hero-grid {
+  .konzultace-zdarma-page .hero-grid {
     grid-template-columns: 1fr;
     gap:2rem;
   }
-  .hero-image {
+  .konzultace-zdarma-page .hero-image {
     position:relative;
     top:0;
   }
-  .hero-content {
+  .konzultace-zdarma-page .hero-content {
     text-align:center;
   }
-  .hero-content h1,
-  .hero-content .subtitle,
-  .hero-content .lead,
-  .hero-content .intro-text,
-  .hero-content .description {
+  .konzultace-zdarma-page .hero-content h1,
+  .konzultace-zdarma-page .hero-content .subtitle,
+  .konzultace-zdarma-page .hero-content .lead,
+  .konzultace-zdarma-page .hero-content .intro-text,
+  .konzultace-zdarma-page .hero-content .description {
     text-align:center;
   }
-  .hero-content .lead,
-  .hero-content .intro-text,
-  .hero-content .description {
+  .konzultace-zdarma-page .hero-content .lead,
+  .konzultace-zdarma-page .hero-content .intro-text,
+  .konzultace-zdarma-page .hero-content .description {
     margin-left:auto;
     margin-right:auto;
   }
-  .info-grid {
+  .konzultace-zdarma-page .info-grid {
     grid-template-columns: 1fr;
     gap:1.5rem;
   }
-  .section-title,
-  .section-subtitle {
+  .konzultace-zdarma-page .section-title,
+  .konzultace-zdarma-page .section-subtitle {
     text-align:center;
   }
-  .description {
+  .konzultace-zdarma-page .description {
     text-align:center;
   }
-  .info-box .description {
+  .konzultace-zdarma-page .info-box .description {
     text-align:center;
   }
 }
 
 @media (max-width: 600px) {
-  .container { padding:1.8rem 1rem; }
-  .hero-compact { padding:1.8rem 1.3rem 2rem; }
-  .cta-primary { font-size:1rem; padding:.95rem 1.5rem; }
-  .how-it-works { padding:1.2rem 1.3rem; }
-  .testimonial-grid { grid-template-columns:1fr; }
+  .konzultace-zdarma-page .container { padding:1.8rem 1rem; }
+  .konzultace-zdarma-page .hero-compact { padding:1.8rem 1.3rem 2rem; }
+  .konzultace-zdarma-page .cta-primary { font-size:1rem; padding:.95rem 1.5rem; }
+  .konzultace-zdarma-page .how-it-works { padding:1.2rem 1.3rem; }
+  .konzultace-zdarma-page .testimonial-grid { grid-template-columns:1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * { animation:none !important; transition:none !important; }
+  .konzultace-zdarma-page * { animation:none !important; transition:none !important; }
 }
-
-/* Header */
-.site-header { position:sticky; top:0; backdrop-filter: blur(14px); background:var(--glass-bg); border-bottom:1px solid var(--glass-border); display:flex; align-items:center; gap:2rem; padding:.9rem 2.2rem; z-index:50; }
-.logo { font-weight:700; font-size:1.3rem; letter-spacing:.5px; display:flex; align-items:center; gap:.25rem; }
-.logo span { color: var(--color-accent); }
-.main-nav { display:flex; gap:1.2rem; }
-.main-nav a { text-decoration:none; font-weight:500; color: var(--color-muted); padding:.55rem .9rem; border-radius: var(--radius-sm); transition:.25s; }
-.main-nav a:hover { background: var(--color-primary); color:#fff; }
-.nav-cta { margin-left:auto; }
-
-/* Buttons */
-button { cursor:pointer; font-family:inherit; font-weight:600; border:none; border-radius: var(--radius-md); padding:.9rem 1.4rem; font-size:.95rem; display:inline-flex; align-items:center; gap:.6rem; position:relative; transition:.35s cubic-bezier(.4,0,.2,1); }
-button.primary { background: linear-gradient(135deg,var(--color-primary) 0%, var(--color-secondary)100%); color:#fff; box-shadow: var(--shadow-soft); }
-button.primary:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
-button.secondary { background: var(--color-accent-soft); color: var(--color-text); box-shadow: var(--shadow-soft); }
-button.secondary:hover { background: #d9f8e4; }
-button.large { font-size:1.2rem; padding:1.1rem 2.4rem; }
-
-/* Hero */
-.hero { display:grid; grid-template-columns: minmax(320px,680px) minmax(240px,420px); gap:3rem; padding:5.5rem clamp(1.2rem,4vw,3rem) 4rem; position:relative; }
-.hero:before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 70% 30%,rgba(99,102,241,.25),transparent 60%); pointer-events:none; }
-.hero-content { z-index:2; }
-.hero-actions { display:flex; gap:1rem; margin:2rem 0 1.3rem; flex-wrap:wrap; }
-.badges { display:flex; gap:.8rem; flex-wrap:wrap; margin-top:1.6rem; }
-.badge { display:flex; align-items:center; gap:.45rem; padding:.5rem .85rem; background:#fff; border:1px solid var(--color-border); border-radius: var(--radius-lg); font-size:.8rem; font-weight:600; letter-spacing:.5px; box-shadow: var(--shadow-soft); }
-.hero-art { position:relative; min-height:420px; }
-.floating-card { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background: var(--glass-bg); backdrop-filter: blur(10px); border:1px solid var(--glass-border); border-radius: var(--radius-lg); padding:1rem 1.2rem; display:flex; flex-direction:column; align-items:center; gap:.5rem; font-size:.75rem; font-weight:600; box-shadow: var(--shadow-soft); animation: float 8s ease-in-out infinite; }
-.floating-card svg { filter: drop-shadow(0 4px 8px rgba(0,0,0,.15)); }
-.fc1 { transform: translate(-120%,-120%); animation-delay:0s; }
-.fc2 { transform: translate(-10%,-10%); animation-delay:2s; }
-.fc3 { transform: translate(-40%,60%); animation-delay:4s; }
-@keyframes float { 0%,100% { translate:0 0; } 50% { translate:0 -14px; } }
-
-/* Cards Grid */
-.cards-grid { padding:4rem clamp(1.2rem,4vw,3rem); }
-.cards-grid .grid { display:grid; gap:1.8rem; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); }
-.card { background:#fff; border:1px solid var(--color-border); border-radius: var(--radius-lg); padding:1.4rem 1.4rem 1.7rem; display:flex; flex-direction:column; gap:.4rem; position:relative; overflow:hidden; box-shadow: var(--shadow-soft); transition:.35s; }
-.card:before { content:""; position:absolute; inset:0; background:linear-gradient(140deg,rgba(99,102,241,.08),rgba(37,99,235,.06)); opacity:0; transition:.35s; }
-.card:hover { transform:translateY(-4px); box-shadow: var(--shadow-hover); }
-.card:hover:before { opacity:1; }
-.icon-circle { width:46px; height:46px; border-radius:50%; background: var(--color-accent-soft); display:grid; place-items:center; margin-bottom:.4rem; }
-
-/* Process / Timeline */
-.process { padding:4.5rem clamp(1.2rem,4vw,3rem); background:linear-gradient(180deg,#f9fafb,#eef6ff); }
-.timeline { list-style:none; margin:0 0 3rem; padding:0; display:grid; gap:1.2rem; max-width:780px; }
-.timeline li { display:grid; grid-template-columns:48px 1fr; gap:1rem; background:#fff; border:1px solid var(--color-border); padding:1rem 1.2rem; border-radius: var(--radius-md); box-shadow: var(--shadow-soft); position:relative; }
-.step-index { width:48px; height:48px; display:grid; place-items:center; background:linear-gradient(135deg,var(--color-secondary),var(--color-primary)); color:#fff; font-weight:700; font-size:1.2rem; border-radius: var(--radius-md); box-shadow:0 4px 10px rgba(0,0,0,.15); }
-.center { text-align:center; }
-
-/* Testimonials */
-.testimonials { padding:4rem clamp(1.2rem,4vw,3rem); }
-.carousel { display:grid; gap:1.6rem; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
-.t-card { background:#fff; border:1px solid var(--color-border); border-radius: var(--radius-lg); padding:1.4rem 1.5rem 1.6rem; position:relative; box-shadow: var(--shadow-soft); }
-.t-card .quote { font-style:italic; line-height:1.5; }
-.t-card .person { margin-top:1rem; font-weight:600; color: var(--color-primary); }
-
-/* Lead Form */
-.lead-form-section { padding:4.5rem clamp(1.2rem,4vw,3rem); background:linear-gradient(160deg,#eef6ff,#f8fdfb); }
-.lead-form { max-width:640px; display:grid; gap:1.2rem; }
-.form-row { display:flex; flex-direction:column; gap:.5rem; }
-.form-row label { font-weight:600; font-size:.85rem; letter-spacing:.5px; text-transform:uppercase; color: var(--color-muted); }
-.form-row input, .form-row textarea { padding:.85rem 1rem; border-radius: var(--radius-md); border:1px solid var(--color-border); background:#fff; font:inherit; resize:vertical; }
-.form-row input:focus, .form-row textarea:focus { outline:2px solid var(--color-primary-glow); outline-offset:2px; }
-.form-actions { display:flex; gap:1rem; flex-wrap:wrap; margin-top:.5rem; }
-.flash { margin:1rem 0 1.6rem; background: var(--color-accent); color:#fff; padding:.85rem 1.2rem; border-radius: var(--radius-md); font-weight:600; box-shadow: var(--shadow-soft); }
-
-
-
-/* Utilities */
-@media (max-width: 980px) {
-  .hero { grid-template-columns:1fr; padding:4.5rem 1.4rem 3rem; }
-  .hero-art { order:-1; min-height:280px; margin-bottom:1rem; }
-  .floating-card { font-size:.65rem; }
-  .main-nav { display:none; }
 }
+    </style>
 
-@media (prefers-reduced-motion: reduce) {
-  .floating-card { animation:none; }
-  button { transition:none; }
-}
-	</style>
+    <div class="konzultace-zdarma-page">
+        <main class="container">
+            <section class="hero-compact">
+                <div class="logo">Shakee<span class="accent">•</span>
+    </div>
+                
+                <div class="hero-grid">
+                    <div class="hero-image">
+                        <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&amp;auto=format&amp;fit=crop&amp;q=80" alt="Zdravá strava a životní styl">
+                    </div>
+                    
+                    <div class="hero-content">
+                        <h1>Konzultace <span class="gradient-text">zdarma</span>
+    </h1>
+                        <p class="subtitle">jen po omezenou dobu</p>
+                        <p class="lead">Dopřejte si chvíli jen pro sebe a zjistěte, jak <strong>malá změna může přinést velký rozdíl</strong>.</p>
+                        <p class="intro-text">V rámci nově spuštěného projektu <strong>Shakee.cz</strong> nabízíme po omezenou dobu <strong>osobní konzultace zdarma</strong>, které vám pomohou lépe porozumět vašemu tělu, životnímu stylu nebo pleti.</p>
+                
+                        <div class="highlight-box">
+                            <p class="highlight-text"><strong>Tato možnost je dostupná pouze nyní</strong> v rámci zahájení projektu a do vyčerpání kapacity našich koučů.</p>
+                            <p class="tagline">Nezávazně, přátelsky a s cílem pomoct vám udělat první krok k lepšímu já.</p>
+                        </div>
+                        
+                        <button class="cta-primary" onclick="window.location.href='https://calendly.com/dzejhou/vstupni-konzultace-zdarma-15-minut?month=2025-11'">
+                            <svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+                            Rezervovat konzultaci zdarma
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h2 class="section-title">Osobní konzultace výživy &amp; životního stylu</h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <p class="description">Získejte jasný přehled o tom, jak na tom opravdu jste – se <strong>stravou, pitným režimem, energií i regenerací</strong>.</p>
+                            <p class="description">Pomocí krátkého dotazníku (5–10 minut) uděláme <strong>komplexní analýzu</strong> vašeho životního stylu a během krátké konzultace (10–15 minut) vám vysvětlíme, co děláte správně a kde se dá zlepšit.</p>
+                        </div>
+                        
+                        <div class="how-it-works">
+                            <h3>Jak to probíhá</h3>
+                            <ol>
+                                <li>
+    <strong>Vyplníte jednoduchý dotazník</strong> (získáte odkaz při rezervaci termínu)</li>
+                                <li>
+    <strong>Spojíme se spolu</strong> telefonicky, přes Messenger, WhatsApp, Telegram nebo Google Meet</li>
+                                <li>
+    <strong>Probereme váš režim</strong>, cíle a doporučíme konkrétní kroky ke zlepšení</li>
+                                <li>
+    <strong>Připravíme vám individuální Fit plán na míru</strong> – kombinaci výživy, návyků a doporučení</li>
+                            </ol>
+                        </div>
+                    </div>
 
+                    <div class="value-note">
+                        <p><strong>Běžná hodnota této konzultace je 500 Kč</strong>, ale v rámci spuštění Shakee.cz ji nabízíme <strong>zcela zdarma</strong> – do vyčerpání kapacity.</p>
+                        <p class="urgency">Neváhejte si svůj termín rezervovat včas.</p>
+                    </div>
+                </div>
+            </section>
 
-	<main class="container">
-		<section class="hero-compact">
-			<div class="logo">Shakee<span class="accent">•</span>
-</div>
-			
-			<div class="hero-grid">
-				<div class="hero-image">
-					<img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&amp;auto=format&amp;fit=crop&amp;q=80" alt="Zdravá strava a životní styl">
-				</div>
-				
-				<div class="hero-content">
-					<h1>Konzultace <span class="gradient-text">zdarma</span>
-</h1>
-					<p class="subtitle">jen po omezenou dobu</p>
-					<p class="lead">Dopřejte si chvíli jen pro sebe a zjistěte, jak <strong>malá změna může přinést velký rozdíl</strong>.</p>
-					<p class="intro-text">V rámci nově spuštěného projektu <strong>Shakee.cz</strong> nabízíme po omezenou dobu <strong>osobní konzultace zdarma</strong>, které vám pomohou lépe porozumět vašemu tělu, životnímu stylu nebo pleti.</p>
-			
-					<div class="highlight-box">
-						<p class="highlight-text"><strong>Tato možnost je dostupná pouze nyní</strong> v rámci zahájení projektu a do vyčerpání kapacity našich koučů.</p>
-						<p class="tagline">Nezávazně, přátelsky a s cílem pomoct vám udělat první krok k lepšímu já.</p>
-					</div>
-					
-					<button class="cta-primary" onclick="window.location.href='https://calendly.com/dzejhou/vstupni-konzultace-zdarma-15-minut?month=2025-11'">
-						<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
-						Rezervovat konzultaci zdarma
-					</button>
-				</div>
-			</div>
-			
-			<div class="info-section">
-				<h2 class="section-title">Osobní konzultace výživy &amp; životního stylu</h2>
-				
-				<div class="info-grid">
-					<div class="info-box">
-						<p class="description">Získejte jasný přehled o tom, jak na tom opravdu jste – se <strong>stravou, pitným režimem, energií i regenerací</strong>.</p>
-						<p class="description">Pomocí krátkého dotazníku (5–10 minut) uděláme <strong>komplexní analýzu</strong> vašeho životního stylu a během krátké konzultace (10–15 minut) vám vysvětlíme, co děláte správně a kde se dá zlepšit.</p>
-					</div>
-					
-					<div class="how-it-works">
-						<h3>Jak to probíhá</h3>
-						<ol>
-							<li>
-<strong>Vyplníte jednoduchý dotazník</strong> (získáte odkaz při rezervaci termínu)</li>
-							<li>
-<strong>Spojíme se spolu</strong> telefonicky, přes Messenger, WhatsApp, Telegram nebo Google Meet</li>
-							<li>
-<strong>Probereme váš režim</strong>, cíle a doporučíme konkrétní kroky ke zlepšení</li>
-							<li>
-<strong>Připravíme vám individuální Fit plán na míru</strong> – kombinaci výživy, návyků a doporučení</li>
-						</ol>
-					</div>
-				</div>
-
-				<div class="value-note">
-					<p><strong>Běžná hodnota této konzultace je 500 Kč</strong>, ale v rámci spuštění Shakee.cz ji nabízíme <strong>zcela zdarma</strong> – do vyčerpání kapacity.</p>
-					<p class="urgency">Neváhejte si svůj termín rezervovat včas.</p>
-				</div>
-			</div>
-		</section>
-
-		<section class="testimonials-compact">
-			<h2>Co říkají klienti</h2>
-			<div class="testimonial-grid">
-				<div class="testimonial-card">
-					<p class="quote">„Konzultace zdarma mě nakopla – jasně, srozumitelně, žádné řeči okolo. Díky za plán!"</p>
-					<div class="author">
-						<strong>Klára, 41</strong>
-						<span class="stars">⭐⭐⭐⭐⭐</span>
-					</div>
-				</div>
-				<div class="testimonial-card">
-					<p class="quote">„Super přístup a žádný tlak na produkty. Fakt mě to motivovalo."</p>
-					<div class="author">
-						<strong>Tomáš, 29</strong>
-						<span class="stars">⭐⭐⭐⭐⭐</span>
-					</div>
-				</div>
-				<div class="testimonial-card">
-					<p class="quote">„Za 15 minut jasné vysvětlení chyb, cítím změnu v energii už po týdnu."</p>
-					<div class="author">
-						<strong>Jana, 34</strong>
-						<span class="stars">⭐⭐⭐⭐⭐</span>
-					</div>
-				</div>
-			</div>
-		</section>
-	</main>
-
-	
-
-
+            <section class="testimonials-compact">
+                <h2>Co říkají klienti</h2>
+                <div class="testimonial-grid">
+                    <div class="testimonial-card">
+                        <p class="quote">„Konzultace zdarma mě nakopla – jasně, srozumitelně, žádné řeči okolo. Díky za plán!"</p>
+                        <div class="author">
+                            <strong>Klára, 41</strong>
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="quote">„Super přístup a žádný tlak na produkty. Fakt mě to motivovalo."</p>
+                        <div class="author">
+                            <strong>Tomáš, 29</strong>
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="quote">„Za 15 minut jasné vysvětlení chyb, cítím změnu v energii už po týdnu."</p>
+                        <div class="author">
+                            <strong>Jana, 34</strong>
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 </body>
